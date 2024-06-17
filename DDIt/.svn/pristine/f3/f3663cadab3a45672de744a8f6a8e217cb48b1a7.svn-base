@@ -1,0 +1,17 @@
+package kr.or.ddit.Users.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.UsersVO;
+
+@Mapper
+public interface UsersDAO {
+
+	public UsersVO selectUsersForAuth(String username);
+	public List<UsersVO> selectUsersAll();
+	public UsersVO selectUsers(String username);
+	public int insertUsers(UsersVO user);
+	public int updateUsersPw(UsersVO vo);
+}

@@ -1,0 +1,58 @@
+package kr.or.ddit.item.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.vo.ItemPurchaseVO;
+import kr.or.ddit.vo.ItemVO;
+
+@Mapper
+public interface ItemPurchaseDAO {
+	/**
+	 * 아이템 구매
+	 * @param itemPurchase
+	 * @return 등록된 레코드 수
+	 */
+	public int insertItemPurchase(ItemPurchaseVO itemPurchase);
+	
+	/**
+	 * 구매 아이템 목록 조회
+	 * @param userId, paging 
+	 * @return 존재하지 않으면, list.size()==0
+	 */
+	public List<ItemPurchaseVO> selectItemPurchaseList(@Param("userId") String userId);
+
+	
+	public int SelectTotalRecord();
+	
+	/**
+	 * 보유 아이템 조회
+	 * @param itemPurchaseCode
+	 * @return 존재하지 않으면 null 반환
+	 */
+	public List<ItemPurchaseVO> selectItemStorage(@Param("userId") String userId);
+	
+	/**
+	 * 보유 아이템 상세 조회
+	 * @param itemPurchaseCode, userId
+	 * @return 존재하지 않으면 null 반환
+	 */
+	public ItemPurchaseVO selectItem(@Param("itemPurchaseCode") String itemPurchaseCode, @Param("userId") String userId);
+	
+	
+	/**
+	 * 구매 아이템 즐겨찾기 수정
+	 * @param itemPurchase
+	 * @return 수정된 레코드 수
+	 */
+	public int updateItemPurchase(ItemPurchaseVO itemPurchase);
+	
+	/**
+	 * 구매 아이템 숨김 수정
+	 * @param itemPurchaseCode
+	 * @return 삭제된 레코드 수
+	 */
+	public int deleteItemPurchase(@Param("itemPurchaseCode") String itemPurchaseCode);
+}

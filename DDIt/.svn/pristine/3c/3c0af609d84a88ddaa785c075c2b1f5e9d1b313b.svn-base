@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemPurchaseDAO">
+<resultMap type="ItemPurchaseVO" id="itemPurchaseMap" autoMapping="true">
+	<association property="item" javaType="ItemVO" autoMapping="true"></association>
+</resultMap>
+
+<insert id="insertItemPurchase" parameterType="ItemPurchaseVO">
+	<selectKey order="BEFORE" resultType="string" keyProperty="itemPurchaseCode">
+		SELECT 'I_PUR' || 
+		LPAD(NVL(TO_NUMBER(SUBSTR(MAX(ITEM_PURCHASE_CODE), 6)), 0)+1, 5,'0')
+		FROM ITEM_PURCHASE
+	</selectKey>
+	INSERT INTO ITEM_PURCHASE (
+		ITEM_PURCHASE_CODE,
+		USER_ID,
+		ITEM_CODE,
+		ITEM_PURCHASE_DT,
+		ITEM_BKMK,
+		ITEM_HIDE
+	) SELECT 
+		#{itemPurchaseCode},
+		#{userId},
+		#{itemCode},
+		TO_DATE(SYSDATE, 'yyyy/mm/dd hh24:mi:ss'),
+		'N',
+		'N'
+	FROM DUAL
+    WHERE NOT EXISTS
+	    (
+	    SELECT 1
+	    FROM ITEM_PURCHASE
+	    WHERE ITEM_CODE = #{itemCode}
+	    )
+</insert>
+
+<select id="selectItemStorage" resultMap="itemPurchaseMap">
+	SELECT
+	    ITEM_PURCHASE_CODE,
+	    USER_ID,
+	    ITEM_PURCHASE.ITEM_CODE,
+	    ITEM_PURCHASE_DT,
+	    ITEM_BKMK,
+	    ITEM_HIDE,
+        ITEM.ITEM_NM,
+        ITEM.ITEM_EFFECT,
+        ITEM.ITEM_CTGRY
+	FROM
+	    ITEM_PURCHASE
+    INNER JOIN ITEM ON (ITEM_PURCHASE.ITEM_CODE = ITEM.ITEM_CODE)
+	WHERE ITEM_PURCHASE.USER_ID=#{userId} AND ITEM_HIDE = 'N'
+	UNION
+	SELECT
+	    ITEM_GIFT_CODE AS ITEM_PURCHASE_CODE,
+	    ADDRSE_USER_ID AS USER_ID,
+	    ITEM_GIFT.ITEM_CODE,
+	    ITEM_GIFT_DT AS ITEM_PURCHASE_DT,
+	    ITEM_BKMK,
+	    ITEM_HIDE,
+        ITEM.ITEM_NM,
+        ITEM.ITEM_EFFECT,
+        ITEM.ITEM_CTGRY
+	FROM
+	    ITEM_GIFT
+    INNER JOIN ITEM ON (ITEM_GIFT.ITEM_CODE = ITEM.ITEM_CODE)
+	WHERE ITEM_GIFT.ADDRSE_USER_ID=#{userId} AND ITEM_HIDE = 'N'
+	ORDER BY ITEM_PURCHASE_DT, ITEM_PURCHASE_CODE
+</select>	
+
+<update id="updateItemPurchaseBkmk" parameterType="ItemPurchaseVO">
+	<selectKey order="BEFORE" resultType="string" keyProperty="tableName">
+		SELECT 
+		    ITEM_PURCHASE_CODE,
+		    ITEM_CODE,
+		    ITEM_BKMK,
+		    ITEM_HIDE,
+	    	DECODE(SUBSTR(ITEM_PURCHASE_CODE,1,5), 'I_PUR', 'ITEM_PURCHASE','ITEM_GIFT') AS TTE
+	    FROM ITEM_PURCHASE
+	    WHERE USER_ID = #{userId}
+	    AND ITEM_CODE = #{itemCode}
+	    UNION ALL
+		    SELECT
+		    ITEM_GIFT_CODE AS ITEM_PURCHASE_CODE,
+		    ITEM_CODE,
+		    ITEM_BKMK,
+		    ITEM_HIDE,
+	    	DECODE(SUBSTR(ITEM_GIFT_CODE,1,5), 'I_PUR', 'ITEM_PURCHASE','ITEM_GIFT') AS TTE
+	    FROM ITEM_GIFT
+	    WHERE ADDRSE_USER_ID = #{userId}
+	    AND ITEM_CODE = #{itemCode}
+	</selectKey>
+	UPDATE #{tableName}
+    SET ITEM_HIDE = DECODE(ITEM_HIDE, 'N', 'Y', 'N'),
+        ITEM_BKMK = 'N'
+    WHERE USER_ID = #{userId}
+    AND ITEM_CODE = #{itemCode}
+</update>
+
+</mapper>

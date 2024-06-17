@@ -1,0 +1,322 @@
+// 대댓글 좌측 빈 공간을 위한 스타일 변수
+const margins = [0, 40, 80, 160];
+// 댓글 리스트 출력을 위한 전역변수들
+var answer = document.querySelector("#answer");
+var snsFeedNo = "";
+// 각 메소드에서 유동적으로 url 수정하기 위해 전역으로 선언.
+var url = "";
+var myDiv = "";
+var thisAnswer = "";
+var form = "";
+var child = "";
+var lengths = "";
+
+/* 로그인한 유저 아이디값 */
+
+/* 리스트 출력 ajax 메소드 */
+function answerList(thisAnswer) {
+    console.log("리스트 : ", thisAnswer);
+    thisAnswer.innerHTML = '';
+    $.ajax ({
+        url : url
+        ,method : "get"
+        ,dataType : "json"
+        ,data : snsFeedNo
+        ,success:function(res){
+            console.log("댓글정보: ", res)
+                for(let i=0; i<res.length; i++) {
+                    /*console.log("상위번호 : ["+ res[i].answerTopNo +"] 댓글 : " + res[i].answerCn); */
+                    const marginStyle = `margin-left: ${margins[res[i].answerDepth]}px;`;
+                        thisAnswer.innerHTML +=
+                            `
+                               <div class="d-flex mt-3 replyL" style="${marginStyle}">
+                                    <div class="flex-1 ms-2 fs-10">
+                                        <div class="dropdown font-sans-serif btn-reveal-trigger">
+                                            <span class="fw-semi-bold" style="color: blue;">${res[i].userId}</span><button class="btn btn-link text-600 btn-sm dropdown-toggle dropdown-caret-none btn-reveal" type="button" id="post-album-action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis-h fa-w-16 fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis-h" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path></svg></button>
+                                            <div class="dropdown-menu dropdown-menu-end py-3" aria-labelledby="post-album-action" style="">
+                                            <a class="dropdown-item" onclick="replyUpdateForm(this)"
+                                                data-user="${userId}" data-no="${res[i].answerNo}" data-answer-user="${res[i].userId}" data-cn="${res[i].answerCn}" data-num="${res[i].snsFeedNo}" href="#!">수정</a>
+                                            <a class="dropdown-item" onclick="replyDelete(this)" data-user="${userId}" data-no="${res[i].answerNo}" data-answer-user="${res[i].userId}" href="#!">삭제</a>
+                                            <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">신고</a>
+                                        </div>
+                                    </div>
+                                        <p class="replyC mb-1 bg-200 rounded-3 p-2">${res[i].answerCn}</p>
+                                        <div id="mydiv" class="px-2"><a onclick="replyForm(this)" data-num="${res[i].answerNo}" data-top="${res[i].answerTopNo}" data-depth="${res[i].answerDepth}" class="reply" href="#!">대댓글</a> • ${res[i].answerWritingTime} </div>
+                                        <div id="replyForm"></div>
+                                    </div>
+                                </div>
+                            `;
+                }
+            }
+    })
+}
+
+
+/* 댓글 클릭 시 해당 피드 댓글리스트 출력 */
+$(".que").click(function() {
+    thisAnswer = $(this).closest("#Accordion_wrap").find("#answer")[0];
+
+    snsFeedNo = $(this).attr("value");
+    url = `${cPath}/sns/${snsFeedNo}`;
+    myDiv = document.getElementById("#myDiv");
+
+    answerList(thisAnswer);
+
+    $(this).next(".anw").stop().slideToggle(300);
+    $(this).toggleClass('on').siblings().removeClass('on');
+    $(this).next(".anw").siblings(".anw").slideUp(300); // 1개씩 펼치기
+});
+
+
+/* 댓글 작성 이벤트 */
+function answerInsert(answer) {
+    let feedNo = answer.dataset.num;
+    let answerTopNo = answer.dataset.top;
+    let answerCn = answer.previousElementSibling.value;
+    let answerDepth = parseInt(0);
+    /* 테스트 유저 아이디 입력 ( 추후 로그인한 회원 아이디로 기입 되야함. ) */
+    let url = `${cPath}/sns/answerInsert.do`;
+    let data = {
+        snsFeedNo : feedNo,
+        answerTopNo : answerTopNo,
+        userId : userId,
+        answerCn : answerCn,
+        answerDepth : answerDepth
+    }
+    console.log("댓글 내용 :" ,answerCn);
+    console.log("피드 번호 : " ,feedNo);
+    console.log("댓글 뎁스 : " ,answerDepth);
+    $.ajax({
+        url : url,
+        method : "POST",
+        dataType : "JSON",
+        data : JSON.stringify(data),
+        contentType:"application/json",
+        success:function(resp) {
+            if(resp.result="ok") {
+                alert("성공");
+                answerList(thisAnswer);
+            }else {
+                alert("실패");
+            }
+        }
+    })
+}
+
+
+/* 대댓글 작성폼 */
+function replyForm(aTag){
+    // 대댓글 달 댓글번호 가져오기.
+    let answerTopNo = aTag.dataset.top;
+    let answerNo = aTag.dataset.num;
+    // 대댓글 달 댓글의 뎁스 가져오기.
+    let answerDepth = aTag.dataset.depth;
+
+    console.log("answerNo : ",answerNo);
+    console.log("depth : " , answerDepth);
+
+	// 대댓글 부모요소 선택
+    let parentElements = aTag.parentElement;
+    // 대댓글 부모의 형제요소 선택
+    let nextElements = aTag.parentElement.nextElementSibling;
+	
+    console.log(nextElements);
+	console.log(parentElements);
+	
+    // replyForm에 대댓글 폼 넣기.
+	nextElements.innerHTML = 
+    `
+		<div id="reply">
+	        <div class="d-flex align-items-center border-top border-200 pt-3">
+	            <input id="replyCn" class="form-control rounded-pill ms-2 fs-10" type="text" name="answerCn" placeholder="댓글 작성 ...">
+	        </div>
+            <button id="replyWrite" onclick="replyWrite(this)" data-num="${answerNo}" data-top="${answerTopNo}" data-depth="${answerDepth}" class="btn btn-primary btn-sm px-4 px-sm-3" style="margin: 13px; margin-left: 45px; height:28px;">작 성</button>
+            <button class="btn btn-danger btn-sm px-4 px-sm-3" onclick="replyClose(this)" style="margin: 13px; margin-left: 1px; height:28px;">취 소</button>
+		</div>
+    `;
+}
+
+/* 대댓글 작성 취소 이벤트 */
+function replyClose(reply) {
+    // 대댓글 폼 가져오기
+	let replyForm = reply.parentElement;
+	
+	console.log(replyForm);
+	
+	replyForm.innerHTML = '';
+}
+
+/*대댓글 작성 비동기 처리 */
+function replyWrite(replyBtn) {
+	// 댓글의 answerNo와 answerDepth 정보 가져오기
+    
+    let answerTopNo = replyBtn.dataset.num;
+    console.log("댓글의 depth : ", replyBtn.dataset.depth);
+	let answerDepth = parseInt(replyBtn.dataset.depth)+1;
+    let replyParent = replyBtn.closest("#reply");
+    let replyCn = replyParent.querySelector("#replyCn").value;
+
+    console.log("피드번호 feedNo : ", snsFeedNo);
+    console.log("대댓글 answerCn : ", replyCn);
+	console.log("대댓글 answerTopNo : ", answerTopNo);
+	console.log("대댓글 answerDepth + 1 : ", answerDepth);
+	
+    let url = `${cPath}/sns/answerInsert.do`;
+    let data = {
+        snsFeedNo : snsFeedNo,
+        answerTopNo : answerTopNo,
+        userId : userId,
+        answerCn : replyCn,
+        answerDepth : answerDepth
+    }
+    console.log("댓글 내용 : " ,replyCn);
+    console.log("피드 번호 : " ,snsFeedNo);
+
+    $.ajax({
+        url : url,
+        method : "POST",
+        dataType : "JSON",
+        data : JSON.stringify(data),
+        contentType:"application/json",
+        success:function(resp) {
+            if(resp.result="ok") {
+                alert("성공");
+                answerList(thisAnswer);
+            }else {
+                alert("실패");
+            }
+        }
+    })
+}
+/* 댓글 수정 폼 */
+function replyUpdateForm(reply) {
+    let replyC = $(reply);
+    console.log("reply : ", replyC);
+    let replyL = replyC.closest(".replyL").find(".replyC");
+    console.log("replyL : ", replyL);
+    
+    let replyFormElement = reply.closest(".replyL");
+    child = replyFormElement.children;
+    lengths = replyFormElement.children.length;
+
+    form = '';
+
+    let replyCn = reply.dataset.cn;
+    let userId = reply.dataset.user;
+    let replyUser = reply.dataset.answerUser;
+    let replyNo = reply.dataset.no;
+    let feedNo = reply.dataset.num;
+
+    console.log("피드 번호 : ", feedNo);
+    console.log("수정 전 댓글내용 : ", replyCn);
+    console.log("수정 하는 사용자 아이디 : ", userId);
+    console.log("댓글 작성자 : ", replyUser);
+    console.log("수정 할 댓글 번호 : ", replyNo);
+
+    for(let i=0; i<lengths; i++) {
+        form += child[i].outerHTML;
+    }
+
+    if(userId == replyUser) {
+        console.log("form : ", form);
+        console.log("여기까지.");
+        replyFormElement.innerHTML =
+        `   
+                <input class="replyUpCn form-control rounded-pill ms-2 fs-10" type="text" value="${replyCn}">
+                <button onclick="replyUpdate(this)" class="btn btn-primary btn-sm px-4 px-sm-2" style="margin-right: 20px; margin-left: 20px; width: 80px; height: 30px;"
+                data-num="" data-user="${userId }" data-replyuser="${replyUser}" data-replyno="${replyNo}" data-feedno="${feedNo}" >수 정</button>
+                <button onclick="replyUpdateRevert(this)" class="btn btn-danger btn-sm px-4 px-sm-2" style="width: 80px; height: 30px;">취 소</button>
+        `
+    }else {
+        
+    }
+}
+
+/* 댓글 수정 이벤트 취소 */
+function replyUpdateRevert(reply) {
+    let replyUpdateRevert = reply.closest(".replyL");
+
+    replyUpdateRevert.innerHTML = '';
+    replyUpdateRevert.innerHTML = `${form}`;
+}
+
+/* 댓글 수정 */
+function replyUpdate(reply) {
+    let url = `${cPath}/sns/answerUpdate.do`;
+
+    let replyCn = document.querySelector(".replyUpCn").value;
+    console.log("!!수정한 댓글 내용", replyCn);
+    let userId = reply.dataset.user;
+    console.log("!!댓글 수정 하는 사용자 : ", userId);
+    let replyUser = reply.dataset.replyuser;
+    console.log("!!댓글 작성자 : ", replyUser);
+    let replyNo = reply.dataset.replyno;
+    console.log("!!댓글 번호 : ", replyNo);
+    let feedNo = reply.dataset.feedno;
+    console.log("!!피드 번호 : ", feedNo);
+
+    let data = {
+        answerCn : replyCn,
+        answerNo : replyNo,
+        snsFeedNo : feedNo,
+        userId : userId
+    }
+
+    if(userId == replyUser) {
+        $.ajax({
+            url : url,
+            method : "POST",
+            dataType : "JSON",
+            data : JSON.stringify(data),
+            contentType : "application/json",
+            success:function(resp) {
+                if(resp.result="ok") {
+                    alert("성공");
+                    answerList(thisAnswer);
+                }else {
+                    alert("실패");
+                }
+            }
+        })
+    }else {
+        alert("니 댓글 아님;");
+    }
+
+}
+
+/* 댓글 삭제 */
+function replyDelete(reply) {
+    console.log("해당 댓글의 번호 : ",reply.dataset.no);
+    console.log("로그인한 사용자 : ",reply.dataset.user);
+    let answerNo = reply.dataset.no;
+    let userId = reply.dataset.user;
+	let answerUserId = reply.dataset.answerUser;
+	
+	console.log("해당 댓글 작성자 : ", answerUserId);
+	
+    let url = `${cPath}/sns/answerDelete.do`;
+    let data = {
+        userId : userId,
+        answerNo : answerNo
+    }
+	if(userId == answerUserId) {
+	    $.ajax({
+	        url : url,
+	        method : "POST",
+	        dataType : "JSON",
+	        data : JSON.stringify(data),
+	        contentType : "application/json",
+	        success:function(resp) {
+	            if(resp.result="ok") {
+	                alert("성공");
+	                answerList(thisAnswer);
+	            }else {
+	                alert("실패");
+	            }
+	        }
+	    })
+	}else {
+		alert("니 댓글 아님");
+	}
+}
+

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.AssignmentDAO">
+	<insert id="insertAssignment" parameterType="AssignmentVO">
+		<selectKey order="BEFORE" keyProperty="assignmentCode" resultType="String">
+		SELECT 'ASM'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ASSIGNMENT_CODE,4))),0)+1,7,'0')
+		FROM ASSIGNMENT
+		</selectKey>	
+		INSERT INTO ASSIGNMENT (
+		    ASSIGNMENT_CODE, 
+		    ASSIGNMENT_SJ, 
+		    ASSIGNMENT_CN, 
+		    ASSIGNMENT_PRESENTN_NMPR,
+		    ATCH_FILE_NO, 
+		    ASSIGNMENT_CREAT_DE, 
+		    ASSIGNMENT_END_DE, 
+		    USER_ID,
+		    CLASS_CODE
+		) VALUES (
+		    #{assignmentCode},
+		    #{assignmentSj},
+		    #{assignmentCn},
+		    #{assignmentPresentnNmpr},
+		    #{atchFileNo},
+		    SYSDATE,
+		    #{assignmentEndDe},
+		    #{userId},
+		    #{classCode}
+		)
+	</insert>
+</mapper>

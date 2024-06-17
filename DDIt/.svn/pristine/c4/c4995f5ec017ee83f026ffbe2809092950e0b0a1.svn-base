@@ -1,0 +1,57 @@
+package kr.or.ddit.project.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.ProjectPostVO;
+import kr.or.ddit.vo.ProjectStudentMappingVO;
+import kr.or.ddit.vo.ProjectVO;
+import kr.or.ddit.vo.UsersVO;
+import kr.or.ddit.vo.WorkVO;
+
+@Mapper
+public interface ProjectDao {
+	
+	/**
+	 * 프로젝트 조회
+	 */
+	public List<ProjectVO> selectProjectList(@Param("paging")PaginationInfo paging);
+	public int selectTotalRecordProject(@Param("paging") PaginationInfo paging);
+	
+	
+	
+	
+	
+	
+	public int insertProject(ProjectVO projectVO);
+	public ProjectVO readProject(int projectNo);
+	public List<ProjectVO> projectList();
+	public List<WorkVO> selectWokrList(@Param("paging")PaginationInfo paging, @Param("projectNo") int projectNo);
+	public int selectTotalRecordWork(@Param("paging") PaginationInfo paging, @Param("projectNo") int projectNo);
+	public int insertWork(WorkVO workVO);
+	public List<WorkVO> workList();
+	public List<UsersVO> selectTeamList(@Param("paging")PaginationInfo paging,@Param("projectNo") int projectNo );
+	public int selectTotalRecordTeam(@Param("paging") PaginationInfo paging,@Param("projectNo") int projectNo);
+	public List<UsersVO> TeamList();
+	public List<CmmnCodeVO> CmmnCodeList();
+	public int insertTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public int updateTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public int deleteTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public List<ProjectStudentMappingVO> MyTeamList(@Param("paging")PaginationInfo paging, @Param("projectNo") int projectNo);
+	public int selectTotalRecordMyTeam(@Param("paging") PaginationInfo paging, @Param("projectNo") int projectNo);
+	public List<ProjectPostVO> selectPostList(@Param("paging")PaginationInfo paging,@Param("projectNo") int projectNo);
+	public int selectTotalRecordPost(@Param("paging") PaginationInfo paging, @Param("projectNo") int projectNo);
+	public int insertPost(ProjectPostVO projectPostVO);
+	public int updatePost(ProjectPostVO projectPostVO);
+	public int deletePost(ProjectPostVO projectPostVO);
+	public int updateCount(int projectPostNo);
+	public ProjectPostVO readPost(int projectPostNo);
+	
+	
+	
+
+}

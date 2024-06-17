@@ -1,0 +1,125 @@
+package kr.or.ddit.sns.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.sns.dao.SnsDAO;
+import kr.or.ddit.vo.FollowVO;
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class SnsServiceImpl implements SnsService{
+	private final SnsDAO snsDao;
+	
+	@Override
+	public List<SnsFeedVO> readFeedList() {
+		List<SnsFeedVO> feedList = snsDao.selectFeedList();
+		return feedList;
+	}
+	
+	@Override
+	public List<SnsAnswerVO> readAnswerList(int snsFeedNo) {
+		List<SnsAnswerVO> answerList = snsDao.selectAnswerList(snsFeedNo);
+		return answerList;
+	}
+	
+	@Override
+	public int createFeed(SnsFeedVO feedVo) {
+		int chk = 0;
+		chk = snsDao.insertFeed(feedVo);
+		if(chk > 0) {
+			return chk;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return chk;
+		}
+	}
+
+	@Override
+	public int deleteFeed(Long snsFeedNo) {
+		int chk = 0;
+		int chk2 = 0;
+		int result = 1;
+		chk = snsDao.deleteFeed(snsFeedNo);
+		chk2 = snsDao.deleteHashTag(snsFeedNo);
+		if(chk > 0 && chk2 > 0) {
+			return result + 1;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return result;
+		}
+	}
+
+	@Override
+	public int updateFeed(SnsFeedVO feedVo) {
+		int chk = 0;
+		chk = snsDao.updateFeed(feedVo);
+		snsDao.updateHashTag(feedVo);
+		return chk;
+	}
+
+	@Override
+	public int createAnswer(SnsAnswerVO answerVo) {
+		int chk = 0;
+		chk = snsDao.insertAnswer(answerVo);
+		return chk;
+	}
+
+	@Override
+	public int updateAnswer(SnsAnswerVO answerVo) {
+		int chk = 0;
+		chk = snsDao.updateAnswer(answerVo);
+		return chk;
+	}
+
+	@Override
+	public int deleteAnswer(SnsAnswerVO answerVo) {
+		int chk = 0;
+		chk = snsDao.deleteAnswer(answerVo);
+		return chk;
+	}
+
+	@Override
+	public List<FollowVO> readUnFollowList(String userId) {
+		List<FollowVO> list = snsDao.selectUnFollowList(userId);
+		return list;
+	}
+
+	@Override
+	public int createFollow(FollowVO followVo) {
+		int chk = 0;
+		chk = snsDao.insertFollow(followVo);
+		return chk;
+	}
+	
+	@Override
+	public int readFollwingCount(String userId) {
+		int count = 0;
+		count = snsDao.selectFollowingCount(userId);
+		return count;
+	}
+
+	@Override
+	public int readFollwerCount(String userId) {
+		int count = 0;
+		count = snsDao.selectFollowerCount(userId);
+		return count;
+	}
+	
+	@Override
+	public List<FollowVO> readFollowingListList(String userId) {
+		List<FollowVO> list = snsDao.selectFollowingList(userId);
+		return list;
+	}
+
+	@Override
+	public List<FollowVO> readFollowerList(String userId) {
+		List<FollowVO> list = snsDao.selectFollowerList(userId);
+		return list;
+	}
+
+}

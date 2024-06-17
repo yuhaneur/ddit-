@@ -1,0 +1,103 @@
+package kr.or.ddit.sj.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.sj.dao.SjDAO;
+import kr.or.ddit.vo.CurriculumVO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class SjServiceImpl implements SjService{
+	
+	@Autowired
+	private SjDAO dao; 
+	@Override
+	public List<SjVO> selectSjList() {
+		return dao.selectSjList();
+	}
+
+	@Override
+	public SjVO selectSj(SjVO sjvo) {
+		return dao.selectSj(sjvo);
+	}
+
+	@Override
+	public int createSj(SjVO sjvo) {
+		return dao.insertSj(sjvo);
+	}
+
+	@Override
+	public List<SjManagerVO> selectSjManagerList(SjVO sjvo) {
+		return dao.selectSjManagerList(sjvo);
+	}
+
+	@Override
+	public int createSjManager(SjVO sjvo) {
+		List<SjManagerVO> sjManagerList =  sjvo.getSjManagerList();
+		int cnt = 0;
+		SjManagerVO sjManagerVo = new SjManagerVO();
+		for (SjManagerVO sjManager : sjManagerList) {
+			sjManagerVo= dao.selectSjManager(sjManager);
+			if(sjManagerVo==null) {
+				cnt += dao.insertSjManager(sjManager);
+			}else {
+				log.info(sjManagerVo.getSjDeleteAt());
+				if(sjManagerVo.getSjDeleteAt().equals("Y")) {
+					cnt += dao.updateSjManager(sjManager);
+				}
+				continue;
+			}
+		}
+		return cnt;
+	}
+
+	@Override
+	public int deleteSjManager(SjManagerVO sjManager) {
+		
+		return dao.deleteSjManager(sjManager);
+	}
+
+//	@Override
+//	public int updateSjManager(SjManagerVO sjManager) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+
+	@Override
+	public List<CurriculumVO> selectCurriculumList(SjVO sjvo) {
+		return dao.selectCurriculumList(sjvo);
+	}
+
+	@Override
+	public int insertCurriculum(CurriculumVO curriculumVO) {
+		int cnt = dao.insertCurriculum(curriculumVO);
+		return cnt;
+	}
+
+	@Override
+	public int deleteCurriculum(CurriculumVO curriculumVO) {
+		int cnt = dao.deleteCurriculum(curriculumVO);
+		return cnt;
+	}
+
+	@Override
+	public CurriculumVO selectCurriculum(CurriculumVO curriculumVO) {
+		CurriculumVO currivo = new CurriculumVO();
+		currivo = dao.selectCurriculum(curriculumVO);
+		return currivo;
+	}
+
+	@Override
+	public int updateCurriculum(CurriculumVO curriculumVO) {
+		int cnt = dao.updateCurriculum(curriculumVO);
+		return cnt;
+	}
+	
+
+}

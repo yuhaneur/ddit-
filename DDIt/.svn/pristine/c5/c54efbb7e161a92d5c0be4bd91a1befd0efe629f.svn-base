@@ -1,0 +1,440 @@
+package kr.or.ddit.school.controller;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.edcCrse.service.EdcCrseService;
+import kr.or.ddit.school.service.AssignmentService;
+import kr.or.ddit.school.service.AttenceService;
+import kr.or.ddit.school.service.SchoolService;
+import kr.or.ddit.sj.service.SjService;
+import kr.or.ddit.teacher.service.TeacherService;
+import kr.or.ddit.vo.AssignmentPresentnHistVO;
+import kr.or.ddit.vo.AssignmentVO;
+import kr.or.ddit.vo.ClassVO;
+import kr.or.ddit.vo.CurriculumVO;
+import kr.or.ddit.vo.EdcCrseVO;
+import kr.or.ddit.vo.EvaluationVO;
+import kr.or.ddit.vo.GrAtchFileVO;
+import kr.or.ddit.vo.LectureRoomVO;
+import kr.or.ddit.vo.ScheduleVO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjMapping;
+import kr.or.ddit.vo.SjVO;
+import kr.or.ddit.vo.StudentVO;
+import kr.or.ddit.vo.TeacherVO;
+import kr.or.ddit.vo.UsersVOWrapper;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/school")
+public class SchoolController {
+	@Autowired
+	private EdcCrseService edcCrseService;
+	
+	@Autowired
+	private TeacherService teacherService;
+	
+	@Autowired
+	private SchoolService schoolService;
+	
+	@Autowired
+	private AssignmentService assignmentService;
+	
+	@Autowired
+	private AttenceService attenceService;
+	@Autowired
+	private SjService sjService;
+	// 클래스화면 메인
+	@GetMapping("{classCode}")
+	public String studentSchoolMain(Model model,
+			Authentication authentication,
+			@PathVariable String classCode) {
+		
+		UsersVOWrapper usersVOWrapper = (UsersVOWrapper) authentication.getPrincipal();
+		String userId = usersVOWrapper.getUsername();
+		usersVOWrapper.getAuthorities();
+		// 로그인한 사람 권한 가져와서 체크 
+		Collection<GrantedAuthority> authorGrList = new ArrayList<GrantedAuthority>();
+		authorGrList = usersVOWrapper.getAuthorities();
+		for (GrantedAuthority grantedAuthority : authorGrList) {
+			log.info("grantedAuthority : {}", grantedAuthority);
+			// 권한이 학생이면
+			if(grantedAuthority.equals("ROLE_STUDENT")) {
+				StudentVO studentVO =  schoolService.selectClassCode(userId);
+				ClassVO classVO = schoolService.selectClass(studentVO.getClassCode());
+				model.addAttribute("classVO", classVO);
+				break;
+			}else {
+				ClassVO classVO = schoolService.selectClass(classCode);
+				model.addAttribute("classVO", classVO);
+			}
+		}
+		
+		return "school/studentSchoolMain";
+	}
+	// 선생님 클래스화면 메인
+	@GetMapping("teacher")
+	public String teacherSchoolMain(Authentication authentication,
+			Model model) {
+		UsersVOWrapper usersVOWrapper = (UsersVOWrapper) authentication.getPrincipal();
+		String userId = usersVOWrapper.getUsername();
+		List<ClassVO> classList=  schoolService.selectTeacherClass(userId);
+		model.addAttribute("classList", classList);
+		return "school/teacherSchoolMain";
+	}
+	
+	
+	@GetMapping("schedule/{classInfo}")
+	@ResponseBody
+	public List<ScheduleVO> selectScheduleList(@PathVariable String classInfo) {
+		List<ScheduleVO> scheduleList = new ArrayList<ScheduleVO>();
+		scheduleList = schoolService.selectScheduleList(classInfo);
+		return scheduleList;
+	}
+	
+	//관리자 클래스 리스트
+	@GetMapping("classList")
+	public String classList(Model model) {
+		List<ClassVO> classList =  schoolService.selectClassList();
+		model.addAttribute("classList", classList);
+		return "school/classList";
+	}
+	//관리자 클래스 등록화면폼
+	@GetMapping("classInsert")
+	public String insertClass(Model model) {
+		List<LectureRoomVO> lectureRoomList = schoolService.selectLectureRoomList();
+		List<EdcCrseVO> edcCrseList= edcCrseService.retrieveEdcCrseList();
+		List<TeacherVO> teacherList = teacherService.retrieveTeacherList();
+		model.addAttribute("lectureRoomList", lectureRoomList);
+		model.addAttribute("edcCrseList", edcCrseList);
+		model.addAttribute("teacherList", teacherList);
+		return "school/classInsert";
+	}
+	//관리자 클래스 등록
+	@PostMapping(value =  "classInsert",consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, String> classInsert(@RequestBody ClassVO classVO){
+		Map<String, String> resultMap= new HashMap<String, String>();
+		int cnt = schoolService.insertClass(classVO);
+		if(cnt>0) {
+			resultMap.put("result", "ok");
+		}else {
+			resultMap.put("result", "fail");
+		}
+		return resultMap;
+	}
+	// 클래스 상세보기
+	@GetMapping("classDetail/{classCode}")
+	public String classDetail(@PathVariable String classCode, Model model ) {
+		// 클래스에 속해있지않은 학생들
+		List<StudentVO> stuList = schoolService.selectClassNotStudentList();
+		ClassVO classVO = schoolService.selectClass(classCode);
+		// 클래스에 속해있는 학생들
+		List<StudentVO> studentList = schoolService.selectStudentList(classCode);
+		model.addAttribute("studentList", studentList);
+		model.addAttribute("stuList", stuList);
+		model.addAttribute("classVO", classVO);
+		return "school/classDetail";
+	}
+	// 클래스에 등록할 선생님 리스트 
+	@GetMapping( value = "teachList", produces = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Map<String, Object> teachList(@RequestParam long sjNo,@RequestParam String edcCrseCode ){
+		SjManagerVO sjManagerVO = new SjManagerVO();
+		sjManagerVO.setEdcCrseCode(edcCrseCode);
+		sjManagerVO.setSjNo(sjNo);
+		Map<String, Object> resultMap= new HashMap<String, Object>();
+		List<SjVO> teachList = schoolService.selectClassInteacher(sjManagerVO);
+		resultMap.put("teachList", teachList);
+		return resultMap;
+	}
+	
+	// 클래스에 담당과목 선생님 저장
+	@PostMapping( value = "teachInsert")
+	public String teachInsert(@ModelAttribute SjMapping sjMapping,@RequestParam String mnOrAt){
+		String classCode = sjMapping.getClassCode();
+		int cnt = schoolService.insertClassInteacher(sjMapping,mnOrAt);
+		ScheduleVO scheduleVO = new ScheduleVO();
+		scheduleVO.setClassCode(classCode);
+		scheduleVO.setSjNo(sjMapping.getSjNo());
+		scheduleVO.setUserId(sjMapping.getUserId());
+		TeacherVO teacher = teacherService.selectTeacher(sjMapping.getUserId());
+		scheduleVO.setTeacherName(teacher.getTeacherName());
+		cnt += schoolService.updateSchedule(scheduleVO);
+		
+		if(cnt>1) {
+			return "redirect:classDetail/"+classCode;
+		}else {
+			return "redirect:classDetail/"+classCode;
+		}
+	}
+	
+	//수업화면
+	@GetMapping("class/{classCode}")
+	public String teaching(@PathVariable String classCode,
+			Model model) {
+		List<SjMapping> sjMappingList = schoolService.selectClassInSubjectList(classCode);
+		model.addAttribute("sjMappingList", sjMappingList);
+		log.info("sjMappingList : {}" , sjMappingList);
+		model.addAttribute("classCode", classCode);
+		return "school/teaching";
+	}
+	
+	// 수업과목내용
+	@GetMapping("class/{edcCrse}/{sjNo}")
+	@ResponseBody
+	public List<CurriculumVO> curriculumList(
+			@PathVariable String edcCrse,
+			@PathVariable long sjNo
+			) {
+		SjVO sjVO = new SjVO();
+		sjVO.setEdcCrseCode(edcCrse);
+		sjVO.setSjNo(sjNo);
+		List<CurriculumVO> sjCurriculumList = sjService.selectCurriculumList(sjVO);
+		
+		
+		return sjCurriculumList;
+	}
+	// 수업에 들어간 파일가져오기
+	@GetMapping("classSjFile/{fileNo}")
+	@ResponseBody
+	public List<GrAtchFileVO> fileList(@PathVariable long fileNo) {
+		List<GrAtchFileVO> fileList = schoolService.selectFileList(fileNo);
+		return fileList;
+	}
+	
+	// 파일 다운로드
+	@GetMapping("fileDownLord/{fileNo}/{fileTurnNo}")
+	public ResponseEntity<Resource> fileDownLord(@PathVariable long fileNo,
+			@PathVariable long fileTurnNo) {
+		//1. 파일이 있는지 부터 확인 > 서비스로가셈
+		GrAtchFileVO grAtchFileVO = schoolService.selectFile(fileNo, fileTurnNo);
+		
+		// 파일을 브라우저에 직접표시할지 다운로드할지 정확히 정해줘야되서 헤더에 정보를 저장함
+		HttpHeaders headers = new HttpHeaders();
+		// APPLICATION_OCTET_STREAM << 바이너리 데이터 브라우저가 파일로 알아먹게 설정해줌
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		// 파일 크기 설정함으로써 사용자가 얼마나 되는건지 알수있음
+		headers.setContentLength(grAtchFileVO.getFileMg());
+		
+		// 헤더에 설정 값 하나 해줄거임 
+		ContentDisposition contentDisposition = 
+				// 파일을 다운로드하라고 트리거 사용해줌
+				ContentDisposition.attachment()
+					// 무슨파일인지 알려주려고 이름 설정해주고  기본인코딩까지해줌
+					.filename(grAtchFileVO.getFileName(), Charset.defaultCharset())
+					//Content-Disposition 헤더로 객체 생성해줌
+											.build();
+		// 이제 만들어진걸 헤더에 집어넣어줌
+		headers.setContentDisposition(contentDisposition);
+		// 스프링에서 제공하는 http 응답 방법 (ResponseEntity) 200상태로 응답해줌
+		return ResponseEntity.ok()
+				// 설정한 헤더도 날려주고 
+						.headers(headers)
+						// 응답 본문으로 바이너리 데이터로 보내줌
+						.body(grAtchFileVO.getBinary());
+	}
+	// 파일 미리보기
+	@GetMapping("fileView/{fileNo}/{fileTurnNo}")
+	public ResponseEntity<Resource> fileView(@PathVariable long fileNo,
+			@PathVariable long fileTurnNo) {
+		//1. 파일이 있는지 부터 확인 > 서비스로가셈
+		GrAtchFileVO grAtchFileVO = schoolService.selectFile(fileNo, fileTurnNo);
+		
+		HttpHeaders headers = new HttpHeaders();
+		// APPLICATION_OCTET_STREAM << 바이너리 데이터 브라우저가 파일로 알아먹게 설정해줌
+		MediaType mediaType = determineMediaType(grAtchFileVO.getFileTy());
+		headers.setContentType(mediaType);
+		// 파일 크기 설정함으로써 사용자가 얼마나 되는건지 알수있음
+		headers.setContentLength(grAtchFileVO.getFileMg());
+		
+		// 헤더에 설정 값 하나 해줄거임 
+		ContentDisposition contentDisposition = 
+				// 파일을 미리보기하라고 트리거 사용해줌
+				ContentDisposition.inline()
+				.filename(grAtchFileVO.getFileName(), Charset.defaultCharset())
+				.build();
+		// 텍스트 파일 인코딩해주기
+		if (mediaType.equals(MediaType.TEXT_PLAIN)) {
+			headers.setContentType(new MediaType("text", "plain", Charset.forName("UTF-8")));
+		}
+		// 이제 만들어진걸 헤더에 집어넣어줌
+		headers.setContentDisposition(contentDisposition);
+		return ResponseEntity.ok()
+				.headers(headers)
+				.body(grAtchFileVO.getBinary());
+	}
+	// 파일 타입 알아보기
+	private MediaType determineMediaType(String fileType) {
+	    if (fileType.endsWith("/jpg") || fileType.endsWith("/jpeg")) {
+	        return MediaType.IMAGE_JPEG;
+	    } else if (fileType.endsWith("/png")) {
+	        return MediaType.IMAGE_PNG;
+	    } else if (fileType.endsWith("/pdf")) {
+	        return MediaType.APPLICATION_PDF;
+	    } else if (fileType.startsWith("text")) {
+	    	return MediaType.TEXT_PLAIN;
+	    }
+	    // 기본값
+	    return MediaType.APPLICATION_OCTET_STREAM;
+	}
+	// 과제화면가기
+	@GetMapping("assignment/{classCode}")
+	public String assignmentForm(
+			Authentication authentication,
+			@PathVariable String classCode,
+			Model model
+			) {
+		UsersVOWrapper usersVOWrapper = (UsersVOWrapper) authentication.getPrincipal();
+		String userId = usersVOWrapper.getUsername();
+		List<AssignmentVO> assignmentList= assignmentService.selectAssignmentList(classCode);
+		ClassVO classVo = schoolService.selectClass(classCode);
+		log.info("assignmentList : {} ",assignmentList);
+		model.addAttribute("classVo", classVo);
+		model.addAttribute("assignmentList", assignmentList);
+		model.addAttribute("userId", userId);
+		model.addAttribute("classCode", classCode);
+		return "school/assignmentMain";
+	}
+	
+	// 과제 등록
+	@PostMapping("assignment")
+	@ResponseBody
+	public Map<String, String> insertAssignment(
+			@ModelAttribute AssignmentVO assignmentVO
+			){
+		log.info("assignmentVO : {}",assignmentVO);
+		int cnt = assignmentService.insertAssignment(assignmentVO);
+		Map<String, String> resultMap= new HashMap<>();
+		if(cnt > 0) {
+			resultMap.put("result", "ok");
+		}else {
+			resultMap.put("result", "fail");
+		}
+		return resultMap;
+	}
+	
+	// 과제 디테일
+	@GetMapping("assignmentDetail/{assignmentCode}")
+	@ResponseBody
+	public Map<String, Object> assignmentDetail(@PathVariable String assignmentCode) {
+		Map<String, Object> map = new HashMap<>();
+		AssignmentVO assignmentVO = assignmentService.selectAssignment(assignmentCode);
+		List<AssignmentPresentnHistVO> aphList = assignmentService.selectAssignmentPresentnHistList(assignmentCode);
+		map.put("assignmentVO", assignmentVO);
+		map.put("aphList", aphList);
+		return map;
+	}
+	// 과제 제출
+	@PostMapping("assignmentPresentnHist")
+	@ResponseBody
+	public Map<String, String> submitAssignment(@ModelAttribute AssignmentPresentnHistVO assignmentPresentnHistVO) {
+		Map<String, String> resultMap = new HashMap<>();
+		int cnt = assignmentService.insertAssignmentPresentnHist(assignmentPresentnHistVO);
+		if(cnt>0) {
+			resultMap.put("result", "ok");
+		}else {
+			resultMap.put("result", "fail");
+		}
+		return resultMap;
+	}
+	// 과제 제출한 내역 화면 (선생님용)
+	@GetMapping("assignmentTeacher/{classCode}")
+	public String assignmentTeacherForm(
+			Authentication authentication,
+			@PathVariable String classCode,
+			Model model
+			) {
+		UsersVOWrapper usersVOWrapper = (UsersVOWrapper) authentication.getPrincipal();
+		String userId = usersVOWrapper.getUsername();
+		List<AssignmentVO> assignmentList= assignmentService.selectAssignmentList(classCode);
+		ClassVO classVo = schoolService.selectClass(classCode);
+		log.info("assignmentList : {} ",assignmentList);
+		model.addAttribute("classVo", classVo);
+		model.addAttribute("assignmentList", assignmentList);
+		model.addAttribute("userId", userId);
+		model.addAttribute("classCode", classCode);
+		return "school/assignmentHistory";
+	}
+	// 학생정보화면 가기(선생님용)
+	@GetMapping("studentsInfo/{classCode}")
+	public String studentsInfo(
+			Authentication authentication,
+			@PathVariable String classCode,
+			Model model) {
+		UsersVOWrapper usersVOWrapper = (UsersVOWrapper) authentication.getPrincipal();
+		String userId = usersVOWrapper.getUsername();
+		List<StudentVO> studentList =  schoolService.selectStudentList(classCode);
+		model.addAttribute("classCode", classCode);
+		model.addAttribute("userId", userId);
+		model.addAttribute("studentList", studentList);
+		return "school/studentsInfo";
+	}
+	// 학생 클래스 등록 시켜주기
+	@PutMapping("studentInClass")
+	@ResponseBody
+	public Map<String, String> studentInClass(@RequestBody Map<String, Object> studentInfo) {
+		Map<String, String> resultMap = new HashMap<String, String>();
+		int cnt = schoolService.updateStudentClass(studentInfo);
+		if(cnt>1) {
+			resultMap.put("result", "ok");
+		}else {
+			resultMap.put("result", "fail");
+		}
+		return resultMap;
+	}
+	
+	// 학생 메모 정보 가져오기 
+	@GetMapping("studentEvaluation/{userId}")
+	@ResponseBody
+	public Map<String, Object> selectEvaluation(@PathVariable String userId) {
+		Map<String, Object> resultMap = new HashMap<>();
+		StudentVO studentVO = new StudentVO();
+		studentVO.setUserId(userId);
+		Map<String, Object> attenanceMap = attenceService.attenanceInfo(studentVO);
+		EvaluationVO evaluationVO = schoolService.selectEvaluation(userId);
+		resultMap.put("attenanceMap", attenanceMap);
+		resultMap.put("evaluationVO", evaluationVO);
+		return resultMap;
+	}
+	
+	// 학생 메모 업데이트
+	@PutMapping("studentEvaluation")
+	@ResponseBody
+	public Map<String, String> updateEvaluation(@RequestBody EvaluationVO evaluationVO) {
+		Map<String, String> resultMap = new HashMap<>();
+		int cnt = schoolService.updateEvaluation(evaluationVO);
+		if(cnt>0) {
+			resultMap.put("result", "ok");
+		}else {
+			resultMap.put("result", "fail");
+		}
+		return resultMap;
+	}
+}

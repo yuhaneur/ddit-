@@ -1,0 +1,31 @@
+package kr.or.ddit.vo;
+
+import java.util.List;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+
+@Data
+public class QustnrWrapperVO {
+	@NotNull @Min(0) private Long qustnrNo;	// 설문번호
+	@NotBlank @Size(max=30) private String userId;	// 작성자
+	@NotBlank @Size(max=100) private String qustnrSj;	//설문제목
+	@NotBlank @Size(max=7) private String qustnrCreatDt;	// 설문생성일
+	@NotBlank @Size(max=7) private String qustnrEndDt;	// 설문종료일
+	@NotBlank @Size(max=10) private String classCode;	// 클래스코드
+	
+	@NotNull @Min(0) private List<Long> qustnrQuestionsNo;	// 설문 문제번호
+	
+	@NotBlank @Size(max=1000) private List<String> qustnrCn;	// 설문내용
+	@NotNull @Min(0) private List<String> answerType;	// 설문 답변유형
+	@NotNull @Min(0) private Long qustnrAnswerNo; //설문답변유형번호
+	@NotBlank @Size(max=20) private String qustnrAnswerCodeGr; //설문답변유형코드그룹
+	 private Long qustnrAnswerOrdr;//설문답변내용순서
+	@Size(max=100) private List<String> qustnrAnswerCn; // 설문답변내용
+	private List<String> users;
+	
+}

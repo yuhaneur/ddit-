@@ -1,0 +1,96 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+	<!-- 시간나오는거 CSS -->
+<link href="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.css" rel="stylesheet" />
+
+
+<!-- 설문등록 시작	-->
+<div class="card-body">
+	<div class="row gx-2">
+		<div class="col-12 mb-4">
+			<h4>설문제목</h4>
+			<input class="form-control" id="discount-percentage" type="text">
+		</div>
+		<div class="col-12 mb-4">
+			<h4>마감일</h4>
+			<input class="form-control datetimepicker" id="datepicker"
+				type="text" placeholder="dd/mm/yy"
+				data-options='{"disableMobile":true}' />
+		</div>
+		<div class="col-12 mb-2">
+			<button class="btn btn-primary btn-sm" type="button" onclick="addSurvey()">
+				<svg class="svg-inline--fa fa-plus fa-w-14 me-2" aria-hidden="true"	focusable="false" data-prefix="fas" data-icon="plus" role="img"
+					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+					data-fa-i2svg="">
+					<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
+				설문내용추가
+			</button>
+		</div>
+		<!-- 설문내용 추가버튼눌르면 추가로 생길것들 -->
+	<div id="surveyContent" class="row">
+		<div class="row">
+			<div class="col-8 mb-3">
+				<h5>설문내용</h5>
+				<input class="form-control" type="text">
+			</div>
+			<div class="col-2">
+				<h5>답변유형</h5>
+				<select class="form-select" name="answerType" onchange="surveyAnswer(this)">
+					<option value="usd">5지선답</option>
+					<option value="eur">예/아니요</option>
+					<option value="gbp">점수</option>
+				</select>
+			</div>
+			<!-- 답변유형 선택했을때 그거에 맞게 인풋타입 나와야됨 -->
+			<div class="surveyAnswer col-8 mb-1 d-flex">
+				<div style="margin-top:1%;">
+			        <span class="number" >1.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="매우그렇다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >2.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="그렇다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >3.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="보통" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >4.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="아니다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >5.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="매우아니다" />
+				</div>
+			</div>
+		</div>
+	</div>
+		<button class="btn btn-danger me-1 mb-1" type="button">취소하기</button>
+		<button class="btn btn-success me-1 mb-1" type="button">등록하기</button>
+		<!-- 설문내용 추가버튼눌르면 추가로 생길것들 끝 -->
+	</div>
+</div>
+<!-- 설문등록 끝	-->
+
+<!-- 설문등록 스크립트 -->
+<script src="${pageContext.request.contextPath }/resources/js/app/school/sulmoonInsert.js"></script>
+
+
+<!-- feather 아이콘 -->
+<script
+	src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<!-- 시간 나오는거 -->
+<script
+	src="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.js"></script>

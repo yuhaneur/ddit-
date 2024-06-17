@@ -1,0 +1,212 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
+<script src='https://cdn.jsdelivr.net/npm/moment@2.27.0/min/moment.min.js'></script>
+<link href="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.css"rel="stylesheet">
+
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+   
+
+
+
+<!-- 학생클래스 메인화면시작 -->
+<security:authentication property="principal" var="principal" />
+${principal.realUser.userId }
+<div class="card mt-3">
+<%-- <c:choose> --%>
+<%-- 	<c:when test="${fn:substring(userId,0,1) eq 'S'}"> --%>
+<!-- 		<p>학생</p> -->
+<%-- 	</c:when> --%>
+<%-- 	<c:otherwise> --%>
+<!-- 		<p>선생</p> -->
+<%-- 	</c:otherwise> --%>
+<%-- </c:choose> --%>
+	<input type="hidden" id="classInfo" value="${classVO.classCode}">
+	<input type="text" id="userId" value="${principal.realUser.userId }">
+	<div class="card-header border-bottom border-200">
+		<h6 class="mb-0">클래스명</h6>
+	</div>
+	<div class="card-body">
+		<div class="row gx-3">
+<%-- 		<c:if test="${fn:substring(userId,0,1) eq 'S'  }"> --%>
+			<div class="col-xxl-4 col-md-6" id="studentInfo">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-primary-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="feather feather-user-check text-primary">
+							<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+							<circle cx="8.5" cy="7" r="4"></circle>
+							<polyline points="17 11 19 13 23 9"></polyline></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!">학생정보</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">View the status of -->
+					<!-- 						your account as well as your invoice email address.</h6> -->
+				</div>
+			</div>
+<%-- 			</c:if> --%>
+<%-- 		<c:if test="${fn:substring(userId,0,1) eq 'A'  }"> --%>
+<!-- 			<div class="col-xxl-4 col-md-6" id="studentsInfo"> -->
+<!-- 				<div -->
+<!-- 					class="hover-bg-100 py-x1 text-center rounded-3 position-relative"> -->
+<!-- 					<div -->
+<!-- 						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-primary-subtle"> -->
+<!-- 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" -->
+<!-- 							viewBox="0 0 24 24" fill="none" stroke="currentColor" -->
+<!-- 							stroke-width="2" stroke-linecap="round" stroke-linejoin="round" -->
+<!-- 							class="feather feather-user-check text-primary"> -->
+<!-- 							<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path> -->
+<%-- 							<circle cx="8.5" cy="7" r="4"></circle> --%>
+<!-- 							<polyline points="17 11 19 13 23 9"></polyline></svg> -->
+<!-- 					</div> -->
+<!-- 					<h5 class="mt-3 mb-2"> -->
+<!-- 						<a class="text-900 hover-primary stretched-link" href="#!">학생정보</a> -->
+<!-- 					</h5> -->
+<!-- 										<h6 class="w-75 mx-auto text-600 mb-x1">View the status of -->
+<!-- 											your account as well as your invoice email address.</h6> -->
+<!-- 				</div> -->
+<!-- 			</div> -->
+<%-- 			</c:if> --%>
+			<div class="col-xxl-4 col-md-6">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-info-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="fas fa-book">
+							<path
+								d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+							<polyline points="14 2 14 8 20 8"></polyline>
+							<line x1="16" y1="13" x2="8" y2="13"></line>
+							<line x1="16" y1="17" x2="8" y2="17"></line>
+							<polyline points="10 9 9 9 8 9"></polyline></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!" onclick="teachingPage()">수업</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">Plan, add-ons, team -->
+					<!-- 						size, and billing cycle are all under your control.</h6> -->
+				</div>
+			</div>
+			<div class="col-xxl-4 col-md-6" id="consulting">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-warning-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="fas fa-people-arrows">
+							<path d="M17 18a5 5 0 0 0-10 0"></path>
+							<line x1="12" y1="2" x2="12" y2="9"></line>
+							<line x1="4.22" y1="10.22" x2="5.64" y2="11.64"></line>
+							<line x1="1" y1="18" x2="3" y2="18"></line>
+							<line x1="21" y1="18" x2="23" y2="18"></line>
+							<line x1="18.36" y1="11.64" x2="19.78" y2="10.22"></line>
+							<line x1="23" y1="22" x2="1" y2="22"></line>
+							<polyline points="8 6 12 2 16 6"></polyline></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!">상담</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">Part-time agents can -->
+					<!-- 						purchase on-demand licenses.</h6> -->
+				</div>
+			</div>
+			<div class="col-xxl-4 col-md-6">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-success-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="far fa-newspaper">
+							<rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+							<path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!" onclick="qustnr()">설문</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">Advanced SSO settings, -->
+					<!-- 						password policy, and domain restriction.</h6> -->
+				</div>
+			</div>
+			<div class="col-xxl-4 col-md-6">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-primary-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="fas fa-chalkboard">
+							<path
+								d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!">공지사항</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">All of the changes -->
+					<!-- 						made to your falcon Support tickets account.</h6> -->
+				</div>
+			</div>
+			<div class="col-xxl-4 col-md-6">
+				<div
+					class="hover-bg-100 py-x1 text-center rounded-3 position-relative">
+					<div
+						class="icon-item icon-item-xl shadow-none mx-auto mt-x1 bg-info-subtle">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+							viewBox="0 0 24 24" fill="none" stroke="currentColor"
+							stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+							class="fas fa-chalkboard-teacher">
+							<circle cx="12" cy="12" r="10"></circle>
+							<line x1="12" y1="8" x2="12" y2="12"></line>
+							<line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+					</div>
+					<h5 class="mt-3 mb-2">
+						<a class="text-900 hover-primary stretched-link" href="#!">질문게시판</a>
+					</h5>
+					<!-- 					<h6 class="w-75 mx-auto text-600 mb-x1">Your Falcon Support -->
+					<!-- 						Tickets will be personalized.</h6> -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 학생클래스 메인화면 끝 -->
+<br>
+<!-- 캘린더 시작 -->
+<!-- 모달은 메인 영역 밖으로 빼어 놓는게 좋음-->
+    <!-- 실제 화면을 담을 영역 -->
+    <div id="Wrapper">
+        <div id='calendar'></div>
+    </div>
+    
+	
+
+<!-- 캘린더 끝 -->
+<!-- 캘린더 모달1 -->
+<!-- 캘린더모달 3 끝 -->
+
+<!-- feather 아이콘 -->
+<script	src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<script>
+	feather.replace()
+</script>
+
+<!-- 캘린더 -->
+<%-- <script	src="${pageContext.request.contextPath}/resources/public/vendors/fullcalendar/index.global.min.js"></script> --%>
+<%-- <script	src="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.js"></script> --%>
+<%-- <script	src="${pageContext.request.contextPath}/resources/public/vendors/dayjs/dayjs.min.js"></script> --%>
+ 
+<script	src="${pageContext.request.contextPath}/resources/js/app/school/studentClassMain.js"></script>

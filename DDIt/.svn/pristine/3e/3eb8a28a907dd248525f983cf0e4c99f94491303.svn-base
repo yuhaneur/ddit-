@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemLikeDAO">
+<select id="selectItemLikeList" resultType="ItemLikeVO">
+	SELECT
+	    ITEM_LIKE_CODE,
+	    ITEM_CODE,
+	    USER_ID
+	FROM
+	    ITEM_LIKE
+</select>
+
+<insert id="insertItemLike" parameterType="ItemLikeVO">
+	<selectKey order="BEFORE" resultType="string" keyProperty="itemLikeCode">
+	SELECT 'I_LIKE' || 
+			TO_NUMBER(SUBSTR(MAX(ITEM_LIKE_CODE), 7)+1)
+	FROM ITEM_LIKE
+	</selectKey>
+	INSERT INTO ITEM_LIKE (
+	    ITEM_LIKE_CODE,
+	    ITEM_CODE,
+	    USER_ID
+	) VALUES (
+	    #{itemLikeCode},
+	    #{itemCode},
+	    #{userId}
+	)
+</insert>
+
+<delete id="deleteItemLike">
+	DELETE ITEM_LIKE
+	WHERE ITEM_LIKE_CODE = #{itemLikeCode}
+</delete>
+
+
+</mapper>

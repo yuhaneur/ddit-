@@ -1,0 +1,25 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+ <c:if test="${not empty forbidden }">
+	<script>
+		alert("${forbidden}");
+	</script>
+	<c:remove var="forbidden" scope="session"/>
+</c:if>
+<div class="card">
+	<div class="card-body overflow-hidden p-lg-6">
+		<div class="row align-items-center">
+			<div class="col-lg-6">
+				<img class="img-fluid"
+					src="${pageContext.request.contextPath}/resources/public/assets/img/icons/spot-illustrations/21.png" alt="" />
+			</div>
+			<div class="col-lg-6 ps-lg-4 my-5 text-center text-lg-start">
+				<h3 class="text-primary">Edit me!</h3>
+				<p class="lead">Create Something Beautiful.</p>
+				<a class="btn btn-falcon-primary"
+					href="${pageContext.request.contextPath}/resources/public/documentation/getting-started.html">Getting started</a>
+			</div>
+		</div>
+	</div>
+</div>

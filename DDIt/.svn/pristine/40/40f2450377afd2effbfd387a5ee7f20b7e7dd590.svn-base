@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.QustnrDAO">
+	<resultMap type="QustnrVO" id="qustnrMap" autoMapping="true">
+		<id property="qustnrNo" column="QUSTNR_NO"/>
+		<collection property="qunTrgterList" ofType="QustnrTrgterVO" autoMapping="true">
+			<id property="userId" column="USER_ID"/>
+			<id property="qustnrNo" column="QUSTNR_NO"/>
+		</collection>
+	</resultMap>
+	<!-- 설문 리스트 조회 -->
+	<select id="selectQustnrList" resultMap="qustnrMap">
+			SELECT 
+				A.QUSTNR_NO, 
+				A.USER_ID, 
+				A.QUSTNR_SJ, 
+				A.QUSTNR_CREAT_DT, 
+				A.QUSTNR_END_DT, 
+				A.CLASS_CODE,
+				C.STUDENT_NAME
+			FROM QUSTNR A INNER JOIN QUSTNR_TRGTER B ON (A.QUSTNR_NO=B.QUSTNR_NO)
+			INNER JOIN STUDENT C ON(A.USER_ID=C.USER_ID)
+			WHERE B.USER_ID=#{userId}
+	</select>
+	<!-- 설문 답변유형 코드그룹 리스트 조회 -->
+	<select id="selectCodeGrList" resultType="CmmnCodeGrVO">
+		SELECT CMMN_CODE_GR, CMMN_CODE_GR_NAME
+		FROM CMMN_CODE_GR
+		WHERE CMMN_CODE_GR LIKE 'Q%'
+	</select>
+	
+	<!-- 답변유형에 따른 코드 -->
+	<select id="selectCodeList" resultType="CmmnCodeVO">
+		SELECT CMMN_CODE, CMMN_CODE_GR, CMMN_CODE_NAME, CMMN_CODE_DESC, OUTPT_ORDR
+		FROM CMMN_CODE
+		WHERE CMMN_CODE_GR = #{codeGr}
+		ORDER BY OUTPT_ORDR
+	</select>
+	<!-- 	설문대상자 리스트 -->
+	<select id="qustnrSelectorList" resultType="QustnrSelectorVO">
+	SELECT USER_ID,STUDENT_NAME as userName
+	FROM STUDENT  
+	WHERE CLASS_CODE=#{classCode}
+		UNION
+	SELECT A.USER_ID ,B.TEACHER_NAME as userName
+	FROM SJ_MAPPING A INNER JOIN TEACHER B ON (A.USER_ID=B.USER_ID)
+	WHERE CLASS_CODE=#{classCode}
+	</select>
+
+</mapper>

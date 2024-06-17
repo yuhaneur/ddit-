@@ -1,0 +1,133 @@
+/**
+ * 
+ */
+
+
+let teacherList = document.querySelector("#teacherList");
+let datepicker2 = document.querySelector("#datepicker2");
+
+const cPath = document.body.dataset.contextPath;
+let loadingImg = document.querySelector(".mask");
+
+
+// 클래스 리스트로 돌아가는 버튼
+function outInsertClass(){
+	location.href=`${cPath}/school/classList`
+}
+
+function makeEndDate(inputTag){
+	console.log("들어왔나");
+	let edcCordTag = document.querySelector("#edcCord");
+  let edcCode = edcCordTag.value;
+  let startDay = inputTag.value;
+  console.log("startDay",startDay);
+  console.log("edcCode",edcCode);
+  let url = `${cPath}/educate/${edcCode}/${startDay}`;
+  $.ajax({
+    url:url,
+    method:'get',
+    dataType:'json',
+    success:function(resp){
+      console.log("resp",resp);
+      let date = new Date(startDay);
+      date.setDate(date.getDate()+resp);
+      
+      let formattedDate = formatDate(date);
+      console.log("formattedDate",formattedDate);
+      datepicker2.value=formattedDate;
+    }
+  })
+}
+function formatDate(date) {
+  let year = date.getFullYear();
+  let month = (date.getMonth() + 1).toString().padStart(2, '0'); 
+  let day = date.getDate().toString().padStart(2, '0'); 
+
+  return `${year}-${month}-${day}`;
+}
+// 선생님 추가
+function addTeacher(){
+  let checkBoxs = document.querySelectorAll(".form-check-input");
+  console.log("checkBoxs",checkBoxs);
+  checkBoxs.forEach(function(i,v){
+    if(i.checked==true && !(i.id)){
+      let teacherId = findElement(i);
+      $.ajax({
+
+      })
+      let txt = `
+        <div class="mb-3">
+          <span>${teacherId[0]}</span>
+          <input type="hidden" id="userId" value="${teacherId[1]}">
+          <button class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="delTeacher(this)">삭제</button>
+          </div>
+          `
+      teacherList.innerHTML +=txt;
+    }
+  })
+}
+
+function delTeacher(delBtn){
+  let pDiv = delBtn.closest(".mb-3");
+  pDiv.remove();
+}
+
+// 요소 찾는 함수
+function findElement(i){
+  let tr = i.closest("tr");
+      let userId = tr.querySelector(".userId");
+      let teacherName = tr.querySelector(".teacherName");
+      console.log("teacherName",teacherName)
+      let info = []
+      info.push(teacherName.innerHTML);
+      info.push(userId.value);
+      console.log("info",info);
+      return info;
+}
+
+function insertClass(){
+  let edcCord = document.querySelector("#edcCord");
+  let lecName = document.querySelector("#edcName");
+  let classNmpr = document.querySelector("#classNmpr");
+  let classStartDay = document.querySelector("#datepicker1");
+  let classEndDay = document.querySelector("#datepicker2");
+  let span = teacherList.querySelector("#userId")
+  let userId = span.value;
+  loadingImg.style.display="block";
+  let data = {
+    className: lecName.value+'호',
+    userId : userId,
+    classCreationDe : classStartDay.value,
+    classEndDe : classEndDay.value,
+    classNmpr : classNmpr.value,
+    edcCrseCode : edcCord.value,
+    lectureRoomNo : lecName.value
+  }
+  let url=`${cPath}/school/classInsert`
+  $.ajax({
+    url:url,
+    data:JSON.stringify(data),
+    method:'POST',
+    dataType:'JSON',
+    contentType:"application/json",
+    success: function(resp){
+      if(resp.result=="ok"){
+        loadingImg.style.display="none";
+        Swal.fire({
+  			title: '등록완료',
+		    text: '클래스등록이 완료되었습니다.',
+		    icon: 'success',
+       		}).then(()=>{
+		        location.href=`${cPath}/school/classList`;
+			})
+      }else{
+         Swal.fire({
+      			title: '등록실패',
+           		   text: '클래스등록이 완료되었습니다.',
+           		   icon: 'error'
+           		})
+      }
+    }
+  })
+  
+}

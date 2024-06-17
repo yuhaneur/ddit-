@@ -1,0 +1,60 @@
+package kr.or.ddit.school.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.school.dao.AttenceDAO;
+import kr.or.ddit.vo.AttenanceVO;
+import kr.or.ddit.vo.GoingOutVO;
+import kr.or.ddit.vo.StudentVO;
+
+@Service
+public class AttenceServiceImpl implements AttenceService{
+	
+	@Autowired
+	private AttenceDAO dao;
+	// 출석등록
+	@Override
+	public int attenanceStudent(AttenanceVO attenanceVO) {
+		int cnt = dao.attenanceStudent(attenanceVO);
+		return cnt;
+	}
+	@Override
+	public AttenanceVO selectAttenance(String userId) {
+		AttenanceVO attenanceVO= dao.selectAttenance(userId);
+		return attenanceVO;
+	}
+	@Override
+	public int updateCheckOut(AttenanceVO attenanceVO) {
+		int cnt = dao.updateCheckOut(attenanceVO);
+		return cnt;
+	}
+	@Override
+	public int insertGoingOut(GoingOutVO goingOutVO) {
+		int cnt = dao.insertGoingOut(goingOutVO);
+		return cnt;
+	}
+	@Override
+	public List<GoingOutVO> checkGoingOut(String attenanceCode) {
+		List<GoingOutVO> goingOutVO = dao.checkGoingOut(attenanceCode);
+		return goingOutVO;
+	}
+	@Override
+	public int updateGoingOut(GoingOutVO goingOutVO) {
+		int cnt = dao.updateGoingOut(goingOutVO);
+		return cnt;
+	}
+	@Override
+	public StudentVO selectStudentInfoList(StudentVO studentVO) {
+		StudentVO vo = dao.selectStudentInfoList(studentVO);
+		return vo;
+	}
+	@Override
+	public List<AttenanceVO> selectAttenanceList(String userId) {
+		List<AttenanceVO> attenanceList = dao.selectAttenanceList(userId);
+		return attenanceList;
+	}
+
+}

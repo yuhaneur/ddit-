@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.ConsultingDAO">
+	<resultMap type="ConsultingVO" id="consultingMap" autoMapping="true">
+		<association property="teacher" javaType="TeacherVO" >
+			<result property="userId" column="USER_ID"/> 
+			<result property="teacherName" column="TEACHER_NAME"/>
+		</association>
+		<association property="student" javaType="StudentVO" >
+			<result property="userId" column="USER_ID2"/>
+			<result property="studentName" column="STUDENT_NAME"/>
+		</association>
+	</resultMap>
+	
+	<resultMap type="ConsultingVO"  id="consultingListMap" autoMapping="true">
+		<association property="teacher" javaType="TeacherVO">
+			<result property="userId" column="TEACHER_ID"/>
+			<result property="teacherName" column="TEACHER_NAME"/>
+		</association>
+	</resultMap>
+	
+	<resultMap type="ConsultingJournalVO" id="consultingJournalMap" autoMapping="true">
+		<association property="consulting" javaType="ConsultingVO" autoMapping="true">
+			<association property="student" javaType="StudentVO">
+				<result property="userId" column="USER_ID2"/>
+				<result property="studentName" column="STUDENT_NAME"/>
+			</association>
+		</association>
+	</resultMap>
+	<!-- 선생님 상담일정 조회 -->
+	<select id="selectCounsultingTeacherList" resultMap="consultingMap">
+		SELECT A.CONSULTING_NO, A.CONSULTING_REQST_CNTNTS, A.CONSULTING_CONFM_AT, A.CONSULTING_DE, A.USER_ID, A.USER_ID2,
+		B.TEACHER_NAME, C.STUDENT_NAME
+		FROM CONSULTING A INNER JOIN TEACHER B ON (A.USER_ID=B.USER_ID)
+		INNER JOIN STUDENT C ON (A.USER_ID2=C.USER_ID)
+		WHERE A.USER_ID=#{userId}
+		<![CDATA[
+		AND A.CONSULTING_CONFM_AT<>'N'
+		]]>
+	</select>
+	
+	<insert id="insertCounsulting" parameterType="ConsultingVO">
+	<selectKey order="BEFORE" resultType="long" keyProperty="consultingNo">
+		SELECT NVL(MAX(CONSULTING_NO),0)+1
+		FROM CONSULTING
+	</selectKey>
+		INSERT INTO CONSULTING(
+		    CONSULTING_NO, CONSULTING_REQST_CNTNTS, CONSULTING_CONFM_AT, CONSULTING_DE, USER_ID, USER_ID2
+		) VALUES(
+		    #{consultingNo},#{consultingReqstCntnts},
+		    'D',#{consultingDe},#{userId},#{userId2}
+		)
+	</insert>
+	<!-- 대기중인 상담목록 -->
+	<select id="selectDcounsultingList" resultMap="consultingListMap">
+		SELECT CONSULTING_NO, CONSULTING_REQST_CNTNTS, CONSULTING_CONFM_AT, CONSULTING_DE, CONSULTING.USER_ID, USER_ID2,
+		TEACHER_NAME,TEACHER.USER_ID AS TEACHER_ID
+		FROM CONSULTING INNER JOIN TEACHER ON(CONSULTING.USER_ID=TEACHER.USER_ID)
+		WHERE USER_ID2=#{userId2}
+		AND CONSULTING_CONFM_AT='D'
+		ORDER BY CONSULTING_DE DESC
+	</select>
+	<!-- 진행중 상담목록 -->
+	<select id="selectYcounsultingList" resultMap="consultingListMap">
+		SELECT CONSULTING_NO, CONSULTING_REQST_CNTNTS, CONSULTING_CONFM_AT, CONSULTING_DE, CONSULTING.USER_ID, USER_ID2,
+		TEACHER_NAME,TEACHER.USER_ID AS TEACHER_ID
+		FROM CONSULTING INNER JOIN TEACHER ON(CONSULTING.USER_ID=TEACHER.USER_ID)
+		WHERE USER_ID2=#{userId2}
+		AND CONSULTING_CONFM_AT='Y'
+		ORDER BY CONSULTING_DE DESC
+	</select>
+	<!-- 완료 상담목록 -->
+	<select id="selectFcounsultingList" resultMap="consultingListMap">
+		SELECT CONSULTING_NO, CONSULTING_REQST_CNTNTS, CONSULTING_CONFM_AT, CONSULTING_DE, CONSULTING.USER_ID, USER_ID2,
+		TEACHER_NAME,TEACHER.USER_ID AS TEACHER_ID
+		FROM CONSULTING INNER JOIN TEACHER ON(CONSULTING.USER_ID=TEACHER.USER_ID)
+		WHERE USER_ID2=#{userId2}
+		AND CONSULTING_CONFM_AT='F'
+		ORDER BY CONSULTING_DE DESC
+	</select>
+	<!-- 선생님 상담리스트 -->
+	<select id="selectConsultingList" resultMap="consultingMap" >
+		SELECT 
+		    A.CONSULTING_NO, A.CONSULTING_REQST_CNTNTS, A.CONSULTING_CONFM_AT,
+		    A.CONSULTING_DE, A.USER_ID, A.USER_ID2, B.STUDENT_NAME
+		FROM CONSULTING A INNER JOIN STUDENT B ON(A.USER_ID2=B.USER_ID)
+		WHERE A.USER_ID=#{userId}
+		<![CDATA[
+		AND A.CONSULTING_CONFM_AT<>'N'
+		AND A.CONSULTING_CONFM_AT<>'F'
+		]]>
+		ORDER BY A.CONSULTING_DE DESC
+	</select>
+	<!-- 상담 진행상태 업데이트 -->
+	<update id="updateConsultingConfmAt" parameterType="ConsultingVO">
+		UPDATE CONSULTING SET
+			CONSULTING_CONFM_AT = #{consultingConfmAt}
+		WHERE CONSULTING_NO=#{consultingNo}
+	</update>
+	<!-- 상담한건조회 -->
+	<select id="selectConsulting" resultMap="consultingMap">
+		SELECT 
+			CONSULTING_NO, CONSULTING_REQST_CNTNTS, 
+			CONSULTING_CONFM_AT, CONSULTING_DE, 
+			CONSULTING.USER_ID, CONSULTING.USER_ID2,
+			STUDENT.STUDENT_NAME
+		FROM CONSULTING INNER JOIN STUDENT ON (CONSULTING.USER_ID2=STUDENT.USER_ID)
+		WHERE CONSULTING_NO = #{consultingNo}
+	</select>
+	<!-- 상담일지 저장  -->
+	<insert id="insertConsultingJournal" parameterType="ConsultingJournalVO">
+		<selectKey order="BEFORE" resultType="long" keyProperty="consultingJournalNo">
+			SELECT NVL(MAX(CONSULTING_JOURNAL_NO),0)+1
+			FROM CONSULTING_JOURNAL
+		</selectKey>
+		INSERT INTO CONSULTING_JOURNAL(
+		CONSULTING_JOURNAL_NO, CONSULTING_NO, CONSULTING_CN
+		) VALUES (
+			#{consultingJournalNo},#{consultingNo},#{consultingCn}
+		)
+	</insert>
+	<!-- 상담일지 리스트 출력 -->
+	<select id="selectConsultingJournalList" resultMap="consultingJournalMap">
+		SELECT 
+		    A.CONSULTING_JOURNAL_NO, A.CONSULTING_NO, A.CONSULTING_CN,
+		    B.CONSULTING_REQST_CNTNTS,B.CONSULTING_DE, B.USER_ID, B.USER_ID2,
+		    C.STUDENT_NAME
+		FROM CONSULTING_JOURNAL A INNER JOIN CONSULTING B ON(A.CONSULTING_NO=B.CONSULTING_NO)
+		INNER JOIN STUDENT C ON(B.USER_ID2=C.USER_ID)
+		WHERE B.USER_ID=#{userId}
+		ORDER BY CONSULTING_JOURNAL_NO DESC
+	</select>
+	<!-- 상담일지 상세조회 -->
+	<select id="selectConsultingJournal" resultType="ConsultingJournalVO">
+		SELECT CONSULTING_JOURNAL_NO, CONSULTING_NO, CONSULTING_CN
+		FROM CONSULTING_JOURNAL
+		WHERE CONSULTING_JOURNAL_NO=#{consultingJournalNo}
+	</select>
+	<!-- 상담일지 수정 -->
+	<update id="updateConsultingJournal" parameterType="ConsultingJournalVO">
+		UPDATE CONSULTING_JOURNAL SET
+		CONSULTING_CN = #{consultingCn}
+		WHERE CONSULTING_JOURNAL_NO = #{consultingJournalNo}
+	</update>
+	
+</mapper>

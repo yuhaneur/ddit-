@@ -1,0 +1,20 @@
+package kr.or.ddit.school.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.school.dao.AssignmentDAO;
+import kr.or.ddit.vo.AssignmentVO;
+
+@Service
+public class AssignmentServiceImpl implements AssignmentService{
+
+	@Autowired
+	private AssignmentDAO dao;
+	@Override
+	public int insertAssignment(AssignmentVO assignmentVO) {
+		int cnt = dao.insertAssignment(assignmentVO);
+		return cnt;
+	}
+
+}

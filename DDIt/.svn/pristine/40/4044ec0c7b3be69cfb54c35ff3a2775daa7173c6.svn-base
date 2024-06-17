@@ -1,0 +1,333 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core"  prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ page import="kr.or.ddit.sns.controller.SnsController" %>
+
+    
+<link href="${pageContext.request.contextPath }/resources/public/vendors/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="${pageContext.request.contextPath }/resources/public/vendors/plyr/plyr.css" rel="stylesheet">
+
+<style>
+  *{
+  box-sizing: border-box; 
+}
+  
+.que{
+  position: relative;
+  padding: 7px 0;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #dddddd;
+  
+}
+  
+.que.on>span{
+  font-weight: bold;
+  color: #006633; 
+}
+  
+.anw {
+  display: none;
+    overflow: hidden;
+  font-size: 14px;
+  background-color: white;
+  padding: 27px 0;
+}
+
+.arrow-wrap {
+  position: absolute;
+  top:50%; right: 10px;
+  transform: translate(0, -50%);
+}
+
+.que .arrow-top {
+  display: none;
+}
+.que .arrow-bottom {
+  display: block;
+}
+.que.on .arrow-bottom {
+  display: none;
+}
+.que.on .arrow-top {
+  display: block; 
+}
+</style>
+<script src="https://www.youtube.com/iframe_api" async=""></script>
+    <div class="row g-3">
+            <div class="col-lg-9">
+              <div class="card mb-3">
+                <div class="card-header bg-body-tertiary overflow-hidden" >
+                  <div class="d-flex align-items-center">
+                    <div class="avatar avatar-m">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/1.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h5 class="mb-0 fs-9">피드 작성</h5>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body p-0">
+                <!-- ============== 피드 작성 ==============-->
+                  <form:form>
+                    <textarea class="shadow-none form-control rounded-0 resize-none px-x1 border-y-0 border-200" placeholder="내용을 입력해주세요." rows="4"></textarea>
+                    <div class="d-flex align-items-center ps-x1 border border-200">
+                      <label class="text-nowrap mb-0 me-2" for="hash-tags"><svg class="svg-inline--fa fa-plus fa-w-14 me-1 fs-11" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg><!-- <span class="fas fa-plus me-1 fs-11"></span> Font Awesome fontawesome.com --><span class="fw-medium fs-10">해시태그</span></label>
+                      <input class="form-control border-0 fs-10 shadow-none" id="hash-tags" type="text" placeholder="#해시태그" />
+                    </div>
+                    <div class="row g-0 justify-content-between mt-3 px-x1 pb-3">
+                      <div class="col">
+                        <button class="btn btn-tertiary btn-sm rounded-pill shadow-none d-inline-flex align-items-center fs-10 mb-0 me-1" type="button"><img class="cursor-pointer" src="${pageContext.request.contextPath }/resources/public/assets/img/icons/spot-illustrations/image.svg" width="17" alt=""><span class="ms-2 d-none d-md-inline-block">Image</span></button>
+                      </div>
+                      <div class="col-auto">
+                        <div class="dropdown d-inline-block me-1">
+                          <button class="btn btn-sm dropdown-toggle px-1" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-globe-americas fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="globe-americas" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm82.29 357.6c-3.9 3.88-7.99 7.95-11.31 11.28-2.99 3-5.1 6.7-6.17 10.71-1.51 5.66-2.73 11.38-4.77 16.87l-17.39 46.85c-13.76 3-28 4.69-42.65 4.69v-27.38c1.69-12.62-7.64-36.26-22.63-51.25-6-6-9.37-14.14-9.37-22.63v-32.01c0-11.64-6.27-22.34-16.46-27.97-14.37-7.95-34.81-19.06-48.81-26.11-11.48-5.78-22.1-13.14-31.65-21.75l-.8-.72a114.792 114.792 0 0 1-18.06-20.74c-9.38-13.77-24.66-36.42-34.59-51.14 20.47-45.5 57.36-82.04 103.2-101.89l24.01 12.01C203.48 89.74 216 82.01 216 70.11v-11.3c7.99-1.29 16.12-2.11 24.39-2.42l28.3 28.3c6.25 6.25 6.25 16.38 0 22.63L264 112l-10.34 10.34c-3.12 3.12-3.12 8.19 0 11.31l4.69 4.69c3.12 3.12 3.12 8.19 0 11.31l-8 8a8.008 8.008 0 0 1-5.66 2.34h-8.99c-2.08 0-4.08.81-5.58 2.27l-9.92 9.65a8.008 8.008 0 0 0-1.58 9.31l15.59 31.19c2.66 5.32-1.21 11.58-7.15 11.58h-5.64c-1.93 0-3.79-.7-5.24-1.96l-9.28-8.06a16.017 16.017 0 0 0-15.55-3.1l-31.17 10.39a11.95 11.95 0 0 0-8.17 11.34c0 4.53 2.56 8.66 6.61 10.69l11.08 5.54c9.41 4.71 19.79 7.16 30.31 7.16s22.59 27.29 32 32h66.75c8.49 0 16.62 3.37 22.63 9.37l13.69 13.69a30.503 30.503 0 0 1 8.93 21.57 46.536 46.536 0 0 1-13.72 32.98zM417 274.25c-5.79-1.45-10.84-5-14.15-9.97l-17.98-26.97a23.97 23.97 0 0 1 0-26.62l19.59-29.38c2.32-3.47 5.5-6.29 9.24-8.15l12.98-6.49C440.2 193.59 448 223.87 448 256c0 8.67-.74 17.16-1.82 25.54L417 274.25z"></path></svg><!-- <span class="fas fa-globe-americas"></span> Font Awesome fontawesome.com --></button>
+                          <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton"><a class="dropdown-item" href="#">전체 공개</a><a class="dropdown-item" href="#">친구 공개</a><a class="dropdown-item" href="#">비공개</a></div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm px-4 px-sm-5">작 성</button>
+                      </div>
+                    </div>
+                  </form:form>
+                  <!-- ============== 피드 작성 끝 ============== -->
+                  
+                </div>
+              </div>
+              
+              <!--
+              		========================== 피드 리스트 ========================== 
+               -->
+              <c:choose>
+                <c:when test="${not empty feedList}">
+                  <c:forEach items="${feedList }" var="feed">
+                  <div>
+                    <div class="card mb-3">
+                      <div class="card-header bg-body-tertiary">
+                        <div class="row justify-content-between">
+                          <div class="col">
+                            <div class="d-flex">
+                              <div class="avatar avatar-2xl status-online">
+                                <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/4.jpg" alt="">
+                              </div>
+                              <div class="flex-1 align-self-center ms-2">
+                                <p class="mb-1 lh-1"><a class="fw-semi-bold" href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">${feed.userId }</a></p>
+                                <p class="mb-0 fs-10">${feed.snsFeedCreatDe } • 학생? • <svg class="svg-inline--fa fa-globe-americas fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="globe-americas" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm82.29 357.6c-3.9 3.88-7.99 7.95-11.31 11.28-2.99 3-5.1 6.7-6.17 10.71-1.51 5.66-2.73 11.38-4.77 16.87l-17.39 46.85c-13.76 3-28 4.69-42.65 4.69v-27.38c1.69-12.62-7.64-36.26-22.63-51.25-6-6-9.37-14.14-9.37-22.63v-32.01c0-11.64-6.27-22.34-16.46-27.97-14.37-7.95-34.81-19.06-48.81-26.11-11.48-5.78-22.1-13.14-31.65-21.75l-.8-.72a114.792 114.792 0 0 1-18.06-20.74c-9.38-13.77-24.66-36.42-34.59-51.14 20.47-45.5 57.36-82.04 103.2-101.89l24.01 12.01C203.48 89.74 216 82.01 216 70.11v-11.3c7.99-1.29 16.12-2.11 24.39-2.42l28.3 28.3c6.25 6.25 6.25 16.38 0 22.63L264 112l-10.34 10.34c-3.12 3.12-3.12 8.19 0 11.31l4.69 4.69c3.12 3.12 3.12 8.19 0 11.31l-8 8a8.008 8.008 0 0 1-5.66 2.34h-8.99c-2.08 0-4.08.81-5.58 2.27l-9.92 9.65a8.008 8.008 0 0 0-1.58 9.31l15.59 31.19c2.66 5.32-1.21 11.58-7.15 11.58h-5.64c-1.93 0-3.79-.7-5.24-1.96l-9.28-8.06a16.017 16.017 0 0 0-15.55-3.1l-31.17 10.39a11.95 11.95 0 0 0-8.17 11.34c0 4.53 2.56 8.66 6.61 10.69l11.08 5.54c9.41 4.71 19.79 7.16 30.31 7.16s22.59 27.29 32 32h66.75c8.49 0 16.62 3.37 22.63 9.37l13.69 13.69a30.503 30.503 0 0 1 8.93 21.57 46.536 46.536 0 0 1-13.72 32.98zM417 274.25c-5.79-1.45-10.84-5-14.15-9.97l-17.98-26.97a23.97 23.97 0 0 1 0-26.62l19.59-29.38c2.32-3.47 5.5-6.29 9.24-8.15l12.98-6.49C440.2 193.59 448 223.87 448 256c0 8.67-.74 17.16-1.82 25.54L417 274.25z"></path></svg><!-- <span class="fas fa-globe-americas"></span> Font Awesome fontawesome.com --></p>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <div class="dropdown font-sans-serif btn-reveal-trigger">
+                              <button class="btn btn-link text-600 btn-sm dropdown-toggle dropdown-caret-none btn-reveal" type="button" id="post-album-action" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis-h fa-w-16 fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis-h" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-10"></span> Font Awesome fontawesome.com --></button>
+                              <div class="dropdown-menu dropdown-menu-end py-3" aria-labelledby="post-album-action"><a class="dropdown-item" href="#!">상세보기</a><a class="dropdown-item" href="#!">수정</a><a class="dropdown-item" href="#!">삭제</a>
+                                <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">신고</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card-body overflow-hidden">
+
+                    <!-- 피드의 내용 들어가는 위치 -->
+                    <p>${feed.snsFeedCn }</p>
+                    <div class="row mx-n1">
+                      <!-- 피드 이미지들 -->
+                      <!-- <div class="col-6 p-1"><a href="${pageContext.request.contextPath }/resources/public/assets/img/generic/4.jpg" data-gallery="gallery-1"><img class="img-fluid rounded" src="${pageContext.request.contextPath }/resources/public/assets/img/generic/4.jpg" alt=""></a></div>
+                      <div class="col-6 p-1"><a href="${pageContext.request.contextPath }/resources/public/assets/img/generic/5.jpg" data-gallery="gallery-1"><img class="img-fluid rounded" src="${pageContext.request.contextPath }/resources/public/assets/img/generic/5.jpg" alt=""></a></div>
+                      <div class="col-4 p-1"><a href="${pageContext.request.contextPath }/resources/public/assets/img/gallery/4.jpg" data-gallery="gallery-1"><img class="img-fluid rounded" src="${pageContext.request.contextPath }/resources/public/assets/img/gallery/4.jpg" alt=""></a></div>
+                      <div class="col-4 p-1"><a href="${pageContext.request.contextPath }/resources/public/assets/img/gallery/5.jpg" data-gallery="gallery-1"><img class="img-fluid rounded" src="${pageContext.request.contextPath }/resources/public/assets/img/gallery/5.jpg" alt=""></a></div>
+                      <div class="col-4 p-1"><a href="${pageContext.request.contextPath }/resources/public/assets/img/gallery/3.jpg" data-gallery="gallery-1"><img class="img-fluid rounded" src="${pageContext.request.contextPath }/resources/public/assets/img/gallery/3.jpg" alt=""></a></div> -->
+                    </div>
+                  </div>
+                  <div class="card-footer bg-body-tertiary pt-0">
+                    <div class="border-bottom border-200 fs-10 py-3"><a class="text-700" href="#!">${feed.snsLikeCount }</a> • 좋아요
+                    </div>
+                    <span class="fw-medium fs-10">#${feed.snsHash.snsTagCn }</span>
+                    <div class="row g-0 fw-semi-bold text-center py-2 fs-10">
+                      <div class="col-auto">
+                        <a class="rounded-2 d-flex align-items-center me-3" href="#!">
+                          <img src="${pageContext.request.contextPath }/resources/public/assets/img/icons/spot-illustrations/like-inactive.png" width="20" alt="">
+                          <span class="ms-1">좋아요</span>
+                        </a>
+                      </div>
+
+                      <div class="col-auto d-flex align-items-center"><a class="rounded-2 text-700 d-flex align-items-center" href="#!"><img src="${pageContext.request.contextPath }/resources/public/assets/img/icons/spot-illustrations/share-inactive.png" width="20" alt=""><span class="ms-1">공유??</span></a></div>
+                    </div>
+
+                <div id="Accordion_wrap">
+                      <div class="que" value="${feed.snsFeedNo }">
+                        <img src="${pageContext.request.contextPath }/resources/public/assets/img/icons/spot-illustrations/comment-active.png" width="20" alt="">
+                        <span class="ms-1">댓글</span>
+                        <div class="arrow-wrap">
+                          <span class="arrow-top">↑</span>
+                         <span class="arrow-bottom">↓</span>
+                        </div>
+                      </div>
+                      <div class="anw">
+						 <form class="d-flex align-items-center border-top border-200 pt-3">
+							<div class="avatar avatar-xl">
+							    <img class="rounded-circle" src="/resources/public/assets/img/team/3.jpg" alt="">
+							</div>
+							<input class="form-control rounded-pill ms-2 fs-10" type="text" placeholder="댓글 작성 ...">
+              <button class="btn btn-primary btn-sm px-4 px-sm-2" style="width: 11%; margin-left: 20px;">작 성</button>
+						</form>
+						<div id="answer">
+                        	<!-- 댓글들 들어가는 위치 -->
+                        </div>
+                      </div>
+                     </div>
+                  </div>
+                </div>
+                </div>
+              </c:forEach>
+            </c:when>
+          </c:choose>
+			<!--
+					========================== 피드 리스트 끝 ========================== 
+			 -->
+            </div>
+            <div class="col-lg-3">
+            	<div class="card">
+                  <div class="card-body">
+                    <div class="row g-3 align-items-center profile-size">
+
+                      <!-- 프로필사진 -->
+                      <div class="col-md-6 col-lg-12 text-center"><img class="rounded-circle img-thumbnail shadow-sm" src="${pageContext.request.contextPath }/resources/public/assets/img/elearning/avatar/trainer.png" alt="" style="width: 250px;"></div>
+                      
+                      <div class="col-md-6 col-lg-12">
+                        <div class="row row-cols-1 g-0">
+                          <div class="col text-center">
+                            <h4>SNS프로필_닉네임</h4>
+                            <h5 class="mb-1 text-800 fs-9">학생 | 402호_전자정부프레임워크</h5>
+                            <p class="mb-0 fs-10">여기는 자기소개 적는 곳임.</p>
+                          </div>
+                          
+                          <!-- 프로필 수정 버튼 -->
+                          <div class="col-lg-5" style="margin: auto; padding: 25px;" >
+                            <button class="btn btn-primary btn-md w-100" type="button" width="20px">
+                              프로필 수정
+                            </button>
+                          </div>
+
+                          <div class="col mt-4 mt-md-5 mt-lg-4">
+                            <div class="row text-center">
+                              <div class="col-6 border-end-sm border-300"><img class="mb-2" src="${pageContext.request.contextPath }/resources/public/assets/img/icons/user-plus.svg" width="30" alt="">
+                                <h4 class="text-700" data-countup="{&quot;endValue&quot;:79563}">79,563</h4>
+                                <h6 class="fw-normal mb-0">Following</h6>
+                              </div>
+                              <div class="col-6"><img class="mb-2" src="${pageContext.request.contextPath }/resources/public/assets/img/icons/users.svg" width="30" alt="">
+                                <h4 class="text-700" data-countup="{&quot;endValue&quot;:120302}">120,302</h4>
+                                <h6 class="fw-normal mb-0">Followers</h6>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+                <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0">추천 팔로워</h5><a class="fs-10" href="#!">See all</a>
+                </div>
+                <div class="card-body">
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/13.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Katheryn Winnick</a></h6>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/5.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Travis Fimmel</a></h6>
+                      <p class="fs-10 mb-0">5 mutual connections</p>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/10.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Gustaf Skarsgård</a></h6>
+                      <p class="fs-10 mb-0">10 mutual connections</p>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/8.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Clive Standen</a></h6>
+                      <p class="fs-10 mb-0">8 mutual connections</p>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/15.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Jennie Jacques</a></h6>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/6.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Isaac Hempstead</a></h6>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/2.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Antony Hopkins</a></h6>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                      <div class="border-bottom border-dashed my-3"></div>
+                    </div>
+                  </div>
+                  <div class="d-flex">
+                    <div class="avatar avatar-3xl">
+                      <img class="rounded-circle" src="${pageContext.request.contextPath }/resources/public/assets/img/team/3.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2">
+                      <h6 class="mb-0"><a href="${pageContext.request.contextPath }/resources/public/pages/user/profile.html">Sophie Turner</a></h6>
+                      <button class="btn btn-tertiary btn-sm py-0 mt-1 border" type="button"><svg class="svg-inline--fa fa-user-plus fa-w-20" data-fa-transform="shrink-5 left-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="user-plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(320 256)"><g transform="translate(-64, 0)  scale(0.6875, 0.6875)  rotate(0 0 0)"><path fill="currentColor" d="M624 208h-64v-64c0-8.8-7.2-16-16-16h-32c-8.8 0-16 7.2-16 16v64h-64c-8.8 0-16 7.2-16 16v32c0 8.8 7.2 16 16 16h64v64c0 8.8 7.2 16 16 16h32c8.8 0 16-7.2 16-16v-64h64c8.8 0 16-7.2 16-16v-32c0-8.8-7.2-16-16-16zm-400 48c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z" transform="translate(-320 -256)"></path></g></g></svg><!-- <span class="fas fa-user-plus" data-fa-transform="shrink-5 left-2"></span> Font Awesome fontawesome.com --><span class="fs-10">팔로우</span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+<script src="${pageContext.request.contextPath }/resources/public/vendors/glightbox/glightbox.min.js"></script>
+<script src="${pageContext.request.contextPath }/resources/public/vendors/plyr/plyr.polyfilled.min.js"></script>
+
+<!-- 댓글 비동기처리 -->
+<script src="${pageContext.request.contextPath }/resources/js/app/sns/snsAnswerList.js"></script>

@@ -1,0 +1,78 @@
+
+package kr.or.ddit.project.service;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.GrAtchFileVO;
+import kr.or.ddit.vo.ProjectPostVO;
+import kr.or.ddit.vo.ProjectStudentMappingVO;
+import kr.or.ddit.vo.ProjectVO;
+import kr.or.ddit.vo.UsersVO;
+import kr.or.ddit.vo.WorkVO;
+
+@Service
+
+public interface ProjectService {
+
+	/**
+	 * 프로젝트 전체 리스트조회
+	 * @return
+	 */
+	public List<ProjectVO> retrieveProjectList(PaginationInfo paging);
+	
+	
+	/**
+	 * 프로젝트 생성
+	 * @param projectVO
+	 * @return
+	 */
+	public int createProject(ProjectVO projectVO);
+	
+	public ProjectVO readProject(int projectNo);
+	
+	public List<ProjectVO> projectList();
+	
+	public List<WorkVO> retrieveWorkList(PaginationInfo paging ,int projectNo);
+	
+	public int createWork(WorkVO workVO);
+	
+	public List<WorkVO> workList();
+	
+	public List<UsersVO> retrieveUserList(PaginationInfo paging,int projectNo);
+	
+	public List<UsersVO> userList();
+	
+	public List<CmmnCodeVO> CmmnCodeList();
+	public int insertTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public int updateTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public int deleteTeam(ProjectStudentMappingVO projectStudentMappingVO);
+	public List<ProjectStudentMappingVO> myTeamList(PaginationInfo paging,int projectNo);
+	public int insertPost(ProjectPostVO projectPostVO);
+	public int updatePost(ProjectPostVO projectPostVO);
+	public int deletePost(ProjectPostVO projectPostVO);
+	public List<ProjectPostVO> selectPostList(PaginationInfo paging,int projectNo);
+	public int updateCount(int projectPostNo);
+	public ProjectPostVO readPost(ProjectPostVO projectPostVO);
+	public List<ProjectStudentMappingVO> ReadTeam(int projectNo);
+	
+	
+	/**
+	 * 첨부파일 조회를 위한 메소드
+	 * @param grAtchFileVO TODO
+	 */
+	public GrAtchFileVO selectAttatch(GrAtchFileVO grAtchFileVO);
+
+	/**
+	 * 첨부파일 삭제를 위한 메소드
+	 * @param grAtchFileVO TODO
+	 */
+	public void deleteAttatch(GrAtchFileVO grAtchFileVO);
+
+
+	
+}

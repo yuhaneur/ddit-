@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.message.dao.MessageDAO">
+	<resultMap type="MessageVO" id="MessageMap" autoMapping="true">
+		<id property="messageNo" column="MESSAGE_NO" />
+		<collection property="atchList"  javaType="java.util.List" ofType="AtchFileVO" autoMapping="true" />
+	</resultMap>
+	
+	<sql id="searchFrag">
+		<where>
+			<if
+				test="paging.simpleCondition neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(paging.simpleCondition.searchWord)">
+				<choose>
+					<when test="paging.simpleCondition.searchType eq 'user'">
+						INSTR(SENDER_ID, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'sj'">
+						INSTR(MESSAGE_SJ, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<otherwise>
+						INSTR(SENDER_ID, #{paging.simpleCondition.searchWord}) > 0
+						OR INSTR(MESSAGE_SJ, #{paging.simpleCondition.searchWord}) > 0
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</sql>
+	
+	<select id="selectTotalRecordMessage" resultType="int" parameterType="String">
+		SELECT COUNT(*) 
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag" />
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'N'
+			AND M.MESSAGE_IMPORTANT = 'N'
+			AND 1=1
+	</select>
+	
+	<select id="selectTotalRecordDeleteMessage" resultType="int" parameterType="String">
+		SELECT COUNT(*) 
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag" />
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'Y'
+			AND 1=1
+	</select>
+	
+	<select id="selectTotalRecordImportantMessage" resultType="int" parameterType="String">
+		SELECT COUNT(*) 
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag" />
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'N'
+			AND M.MESSAGE_IMPORTANT = 'Y'
+			AND 1=1
+	</select>
+	
+	<select id="selectMessageList" resultMap="MessageMap" parameterType="map">
+		WITH ORDERED AS (
+			SELECT M.MESSAGE_NO
+				      ,M.SENDER_ID
+				      ,M.MESSAGE_SJ
+				      ,M.MESSAGE_SEND_DE
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag"></include>
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'N'
+			AND M.MESSAGE_IMPORTANT = 'N'
+			AND 1=1
+		    ORDER BY M.ROWID DESC
+		    ), RNUMOREDERED AS(
+		    	SELECT ROWNUM RNUM, ORDERED.*
+		    	FROM ORDERED
+		    )
+		    SELECT *
+		    FROM RNUMOREDERED
+		    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+	</select>
+	
+	<select id="selectMessageDeleteList" resultMap="MessageMap" parameterType="map">
+		WITH ORDERED AS (
+			SELECT M.MESSAGE_NO
+				      ,M.SENDER_ID
+				      ,M.MESSAGE_SJ
+				      ,M.MESSAGE_SEND_DE
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag"></include>
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'Y'
+			AND 1=1
+		    ORDER BY M.ROWID DESC
+		    ), RNUMOREDERED AS(
+		    	SELECT ROWNUM RNUM, ORDERED.*
+		    	FROM ORDERED
+		    )
+		    SELECT *
+		    FROM RNUMOREDERED
+		    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+	</select>
+	
+	<select id="selectMessageImportantList" resultMap="MessageMap" parameterType="map">
+		WITH ORDERED AS (
+			SELECT M.MESSAGE_NO
+				      ,M.SENDER_ID
+				      ,M.MESSAGE_SJ
+				      ,M.MESSAGE_SEND_DE
+			FROM MESSAGE M
+			INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		<include refid="searchFrag"></include>
+			AND R.USER_ID = #{userId}
+			AND M.CMMN_CODE = 'N'
+			AND M.MESSAGE_IMPORTANT = 'Y'
+			AND 1=1
+		    ORDER BY M.ROWID DESC
+		    ), RNUMOREDERED AS(
+		    	SELECT ROWNUM RNUM, ORDERED.*
+		    	FROM ORDERED
+		    )
+		    SELECT *
+		    FROM RNUMOREDERED
+		    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+	</select>
+	
+	<select id="selectMessage" parameterType="int" resultMap="MessageMap">
+		SELECT M.MESSAGE_NO
+		      ,M.SENDER_ID
+		      ,M.MESSAGE_SJ
+		      ,M.MESSAGE_CN
+		      ,M.MESSAGE_SEND_DE
+		      ,G.STRE_FILE_NAME
+		FROM MESSAGE M
+		INNER JOIN RECIEVEMESSAGE R ON (M.MESSAGE_NO = R.MESSAGE_NO)
+		LEFT JOIN GR_ATCH_FILE G ON (G.ATCH_FILE_NO = M.ATCH_FILE_NO)
+		WHERE R.MESSAGE_NO = #{messageNo}
+	</select>
+	
+	<update id="deleteMessage" parameterType="int">
+		UPDATE MESSAGE
+		SET CMMN_CODE = 'Y'
+		WHERE MESSAGE_NO = #{messageNo}
+	</update>
+	
+	<update id="deleteHardMessage" parameterType="int">
+		UPDATE MESSAGE
+		SET CMMN_CODE = 'D'
+		WHERE MESSAGE_NO = #{messageNo}
+	</update>
+	
+	<update id="revertMessage" parameterType="int">
+		UPDATE MESSAGE
+		SET CMMN_CODE = 'N'
+		WHERE MESSAGE_NO = #{messageNo}
+	</update>
+	
+	<update id="importantMessage" parameterType="int">
+		UPDATE MESSAGE
+		SET MESSAGE_IMPORTANT = 'Y'
+		WHERE MESSAGE_NO = #{messageNo}
+	</update>
+	
+	<update id="importantMessageRevert" parameterType="int">
+		UPDATE MESSAGE
+		SET MESSAGE_IMPORTANT = 'N'
+		WHERE MESSAGE_NO = #{messageNo}		
+	</update>
+	
+	<insert id="insertMessage" parameterType="MessageVO">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(ATCH_FILE_NO), 0)+1 FROM GR_ATCH_FILE
+		</selectKey>
+		INSERT ALL INTO MESSAGE
+			(MESSAGE_NO, MESSAGE_SJ, MESSAGE_CN, SENDER_ID, ATCH_FILE_NO)
+		VALUES
+			((SELECT MAX(MESSAGE_NO) + 1 FROM MESSAGE), #{messageSj}, #{messageCn}, #{senderId},
+			<if test="atchFileNo eq null">
+				#{atchFileNo}
+			</if>
+			<if test="atchFileNo neq null">
+				(SELECT NVL(MAX(ATCH_FILE_NO),0)FROM GR_ATCH_FILE)
+			</if>
+			)
+		INTO RECIEVEMESSAGE
+			(RECIEVE_MESSAGE_NO, MESSAGE_NO, USER_ID)
+		VALUES
+			((SELECT MAX(RECIEVE_MESSAGE_NO) + 1 FROM RECIEVEMESSAGE),(SELECT MAX(MESSAGE_NO) + 1 FROM MESSAGE), #{userId})
+		SELECT *
+		FROM DUAL
+	</insert>
+	
+	<insert id="insertAttatchMessage">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(ATCH_FILE_NO), 0)+1 FROM GR_ATCH_FILE
+		</selectKey>
+		INSERT ALL
+		<foreach collection="messageVo.atchList" item="atch" index="idx">
+			INTO GR_ATCH_FILE (
+				ATCH_FILE_NO, 
+				ATCH_FILE_TURN, 
+				JOB_SE, 
+				FILE_COURS, 
+				FILE_NAME, 
+				STRE_FILE_NAME, 
+				FILE_TY, 
+				FILE_MG
+			)VALUES(
+				#{atchFileNo},
+				(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM GR_ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo}),
+				#{atch.jobSe},
+				#{atch.fileCours},
+				#{atch.fileName},
+				#{atch.streFileName},
+				#{atch.fileTy},
+				#{atch.fileMg}
+			 )
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+</mapper>

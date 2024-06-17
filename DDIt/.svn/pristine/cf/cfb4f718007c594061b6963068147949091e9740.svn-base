@@ -1,0 +1,9 @@
+package kr.or.ddit.teacher.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.TeacherVO;
+
+public interface TeacherService {
+	public List<TeacherVO> retrieveTeacherList();
+}

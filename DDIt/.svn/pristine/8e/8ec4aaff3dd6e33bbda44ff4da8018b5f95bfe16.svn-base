@@ -1,0 +1,88 @@
+// 자기소개폼과 자기소개 값 가져오기 위한 전역변수
+var profileForm = "";
+var profileFormBtn = "";
+var intro = "";
+var userId = "";
+
+// 수정 이벤트 취소에 쓰일 전역 변수
+var profileRevertForm = "";
+var child = "";
+var lengths = "";
+var form = "";
+
+function profileUpdateForm(btn) {
+    userId = btn.dataset.id;
+    intro = btn.dataset.intro;
+
+    // 수정폼
+    profileForm = btn.closest(".profileForm").children[0];
+    // 취소 시 되돌릴 원래 폼.
+    profileRevertForm = btn.closest(".profileForm");
+    
+    child = profileRevertForm.children;
+    lengths = profileRevertForm.children.length;
+
+    // 계속해서 form에 폼이 담기는 것을 방지하기 위해 빈 값으로 초기화
+    form = '';
+    for(let i=0; i<lengths; i++) {
+        form += child[i].outerHTML;
+    }
+
+    // 수정 버튼폼
+    profileFormBtn = btn.closest(".profileFormBtn");
+
+    console.log(profileForm);
+    console.log(profileFormBtn);
+	
+    console.log(intro);
+	
+	profileForm.innerHTML = 
+    `
+            <div class="col-lg-12">
+            <label class="form-label" for="intro">자기소개</label>
+            <textarea name="teacherIntro" id="intro" class="form-control" cols="30" rows="5">${intro}</textarea>
+            </div>
+            <div class="col-12 d-flex justify-content-end">
+            </div>
+    `
+
+
+    profileFormBtn.innerHTML =
+    `
+        <button class="btn btn-primary"  onclick="profileUpdate(this)" data-id = "${userId}"  style="margin-top: 20px;">수 정</button>
+        <button class="btn btn-danger"  onclick="profileRevert(this)" style="margin-top: 20px; margin-left: 20px;">취 소</button>
+    `
+}
+
+function profileUpdate() {
+    let teacherIntro = document.querySelector("#intro").value;
+
+    let url = `${cPath}/snsProfile/myProfile.do`;
+    let method = "POST";
+    let data = {
+        teacherIntro : teacherIntro,
+        userId : userId
+    }
+
+    $.ajax({
+        url : url,
+        method : method,
+        data : JSON.stringify(data),
+        dataType : "JSON",
+        contentType : "application/json",
+
+        success:function(resp){
+            console.log("asdfdsafsdfd");
+            console.log("resp",resp);
+
+            location.href = location.href;
+        }
+    })
+}
+
+
+// 수정 이벤트 취소
+function profileRevert(btn) {
+    let profileForm = btn.closest(".profileForm");
+    profileForm.innerHTML = `${form}`;
+}

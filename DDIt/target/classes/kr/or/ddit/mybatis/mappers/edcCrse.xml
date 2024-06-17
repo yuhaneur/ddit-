@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.edcCrse.dao.EdcCrseDAO">
+	<select id="selectEdcCrseList" resultType="EdcCrseVO">
+		SELECT EDC_CRSE_CODE, EDC_CRSE_NAME, EDC_DAY_CO, EDC_BEGIN_DE, EDC_END_DE 
+		FROM EDC_CRSE
+		ORDER BY EDC_END_DE DESC
+	</select>
+	
+	<select id="selectEdcCrse" parameterType="String" resultType="EdcCrseVO">
+		SELECT EDC_CRSE_CODE, EDC_CRSE_NAME, EDC_DAY_CO, EDC_BEGIN_DE, EDC_END_DE
+		FROM EDC_CRSE
+		WHERE EDC_CRSE_CODE=#{EDC_CRSE_CODE}
+	</select>
+	
+	<insert id="insertEdcCrse" parameterType="EdcCrseVO">
+		<selectKey order="BEFORE" resultType="string" keyProperty="edcCrseCode">
+			SELECT 'EDC'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(EDC_CRSE_CODE,4))),0)+1,7,'0')
+			FROM EDC_CRSE
+		</selectKey>
+		INSERT INTO EDC_CRSE
+		(EDC_CRSE_CODE, EDC_CRSE_NAME, EDC_DAY_CO, EDC_BEGIN_DE, EDC_END_DE)
+		VALUES
+		(#{edcCrseCode},#{edcCrseName},#{edcDayCo},#{edcBeginDe},#{edcEndDe})
+	</insert>
+	
+	<!-- 교육기간 마지막일 구하기 -->
+	<select id="endDate" resultType="String">
+		SELECT TO_CHAR(TO_DATE(#{startDate})+#{edcDayCo},'YYYY/MM/DD')
+		FROM DUAL
+	</select>
+	<!-- 휴일 개수 -->
+	<select id="countDate" resultType="int">
+		SELECT COUNT(*)
+		FROM CALENDAR
+		WHERE DATEVALUE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+		AND (HOLIDAY=1 OR DAYOFWEEK=1 OR DAYOFWEEK=7)
+	</select>
+</mapper>

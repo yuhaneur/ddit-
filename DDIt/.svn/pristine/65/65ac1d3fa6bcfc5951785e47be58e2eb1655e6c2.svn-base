@@ -1,0 +1,31 @@
+package kr.or.ddit.project.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.vo.ProjectVO;
+
+@Service
+
+public interface ProjectService {
+
+	/**
+	 * 프로젝트 전체 리스트조회
+	 * @return
+	 */
+	public List<ProjectVO> retrieveProjectList(PaginationInfo paging);
+	
+	
+	/**
+	 * 프로젝트 생성
+	 * @param projectVO
+	 * @return
+	 */
+	public int createProject(ProjectVO projectVO);
+
+
+	
+
+}

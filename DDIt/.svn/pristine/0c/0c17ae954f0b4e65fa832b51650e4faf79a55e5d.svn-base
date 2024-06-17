@@ -1,0 +1,25 @@
+package kr.or.ddit.school.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.ClassVO;
+import kr.or.ddit.vo.LectureRoomVO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjMapping;
+import kr.or.ddit.vo.SjVO;
+
+public interface SchoolService {
+	// 강의실 조회해오기
+	public List<LectureRoomVO> selectLectureRoomList();
+	// 클래스 목록조회
+	public List<ClassVO> selectClassList();
+	// 클래스 등록
+	public int insertClass(ClassVO classVO);
+	// 클래스 수정
+	public int updateClass(ClassVO classVO);
+	
+	// 클래스에 들어올 선생님들 조회
+	public List<SjVO> selectClassInteacher(SjManagerVO sjManagerVO);
+	// 클래스에 들어올 선생님들 저장
+	public int insertClassInteacher(SjMapping sjMappingVO);
+}

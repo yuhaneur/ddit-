@@ -1,0 +1,336 @@
+package kr.or.ddit.sns.controller;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.paging.SimpleCondition;
+import kr.or.ddit.sns.service.SnsLikeService;
+import kr.or.ddit.sns.service.SnsService;
+import kr.or.ddit.snsProfile.service.SnsProfileService;
+import kr.or.ddit.vo.FollowVO;
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+import kr.or.ddit.vo.SnsLikeVO;
+import kr.or.ddit.vo.StudentVO;
+import kr.or.ddit.vo.TeacherVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/sns")
+public class SnsController {
+	private static final String MODELNAME = "newFeed";
+	
+	@Autowired
+	private SnsService service;
+	
+	@Autowired
+	private SnsProfileService profileService;
+	
+	@Autowired
+	private SnsLikeService likeService;
+	
+	@ModelAttribute(MODELNAME)
+	public SnsFeedVO newFeed() {
+		return new SnsFeedVO();
+	}
+	
+	// 피드 리스트
+	@GetMapping("/feedList.do")
+	public String snsFeedListTest(
+			@RequestParam(required = false , defaultValue = "1") int currentPage 
+			,@ModelAttribute("condition")SimpleCondition simpleCondition
+			,Model model
+	) {
+
+		/*
+		simpleCondition.setSearchType("sns");
+		PaginationInfo paging = new PaginationInfo(5,9);
+		paging.setCurrentPage(currentPage);
+		paging.setSimpleCondition(simpleCondition);
+		*/
+		
+		List<SnsFeedVO> feedList = service.readFeedList();
+		log.info("피드 리스트 {} ", feedList);
+		model.addAttribute("feedList", feedList);
+		
+		/*
+		PaginationRenderer render = new SnsPaginationRenderer();
+		model.addAttribute("pagingFunction", "paging");
+		String pagingHTML = render.renderPagination(paging, "paging");
+		model.addAttribute("pagingHTML",pagingHTML);
+		
+		log.info("paging : ============ {}", pagingHTML);
+		*/
+		
+		return "sns/snsFeed";
+	}
+	
+	// 피드 상세보기
+	@GetMapping("/feed")
+	public SnsFeedVO snsFeedTest(
+		@RequestParam int snsFeedNo
+	) {
+		SnsFeedVO feed = service.readFeed(snsFeedNo);
+		return feed;
+	}
+	
+	// 학생 교사 검증
+	@ResponseBody
+	@GetMapping("/validate")
+	public Map<String, String> validate(
+		@RequestParam String userId
+	) {
+		Map<String, String> result = new HashMap<>();
+		log.info("유저아이디: {}",userId);
+		int chk = profileService.validateUser(userId);
+		if(chk == 1) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 요약 프로필 출력 ( 학생 )
+	@ResponseBody
+	@GetMapping("/profileStudent{userId}")
+	public StudentVO snsStudentProfile(
+			@RequestParam String userId
+	){
+		StudentVO profile = profileService.readStudent(userId);
+		log.info("학생: {}", profile);
+		return profile;
+	}
+	
+	// 요약 프로필 출력 ( 교사 )
+	@ResponseBody
+	@GetMapping("/profileTeacher{userId}")
+	public TeacherVO snsTeacherProfile(
+			@RequestParam String userId
+			){
+		TeacherVO profile = profileService.readTeacher(userId);
+		return profile;
+	}
+	
+	// 피드 등록
+	@ResponseBody
+	@PostMapping("/feedList.do")
+	public Map<String, String> snsFeedInsert(
+			SnsFeedVO feedVO
+			) throws IOException {
+		log.info("피드등록 테스트 : {}", feedVO);
+		Map<String, String> result = new HashMap<>();
+		int chk = service.createFeed(feedVO);
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 피드 수정
+	@ResponseBody
+	@PutMapping(value = "/feedUpdate.do", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, String> snsFeedUpdate(
+			@RequestBody SnsFeedVO feedVO
+			) {
+		int chk = service.updateFeed(feedVO); 
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 피드 삭제
+	@ResponseBody
+	@DeleteMapping("/feedDelete.do")
+	public Map<String, String> snsFeedDelete(
+			@RequestBody Long snsFeedNo
+			) {
+		int chk = service.deleteFeed(snsFeedNo);
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 댓글 리스트 출력
+	@ResponseBody
+	@GetMapping("/{snsFeedNo}")
+	public List<SnsAnswerVO> snsAnswerListTest(
+		@PathVariable int snsFeedNo
+	) {
+		List<SnsAnswerVO> answerList = service.readAnswerList(snsFeedNo);
+		return answerList;
+	}
+
+	// 추천 팔로우 리스트
+	@GetMapping("/follow{userId}")
+	public List<FollowVO> snsUnFollowListTest(
+		@PathVariable String userId
+	) {
+		List<FollowVO> unFollowList = service.readUnFollowList(userId);
+		return unFollowList;
+	}
+	
+	// 팔로워 추가
+	@ResponseBody
+	@PostMapping("/followInsert.do")
+	public Map<String, String> snsFollowInsert(
+		@RequestBody FollowVO followVo	
+	){
+		log.info("================= userId {} / userId2 {}", followVo);
+		int chk = service.createFollow(followVo);
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	// 팔로잉 카운트
+	@ResponseBody
+	@GetMapping("/followingCount{userId}")
+	public int snsFollowingCount(
+		@PathVariable String userId
+	) {
+		int count = service.readFollwingCount(userId);
+		return count;
+	}
+	
+	// 팔로워 카운트
+	@ResponseBody
+	@GetMapping("/followerCount{userId}")
+	public int snsFollowerCount(
+			@PathVariable String userId
+			) {
+		int count = service.readFollwerCount(userId);
+		return count;
+	}
+	
+	
+	/**
+	 * @param snsAnswerVo
+	 * @return 댓글 등록
+	 */
+	@ResponseBody
+	@PostMapping("/answerInsert.do")
+	public Map<String, String> snsAnswerInsert(
+		@RequestBody SnsAnswerVO snsAnswerVo
+	) {
+		int chk = service.createAnswer(snsAnswerVo);
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	
+	/**
+	 * @param snsAnswerVo
+	 * @return 댓글 수정
+	 */
+	@ResponseBody
+	@PostMapping("/answerUpdate.do")
+	public Map<String, String> snsAnswerUpdate(
+		@RequestBody SnsAnswerVO snsAnswerVo
+	) {
+		int chk = service.updateAnswer(snsAnswerVo);
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	/**
+	 * @param snsAnswerVo
+	 * @return 댓글 삭제
+	 */
+	@ResponseBody
+	@PostMapping("/answerDelete.do")
+	public Map<String, String> snsAnswerDelete(
+		@RequestBody SnsAnswerVO snsAnswerVo
+	) {
+		int chk = service.deleteAnswer(snsAnswerVo);
+		Map<String, String> result = new HashMap<>();
+		if(chk > 0) {
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 좋아요 증가
+	@ResponseBody
+	@PostMapping("/like")
+	public Map<String, String> snsFeedLike(
+		@RequestBody SnsLikeVO feedLike
+	) {
+		log.info("피드 좋아요 : {}", feedLike);
+		Long snsFeedNo = feedLike.getSnsFeedNo();
+		Map<String, String> result = new HashMap<>();
+		
+		int chk = likeService.insertFeedLike(feedLike);
+		if(chk > 0) {
+			likeService.insertFeedLikeCount(snsFeedNo);
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+	
+	// 좋아요 감소
+	@ResponseBody
+	@PostMapping("/likeMinus")
+	public Map<String, String> snsFeedLikeMinus(
+			@RequestBody SnsLikeVO feedLike
+			) {
+		log.info("피드 좋아요 마이너스 : {}", feedLike);
+		Long snsFeedNo = feedLike.getSnsFeedNo();
+		Map<String, String> result = new HashMap<>();
+		
+		int chk = likeService.insertFeedLike(feedLike);
+		if(chk > 0) {
+			likeService.insertFeedLikeMinus(snsFeedNo);
+			result.put("result", "ok");
+		}else {
+			result.put("result", "fail");
+		}
+		return result;
+	}
+}

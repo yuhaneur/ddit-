@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-5.8.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.factory.PasswordEncoderFactories" factory-method="createDelegatingPasswordEncoder"></bean>
+	<bean id="testEncoder" class="org.springframework.security.crypto.password.NoOpPasswordEncoder"></bean>
+	<security:authentication-manager>
+		<security:authentication-provider user-service-ref="customUsersDetailsService">
+			<security:password-encoder ref="testEncoder"/>
+		</security:authentication-provider>
+	</security:authentication-manager>
+	<security:http>
+		<!-- 정적 리소스는 모두 접근 허용 -->
+		<security:csrf disabled="true"/>
+		<security:intercept-url pattern="/resources/**" access="permitAll" />
+		<security:form-login login-page="/auth/login.do"
+							  username-parameter="userId"
+							  password-parameter="userPw"
+							  default-target-url="/"
+							  authentication-failure-handler-ref="usersLoginFailHandler"
+							  
+		 />
+		<security:logout logout-url="/auth/logout.do" />
+<!-- 		<security:intercept-url pattern="/board/new" access="hasRole('ADMIN')"/> -->
+<!-- 		<security:intercept-url pattern="/board/**" method="GET" access="permitAll()"/> -->
+<!-- 		<security:intercept-url pattern="/board/**" method="PUT" access="hasAuthority('ROLE_ADMIN')"/> -->
+<!-- 		<security:intercept-url pattern="/board/**" method="DELETE" access="hasAuthority('ROLE_ADMIN')"/> -->
+		<security:intercept-url pattern="/auth/login.do" access="isAnonymous()"/>
+		<security:intercept-url pattern="/logout.do" access="isAuthenticated()"/>
+		<security:intercept-url pattern="/**" access="permitAll()"/>
+	</security:http>
+	<security:global-method-security pre-post-annotations="enabled"/>
+</beans>

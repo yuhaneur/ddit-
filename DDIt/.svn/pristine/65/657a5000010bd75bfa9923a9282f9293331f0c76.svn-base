@@ -1,0 +1,53 @@
+package kr.or.ddit.vo;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = {"curriculumOrdr","sjNo","edcCrseCode"})
+public class CurriculumVO {
+	@NotNull @Min(0) private Long curriculumOrdr;
+	@NotBlank @Size(max=50) private String classTopic;
+	@Size(max=500) private String classCn;
+	@NotBlank @Size(max=1) private String assortedSn;
+	@NotNull @Min(0) private Long sjNo;
+	@NotBlank @Size(max=10) private String edcCrseCode;
+	
+	private Long atchFileNo;
+	
+	// 업로드 파일들을 저장
+	private MultipartFile[] curriculemFiles;
+	// 업로드파일 정보 저장
+	private List<GrAtchFileVO> atchList;
+	public void setCurriculemFiles(MultipartFile[] curriculemFiles) {
+		// 파일들 비어있으면 업로드파일정보저장하는리스트 빈 리스트로만들고 끝
+		if (curriculemFiles == null || curriculemFiles.length == 0) {
+		    this.atchList = Collections.emptyList();
+		    return;
+		  }
+		// 안비어있으면 리스트 하나만들고
+		  List<GrAtchFileVO> atchList = new ArrayList<>();
+		  // 파일들 하나씩 뺴서 업로드파일정보저장하는 리스트에 추가해줌
+		  for (MultipartFile curriculemFile : curriculemFiles) {
+		    if (!curriculemFile.isEmpty()) {
+		      atchList.add(new GrAtchFileVO(curriculemFile));
+		    }
+		  }
+		  // 업로드된 파일들의 배열을 저장
+		this.atchList = atchList;
+	}
+	// 수정할때 예전순서
+	private Long oldCurriculumOrdr;
+	
+}

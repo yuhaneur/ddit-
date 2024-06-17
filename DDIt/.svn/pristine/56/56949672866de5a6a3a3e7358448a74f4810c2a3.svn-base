@@ -1,0 +1,178 @@
+package kr.or.ddit.school.controller;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.school.service.AttenceService;
+import kr.or.ddit.school.service.ConsultingService;
+import kr.or.ddit.vo.AttenanceVO;
+import kr.or.ddit.vo.ConsultingVO;
+import kr.or.ddit.vo.GoingOutVO;
+import kr.or.ddit.vo.StudentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/school")
+public class StudentAttenceController {
+	@Autowired
+	private AttenceService attenceService;
+	
+	@Autowired
+	private ConsultingService consultingService;
+	// 학생자신 정보
+	@GetMapping("info/{userId}/{classInfo}")
+	public String myInfo(Model model,
+			@PathVariable String userId,
+			@PathVariable String classInfo) {
+		StudentVO sdvo = new StudentVO();
+		sdvo.setClassCode(classInfo);
+		sdvo.setUserId(userId);
+		
+		StudentVO studentVO= attenceService.selectStudentInfoList(sdvo);
+		// 출석 정보구하기
+		Map<String, Object> attenanceMap = attenceService.attenanceInfo(studentVO);
+		
+		model.addAttribute("attenanceMap", attenanceMap);
+		model.addAttribute("studentVO", studentVO);
+		return "school/myInfo";
+	}
+	// 출석하기
+	@PostMapping("info")
+	@ResponseBody
+	public Map<String, Object> insertAttence(@ModelAttribute AttenanceVO attenanceVO){
+		Map<String, Object> map = new HashMap();
+		AttenanceVO atvo =attenceService.selectAttenance(attenanceVO.getUserId());
+		if(atvo!=null) {
+			map.put("check", "이미 출석하셨습니다.");
+			return map;
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		log.info("@@@@@@date {} ",date);
+		int cnt = attenceService.attenanceStudent(attenanceVO);
+		
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "출석실패");
+		}
+		return map;
+	}
+	// 퇴실하기
+	@PutMapping("info")
+	@ResponseBody
+	public Map<String, Object> updateCheckOut(@RequestBody AttenanceVO attenanceVO){
+		Map<String, Object> map = new HashMap();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		log.info("@@@@@@date {} ",date);
+		int cnt = attenceService.updateCheckOut(attenanceVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "퇴실실패!! 집가지마!");
+		}
+		return map;
+	}
+	// 외출하기
+	@PostMapping("goingOut")
+	@ResponseBody
+	public Map<String, Object> goingOut(@RequestParam String userId) {
+		Map<String, Object> map = new HashMap();
+		AttenanceVO attenanceVO= attenceService.selectAttenance(userId);
+		// 저장용 vo
+		GoingOutVO goingOutVO = new GoingOutVO();
+		// 체크용 vo
+		List<GoingOutVO> checkVo = new ArrayList<GoingOutVO>();
+		log.info("attenanceVO.getAttenanceCode() {}",attenanceVO.getAttenanceCode());
+		goingOutVO.setAttenanceCode(attenanceVO.getAttenanceCode());
+		
+		// 복귀안한 외출있는지 확인
+		checkVo = attenceService.checkGoingOut(attenanceVO.getAttenanceCode());
+		log.info("checkVo.size( ) {}",checkVo.size());
+		if(checkVo.size() != 0) {
+			if(checkVo.get(checkVo.size()-1).getEntranceTime()==null) {
+				map.put("check", "복귀안한 외출이있어요");
+				return map;
+			}
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		int cnt = attenceService.insertGoingOut(goingOutVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "외출실패!! 못감!");
+		}
+		return map;
+	}
+	// 복귀하기
+	@PutMapping("goingOut")
+	@ResponseBody
+	public Map<String, Object> updateGoingOut(@RequestBody AttenanceVO attenance) {
+		Map<String, Object> map = new HashMap();
+		AttenanceVO attenanceVO= attenceService.selectAttenance(attenance.getUserId());
+		// 업데이트용 vo
+		GoingOutVO goingOutVO = new GoingOutVO();
+		// 체크용 vo
+		List<GoingOutVO> checkVo = new ArrayList<GoingOutVO>();
+		// 복귀안한 외출있는지 확인
+		checkVo = attenceService.checkGoingOut(attenanceVO.getAttenanceCode());
+		if(checkVo.size()==0 || checkVo.get(checkVo.size()-1).getCheckoutTime()==null) {
+			map.put("check", "외출이없는뎅");
+			return map;
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		goingOutVO.setGoingoutNo(checkVo.get(checkVo.size()-1).getGoingoutNo());
+		int cnt = attenceService.updateGoingOut(goingOutVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "복귀실패!!");
+		}
+		return map;
+	}
+	
+	@GetMapping("info/{userId}")
+	@ResponseBody
+	public Map<String , Object> attenanceInfo(@PathVariable String userId) {
+		List<AttenanceVO> attenanceList = 	attenceService.selectAttenanceList(userId);
+		List<ConsultingVO> consultingList = consultingService.selectYcounsultingList(userId);
+		Map<String , Object> map = new HashMap<String, Object>();
+		
+		map.put("attenanceList", attenanceList);
+		map.put("consultingList", consultingList);
+		return map;
+		
+	}
+	
+	
+}

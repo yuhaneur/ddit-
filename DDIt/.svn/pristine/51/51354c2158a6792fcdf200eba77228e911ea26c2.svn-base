@@ -1,0 +1,221 @@
+package kr.or.ddit.school.controller;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.school.service.AttenceService;
+import kr.or.ddit.vo.AttenanceVO;
+import kr.or.ddit.vo.GoingOutVO;
+import kr.or.ddit.vo.StudentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/school")
+public class StudentAttenceController {
+	@Autowired
+	private AttenceService attenceService;
+	
+	// 학생자신 정보
+	@GetMapping("info/{userId}/{classInfo}")
+	public String myInfo(Model model,
+			@PathVariable String userId,
+			@PathVariable String classInfo) {
+		StudentVO sdvo = new StudentVO();
+		sdvo.setClassCode(classInfo);
+		sdvo.setUserId(userId);
+		
+		StudentVO studentVO= attenceService.selectStudentInfoList(sdvo);
+			// d-Day 구하기
+		String classEndDate =  studentVO.getClassVO().getClassEndDe();
+		classEndDate = classEndDate.substring(0, 10);
+		LocalDate nowDate = LocalDate.now();
+		LocalDate endDate = LocalDate.parse(classEndDate,DateTimeFormatter.ISO_DATE );
+		// 시간차 구하기
+		long dDay = nowDate.until(endDate, ChronoUnit.DAYS);
+		
+		// 출석
+		int ok = 0;
+		// 지각
+		int late = 0;
+		// 조퇴
+		int sick = 0;
+		// 결석
+		int no = 0;
+		
+		// 출결정보 구하기
+		List<AttenanceVO> attenanceList =  attenceService.selectAttenanceList(userId);
+		for (AttenanceVO attenanceVO : attenanceList) {
+			// 입출결시간이 둘다 있을때
+			if(attenanceVO.getEntranceTime()!=null && attenanceVO.getCheckoutTime()!=null) {
+				// 입실시간
+				String entranceTime =  attenanceVO.getEntranceTime();
+				entranceTime = entranceTime.substring(11, 16);
+				LocalTime firstTime = LocalTime.parse(entranceTime, DateTimeFormatter.ofPattern("HH:mm"));
+				// 퇴실시간 
+				String checkOutTime =  attenanceVO.getCheckoutTime();
+				checkOutTime = checkOutTime.substring(11, 16);
+				LocalTime secondTime = LocalTime.parse(checkOutTime, DateTimeFormatter.ofPattern("HH:mm"));
+				// 지각 기준시간
+				LocalTime lateTime = LocalTime.of( 9, 10, 0);
+				// 지각 기준시간보다 후의 입실시간이면 지각처리
+				if(firstTime.isAfter(lateTime)) {
+					late++;
+					continue;
+				}
+				
+				// 조퇴 기준시간
+				LocalTime outTime = LocalTime.of(17,40,0);
+				// 조퇴기준시간보다 전의 퇴실시간이면 조퇴처리
+				if(secondTime.isBefore(outTime)) {
+					sick++;
+					continue;
+				}
+				// 뒤에서(퇴실) 앞에뺀(출석) 시간 (분)
+				long minutes = ChronoUnit.MINUTES.between( firstTime, secondTime );
+				// 퇴실 - 입실이 480분 이상이면 정상출결
+				if(minutes>=480) {
+					ok++;
+					continue;
+				}
+			}
+			
+			// 출결이나 퇴실이나 둘중에 하나만 없어도 결석처리
+			if(attenanceVO.getEntranceTime()==null || attenanceVO.getCheckoutTime()==null) {
+				no++;
+			}
+		}
+		
+		model.addAttribute("ok", ok);
+		model.addAttribute("late", late);
+		model.addAttribute("sick", sick);
+		model.addAttribute("no", no);
+		
+		model.addAttribute("studentVO", studentVO);
+		model.addAttribute("dDay", dDay);
+		return "school/myInfo";
+	}
+	// 출석하기
+	@PostMapping("info")
+	@ResponseBody
+	public Map<String, Object> insertAttence(@ModelAttribute AttenanceVO attenanceVO){
+		Map<String, Object> map = new HashMap();
+		AttenanceVO atvo =attenceService.selectAttenance(attenanceVO.getUserId());
+		if(atvo!=null) {
+			map.put("check", "이미 출석하셨습니다.");
+			return map;
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		log.info("@@@@@@date {} ",date);
+		int cnt = attenceService.attenanceStudent(attenanceVO);
+		
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "출석실패");
+		}
+		return map;
+	}
+	// 퇴실하기
+	@PutMapping("info")
+	@ResponseBody
+	public Map<String, Object> updateCheckOut(@RequestBody AttenanceVO attenanceVO){
+		Map<String, Object> map = new HashMap();
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		log.info("@@@@@@date {} ",date);
+		int cnt = attenceService.updateCheckOut(attenanceVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "퇴실실패!! 집가지마!");
+		}
+		return map;
+	}
+	// 외출하기
+	@PostMapping("goingOut")
+	@ResponseBody
+	public Map<String, Object> goingOut(@RequestParam String userId) {
+		Map<String, Object> map = new HashMap();
+		AttenanceVO attenanceVO= attenceService.selectAttenance(userId);
+		// 저장용 vo
+		GoingOutVO goingOutVO = new GoingOutVO();
+		// 체크용 vo
+		List<GoingOutVO> checkVo = new ArrayList<GoingOutVO>();
+		log.info("attenanceVO.getAttenanceCode() {}",attenanceVO.getAttenanceCode());
+		goingOutVO.setAttenanceCode(attenanceVO.getAttenanceCode());
+		
+		// 복귀안한 외출있는지 확인
+		checkVo = attenceService.checkGoingOut(attenanceVO.getAttenanceCode());
+		log.info("checkVo.size( ) {}",checkVo.size());
+		if(checkVo.size() != 0) {
+			if(checkVo.get(checkVo.size()-1).getEntranceTime()==null) {
+				map.put("check", "복귀안한 외출이있어요");
+				return map;
+			}
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		int cnt = attenceService.insertGoingOut(goingOutVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "외출실패!! 못감!");
+		}
+		return map;
+	}
+	// 복귀하기
+	@PutMapping("goingOut")
+	@ResponseBody
+	public Map<String, Object> updateGoingOut(@RequestBody AttenanceVO attenance) {
+		Map<String, Object> map = new HashMap();
+		AttenanceVO attenanceVO= attenceService.selectAttenance(attenance.getUserId());
+		// 업데이트용 vo
+		GoingOutVO goingOutVO = new GoingOutVO();
+		// 체크용 vo
+		List<GoingOutVO> checkVo = new ArrayList<GoingOutVO>();
+		// 복귀안한 외출있는지 확인
+		checkVo = attenceService.checkGoingOut(attenanceVO.getAttenanceCode());
+		if(checkVo.size()==0 || checkVo.get(checkVo.size()-1).getCheckoutTime()==null) {
+			map.put("check", "외출이없는뎅");
+			return map;
+		}
+		LocalDateTime localDateTime = LocalDateTime.now();
+		String date = localDateTime.toString().substring(0, 16);
+		date = date.replaceAll("T", " ");
+		goingOutVO.setGoingoutNo(checkVo.get(checkVo.size()-1).getGoingoutNo());
+		int cnt = attenceService.updateGoingOut(goingOutVO);
+		if(cnt>0) {
+			map.put("ok", date);
+		}else {
+			map.put("fail", "복귀실패!!");
+		}
+		return map;
+	}
+}

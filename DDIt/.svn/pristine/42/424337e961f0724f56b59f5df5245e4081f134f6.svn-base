@@ -1,0 +1,15 @@
+package kr.or.ddit.school.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.AssignmentVO;
+
+@Mapper
+public interface AssignmentDAO {
+	/**
+	 * 과제등록
+	 * @param assignmentVO
+	 * @return
+	 */
+	public int insertAssignment(AssignmentVO assignmentVO);
+}

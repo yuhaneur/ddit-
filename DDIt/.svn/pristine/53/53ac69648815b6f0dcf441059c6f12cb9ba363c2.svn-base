@@ -1,0 +1,59 @@
+package kr.or.ddit.item.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.ItemPurchaseVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class ItemPurchaseDAOTest extends AbstractRootContextTest{
+	
+	@Autowired
+	ItemPurchaseDAO dao;
+	
+	@Test
+	void testInsertItemPurchase() {
+		ItemPurchaseVO itemPurchase = new ItemPurchaseVO();
+		itemPurchase.setUserId("A002");
+		itemPurchase.setItemCode("ITEM00001");
+		assertDoesNotThrow(()->dao.insertItemPurchase(itemPurchase));
+		log.info("list : {}", itemPurchase);
+	}
+
+	@Test
+	void testSelectItemPurchaseList() {
+		List<ItemPurchaseVO> itemPurchaselist = dao.selectItemPurchaseList("A005");
+		assertNotNull(itemPurchaselist);
+		log.info("list : {}", itemPurchaselist);
+		
+	}
+
+	@Test
+	void testSelectTotalRecord() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testSelectItemStorage() {
+		List<ItemPurchaseVO> itemPurchaselist = dao.selectItemStorage("A005");
+		assertNotNull(itemPurchaselist);
+		log.info("list : {}", itemPurchaselist);
+	}
+
+	@Test
+	void testUpdateItemPurchase() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testDeleteItemPurchase() {
+		fail("Not yet implemented");
+	}
+
+}

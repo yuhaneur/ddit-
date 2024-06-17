@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.QustnrDAO">
+	<resultMap type="QustnrVO" id="qustnrMap" autoMapping="true">
+		<id property="qustnrNo" column="QUSTNR_NO"/>
+		<collection property="qunTrgterList" ofType="QustnrTrgterVO" autoMapping="true">
+			<id property="userId" column="USER_ID"/>
+			<id property="qustnrNo" column="QUSTNR_NO"/>
+		</collection>
+		<collection property="questionsList" ofType="QustnrQuestionsVO" autoMapping="true">
+			<id property="qustnrNo" column="QUSTNR_NO"/>
+			<id property="qustnrQuestionsNo" column="QUSTNR_QUESTIONS_NO"/>
+			<collection property="qustnrAnswerTyList" ofType="QustnrAnswerTyVO" autoMapping="true">
+				<id property="qustnrNo" column="QUSTNR_NO"/>
+				<id property="qustnrQuestionsNo" column="QUSTNR_QUESTIONS_NO"/>
+				<id property="qustnrAnswerNo" column="QUSTNR_ANSWER_NO"/>
+			</collection>
+		</collection>
+	</resultMap>
+	<!-- 설문 리스트 조회 -->
+	<select id="selectQustnrList" resultMap="qustnrMap">
+			SELECT 
+				A.QUSTNR_NO, 
+				A.USER_ID, 
+				A.QUSTNR_SJ, 
+				A.QUSTNR_CREAT_DT, 
+				A.QUSTNR_END_DT, 
+				A.CLASS_CODE,
+				C.STUDENT_NAME
+			FROM QUSTNR A INNER JOIN QUSTNR_TRGTER B ON (A.QUSTNR_NO=B.QUSTNR_NO)
+			INNER JOIN STUDENT C ON(A.USER_ID=C.USER_ID)
+			WHERE B.USER_ID=#{userId}
+	</select>
+	<!-- 설문 답변유형 코드그룹 리스트 조회 -->
+	<select id="selectCodeGrList" resultType="QustnrAnswerDetailGrVO">
+		SELECT QUSTNR_ANSWER_CODE_GR, QUSTNR_ANSWER_CODE_NM
+    	FROM QUSTNR_ANSWER_DETAIL_GR
+	</select>
+	
+	<!-- 답변유형에 따른 코드 -->
+	<select id="selectCodeList" resultType="QustnrAnswerDetailVO">
+		SELECT 
+		QUSTNR_ANSWER_NO, QUSTNR_ANSWER_CODE_GR, QUSTNR_ANSWER_ORDR, QUSTNR_ANSWER_CN
+		FROM QUSTNR_ANSWER_DETAIL
+		WHERE QUSTNR_ANSWER_CODE_GR=#{qustnrAnswerCode}
+		ORDER BY QUSTNR_ANSWER_ORDR
+	</select>
+	<!-- 	설문대상자 리스트 -->
+	<select id="qustnrSelectorList" resultType="QustnrSelectorVO">
+	SELECT USER_ID,STUDENT_NAME as userName
+	FROM STUDENT  
+	WHERE CLASS_CODE=#{classCode}
+		UNION
+	SELECT A.USER_ID ,B.TEACHER_NAME as userName
+	FROM SJ_MAPPING A INNER JOIN TEACHER B ON (A.USER_ID=B.USER_ID)
+	WHERE CLASS_CODE=#{classCode}
+	</select>
+	
+	<!-- 설문 등록 -->
+	<insert id="insertQustnr" parameterType="QustnrVO">
+		<selectKey order="BEFORE" resultType="long" keyProperty="qustnrNo">
+			SELECT NVL(MAX(QUSTNR_NO),0)+1
+			FROM QUSTNR
+		</selectKey>
+		INSERT INTO QUSTNR (
+		    QUSTNR_NO, 
+		    USER_ID, 
+		    QUSTNR_SJ,
+		    QUSTNR_CREAT_DT,
+		    QUSTNR_END_DT, 
+		    CLASS_CODE
+		) VALUES(
+			#{qustnrNo},#{userId},#{qustnrSj},SYSDATE,#{qustnrEndDt},#{classCode}
+		)
+	</insert>
+	<!-- 설문문제등록 -->
+	<insert id="insertQustnrQuestions" parameterType="QustnrQuestionsVO">
+		INSERT INTO QUSTNR_QUESTIONS (
+		    QUSTNR_QUESTIONS_NO, 
+		    QUSTNR_NO, 
+		    QUSTNR_CN
+		) VALUES(
+			#{qustnrQuestionsNo},#{qustnrNo},#{qustnrCn}
+		)
+	</insert>
+	<!-- 설문답변내용등록 -->
+	<insert id="insertQustnrAnswer" parameterType="QustnrAnswerTyVO">
+		INSERT INTO QUSTNR_ANSWER_TY (
+		    QUSTNR_ANSWER_NO, 
+		    QUSTNR_QUESTIONS_NO, 
+		    QUSTNR_NO, 
+		    QUESTIONNAIRE_ANSWER
+		) VALUES(
+			#{qustnrAnswerNo},#{qustnrQuestionsNo},#{qustnrNo},#{questionnaireAnswer}
+		)
+	</insert>
+	<!-- 설문 대상자 등록 -->
+	<insert id="insertQustnrSelector" parameterType="QustnrTrgterVO">
+		INSERT INTO QUSTNR_TRGTER (
+			USER_ID, QUSTNR_NO
+		) VALUES (
+			#{userId},#{qustnrNo}
+		)
+	</insert>
+	
+	<!-- 설문 상세보기 -->
+	<select id="selectQustnr" resultMap="qustnrMap">
+		SELECT 
+		    A.QUSTNR_NO, A.USER_ID, A.QUSTNR_SJ, A.QUSTNR_CREAT_DT, A.QUSTNR_END_DT,
+		    B.QUSTNR_QUESTIONS_NO,B.QUSTNR_CN, C.QUESTIONNAIRE_ANSWER,C.QUSTNR_ANSWER_NO
+		FROM QUSTNR A LEFT JOIN QUSTNR_QUESTIONS B ON (A.QUSTNR_NO=B.QUSTNR_NO)
+		LEFT JOIN QUSTNR_ANSWER_TY C ON (B.QUSTNR_QUESTIONS_NO=C.QUSTNR_QUESTIONS_NO)
+		WHERE (B.QUSTNR_NO=C.QUSTNR_NO)
+		AND A.QUSTNR_NO=#{qustnrNo}
+	</select>
+</mapper>

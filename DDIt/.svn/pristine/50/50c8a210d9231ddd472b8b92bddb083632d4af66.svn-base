@@ -1,0 +1,51 @@
+package kr.or.ddit.vo;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "assignmentCode")
+public class AssignmentVO {
+	@NotBlank @Size(max=30) private String userId;
+	@NotBlank @Size(max=10) private String classCode;
+	@NotBlank @Size(max=50) private String assignmentCode;
+	@NotBlank @Size(max=100) private String assignmentSj;
+	@Size(max=1000) private String assignmentCn;
+	 private Long assignmentPresentnNmpr;
+	 private Long atchFileNo;
+	@NotBlank @Size(max=1000) private String assignmentCreatDe;
+	@NotBlank @Size(max=1000) private String assignmentEndDe;
+	
+	private MultipartFile[] assignmentFiles;
+	// 업로드파일 정보 저장
+	private List<GrAtchFileVO> atchList;
+	public void setAssignmentFiles(MultipartFile[] assignmentFiles) {
+		// 파일들 비어있으면 업로드파일정보저장하는리스트 빈 리스트로만들고 끝
+		if (assignmentFiles == null || assignmentFiles.length == 0) {
+		    this.atchList = Collections.emptyList();
+		    return;
+		  }
+		// 안비어있으면 리스트 하나만들고
+		  List<GrAtchFileVO> atchList = new ArrayList<>();
+		  // 파일들 하나씩 뺴서 업로드파일정보저장하는 리스트에 추가해줌
+		  for (MultipartFile assignmentFile : assignmentFiles) {
+		    if (!assignmentFile.isEmpty()) {
+		      atchList.add(new GrAtchFileVO(assignmentFile));
+		    }
+		  }
+		  // 업로드된 파일들의 배열을 저장
+		this.atchList = atchList;
+	}
+	
+	private TeacherVO teacher;
+	
+}

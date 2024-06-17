@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.authority.dao.AuthorityDAO">
+
+<insert id="insertAuthority" parameterType="AuthorityVO">
+<selectKey order="BEFORE" resultType="String" keyProperty="authorityNo">
+	SELECT MAX(AUTHORITY_NO) +1
+	FROM AUTHORITY
+</selectKey>
+
+INSERT INTO AUTHORITY (
+    USER_ID,
+    AUTH,
+    AUTHORITY_NO
+) VALUES (
+    #{userId},
+    #{auth},
+    #{authorityNo}
+)		
+</insert>
+
+</mapper>

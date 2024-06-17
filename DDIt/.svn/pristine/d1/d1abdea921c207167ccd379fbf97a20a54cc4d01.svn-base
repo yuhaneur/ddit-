@@ -1,0 +1,239 @@
+package kr.or.ddit.school.service;
+
+import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import kr.or.ddit.school.dao.SchoolDAO;
+import kr.or.ddit.vo.CalendarVO;
+import kr.or.ddit.vo.ClassAllocationVO;
+import kr.or.ddit.vo.ClassVO;
+import kr.or.ddit.vo.GrAtchFileVO;
+import kr.or.ddit.vo.LectureRoomVO;
+import kr.or.ddit.vo.SchedulePairMapVO;
+import kr.or.ddit.vo.ScheduleVO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjMapping;
+import kr.or.ddit.vo.SjVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+public class SchoolServiceImpl implements SchoolService{
+
+	@Value("#{appInfo.atchSavePath}")
+	private File saveFolder;
+	@Autowired
+	private SchoolDAO dao;
+	@Override
+	public List<LectureRoomVO> selectLectureRoomList() {
+		return dao.selectLectureRoomList();
+	}
+
+	@Override
+	public List<ClassVO> selectClassList() {
+		List<ClassVO> classList =  dao.selectClassList();
+		return classList;
+	}
+
+	@Override
+	public int insertClass(ClassVO classVO) {
+		int cnt = dao.insertClass(classVO);
+		// 클래스 시작일 뽑아와서
+		String classCode = classVO.getClassCode();
+		ClassVO classInfo =  dao.scheduleInfo(classCode);
+		String start = classInfo.getClassCreationDe();
+		String end = classInfo.getClassEndDe();
+		// 초까지 다나와서 일까지만 자르기
+		start = start.substring(0,10);
+		end = end.substring(0, 10);
+		
+		// 교육 기간동안 휴일이 아닌 날짜들
+		List<CalendarVO> noHolidayList =  dao.selectNoHolidayList(start, end);
+		log.info("noHolidayList : {}" , noHolidayList);
+		
+		// DateTimeFormatter.ISO_DATE : 'yyyy-MM-dd' 로 변환하는 상수
+//		LocalDate startDate = LocalDate.parse(start, DateTimeFormatter.ISO_DATE);
+//		log.info("classInfo : {} ",classInfo);
+		
+		// 클래스 안에 sjvo리스트 정보 빼기 교육시간 필요함
+		List<SjVO> classInSjvo =  classInfo.getEdcCrse().getSjList();
+		
+		// 교과목 개수만큼 배열을 만든다. 
+		SjVO[] sjvoList = new SjVO[classInSjvo.size()];
+		
+		//교육시간이 총몇시간인지 구하기
+		long sumTime = 0;
+		for(int i =0 ; i<classInSjvo.size();i++) {
+			sjvoList[i] = classInSjvo.get(i);
+			sumTime += sjvoList[i].getEdcTime();
+		}
+		// 이게 몇일인지 구하기
+		int dayCount = (int)sumTime/8;
+		// 하나의 페어vo를 담을 배열 선언하기 크기는 총 일만큼의 크기로 지정
+		SchedulePairMapVO[] schedulePairMapVOList = new SchedulePairMapVO[dayCount];
+		// 배열의 크기만큼 반복문을 돌리고 여기 안에서 하나하나 페어를 만들어줄거임
+		for(int i=0;i<schedulePairMapVOList.length;i++) {
+			SchedulePairMapVO schedulePairMapVO = findPair(sjvoList);
+			//더이상의 페어가 안나오면 반복문 멈출거임
+			if(schedulePairMapVO == null)
+				break;
+			// 페어가 나오면 배열에 담아줄거임
+			schedulePairMapVOList[i]=schedulePairMapVO;
+		}
+        
+		for (int i = 0 ; i<noHolidayList.size();i++) {
+			String beforeDate = noHolidayList.get(i).getDateValue();
+			String date = beforeDate.substring(0, 10);
+			SjVO firstSj = schedulePairMapVOList[i].getFirst();
+			SjVO secondSj = schedulePairMapVOList[i].getSecond();
+			ScheduleVO scheduleVO = new ScheduleVO();
+			scheduleVO.setClassCode(classCode);
+			scheduleVO.setEndDate(date);
+			scheduleVO.setStartDate(date);
+			scheduleVO.setSjName(firstSj.getSjName());
+			scheduleVO.setSjNo(firstSj.getSjNo());
+			scheduleVO.setSjOrdr(firstSj.getSjOrdr());
+			ScheduleVO scheduleVO2 = new ScheduleVO();
+			scheduleVO2.setClassCode(classCode);
+			scheduleVO2.setEndDate(date);
+			scheduleVO2.setStartDate(date);
+			scheduleVO2.setSjName(secondSj.getSjName());
+			scheduleVO2.setSjNo(secondSj.getSjNo());
+			scheduleVO2.setSjOrdr(secondSj.getSjOrdr());
+			dao.insertSchedule(scheduleVO);
+			dao.insertSchedule(scheduleVO2);
+		}
+        
+		return cnt;
+	}
+	// 페어찾는 함수
+	private SchedulePairMapVO findPair(SjVO[] sjvoList) {
+		SjVO morningSj = null;
+		SjVO afterSj = null;
+		for(int i = 0; i<sjvoList.length; i++) {
+			// 4시간 이상남아있으면 오전타임에 먼저넣어줄거임
+			if(sjvoList[i].getEdcTime()>=4) {
+				morningSj = sjvoList[i];
+				// 마지막 친구가 아니면 오전으로들어간친구 다음친구를 오후에 넣어줄거임
+				if(i<sjvoList.length - 1) {
+					afterSj = sjvoList[i+1];
+				}else {
+					// 마지막 친구면 오전친구를 또 오후에 넣어줄거임
+					afterSj = morningSj;
+				}
+				// 페어에 들어갈 오전 오후 파트 다 구했으니 반복문 멈출거임
+				break;
+			}
+		}
+		// 오전 오후 파트 둘다 있으면 4시간씩 뺴줄거임 그리고 페어vo하나에 오전오후파트 둘다넣기
+		SchedulePairMapVO schedulePairMapVO = null;
+		if(morningSj !=null && afterSj!=null) {
+			morningSj.setEdcTime(morningSj.getEdcTime()-4);
+			afterSj.setEdcTime(afterSj.getEdcTime()-4);
+			schedulePairMapVO = new SchedulePairMapVO();
+			schedulePairMapVO.setFirst(morningSj);
+			schedulePairMapVO.setSecond(afterSj);
+		}
+		return schedulePairMapVO;
+	}
+
+	@Override
+	public int updateClass(ClassVO classVO) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<SjVO> selectClassInteacher(SjManagerVO sjManagerVO) {
+		return dao.selectClassInteacher(sjManagerVO);
+	}
+
+	@Override
+	public int insertClassInteacher(SjMapping sjMappingVO,String mnOrAt) {
+		int cnt = dao.insertClassInteacher(sjMappingVO);
+		if(cnt >0) {
+			ClassAllocationVO classAllocation = new ClassAllocationVO();
+			classAllocation.setSjMappingCode(sjMappingVO.getSjMappingCode());
+			classAllocation.setMnOrAt(mnOrAt);
+			cnt += dao.insertClassAllocation(classAllocation);
+		}
+		return cnt;
+	}
+
+	@Override
+	public ClassVO selectClass(String classCode) {
+		ClassVO classvo = dao.selectClass(classCode);
+		return classvo;
+	}
+
+	@Override
+	public List<SjMapping> selectSjTeacherList(String classCode) {
+		List<SjMapping> sjMappingList = dao.selectSjTeacherList(classCode);
+		return sjMappingList;
+	}
+
+	@Override
+	public ClassVO scheduleInfo(String classCode) {
+		ClassVO classVO =  dao.scheduleInfo(classCode);
+		return classVO;
+	}
+
+	@Override
+	public List<ScheduleVO> selectScheduleList(String classCode) {
+		List<ScheduleVO> scheduleList = dao.selectScheduleList(classCode);
+		return scheduleList;
+	}
+
+	@Override
+	public int updateSchedule(ScheduleVO scheduleVO) {
+		int cnt = dao.updateSchedule(scheduleVO);
+		return cnt;
+	}
+
+	@Override
+	public List<SjMapping> selectClassInSubjectList(String classCode) {
+		List<SjMapping> sjMappingList =  dao.selectClassInSubjectList(classCode);
+		return sjMappingList;
+	}
+
+	@Override
+	public List<GrAtchFileVO> selectFileList(long fileNo) {
+		List<GrAtchFileVO> fileList = dao.selectFileList(fileNo);
+		return fileList;
+	}
+
+	@Override
+	public GrAtchFileVO selectFile(long fileNo, long fileTurnNo) {
+		// 들어온 정보에맞는 파일이있는지 확인
+		GrAtchFileVO grAtchFileVO =dao.selectFile(fileNo, fileTurnNo);
+		// 그게 없으면 스프링에서 제공해주는 에러 처리해줄꺼임
+		if(grAtchFileVO == null) {
+			throw new ResponseStatusException
+				(HttpStatus.NOT_FOUND, String.format("%d번 %d째 파일의 메타 정보가 없음.", fileNo,fileTurnNo));
+		}
+		// 있으면 메타데이터 정보를 가져왔음 이제 로컬에 있는 파일을 찾을꺼임
+		// 저장시켰던 폴더경로랑 저장된이름을 가져와서
+		File file = new File(saveFolder, grAtchFileVO.getStreFileName());
+		// 그게 존재하지 않으면
+		if(!file.exists()) {
+			throw new ResponseStatusException
+			(HttpStatus.NOT_FOUND, String.format(" 파일이 존재하지않음"));
+		}
+		// 로컬파일을 스프링 리소스로 만들어서 바이너리데이터에 접근할수있는데 이걸 VO에 있는 Binary에 집어넣어버림
+		grAtchFileVO.setBinary(new FileSystemResource(file));
+		return grAtchFileVO;
+	}
+
+
+}

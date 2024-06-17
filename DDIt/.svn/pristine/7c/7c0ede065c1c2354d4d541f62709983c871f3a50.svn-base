@@ -1,0 +1,48 @@
+package kr.or.ddit.point.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.PointHistoryVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class PointHistoryDAOTest extends AbstractRootContextTest{
+
+	@Autowired
+	PointHistoryDAO dao;	
+	
+	@Test
+	void testInsertPointHistory() {
+		PointHistoryVO point = new PointHistoryVO();
+		point.setPointCode("CBCR99999");
+		point.setUserId("A002");
+		assertDoesNotThrow(()->dao.insertPointHistory(point));
+	}
+
+	@Test
+	void testSelectPointHistoryListAll() {
+		List<PointHistoryVO> list = dao.selectPointHistoryListAll();
+		assertNotNull(list);
+		log.info("list : {}", list);
+	}
+	
+	@Test
+	void testSelectPointHistoryList() {
+		List<PointHistoryVO> list = dao.selectPointHistoryList("A005");
+		assertNotNull(list);
+		log.info("list : {}", list);
+	}
+	
+	@Test
+	void testSelectPoint() {
+		assertDoesNotThrow(()->dao.selectPoint("A005"));
+		
+	}
+
+}

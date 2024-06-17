@@ -1,0 +1,27 @@
+package kr.or.ddit.school.service;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.vo.CmmnCodeGrVO;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.QustnrVO;
+
+public interface QustnrService {
+	/** 자신이 포함된 설문 리스트 조회
+	 * @param userId 접속한 유저
+	 */
+	public List<QustnrVO> selectQustnrList(@Param("userId") String userId); 
+	
+	/**
+	 * 설문 답변유형 공통코드 가져오기
+	 */
+	public List<CmmnCodeGrVO> selectCodeGrList();
+	
+	/**
+	 * @param codeGr
+	 * @return 답변유형에 따른 코드리스트
+	 */
+	public List<CmmnCodeVO> selectCodeList(String codeGr);
+}

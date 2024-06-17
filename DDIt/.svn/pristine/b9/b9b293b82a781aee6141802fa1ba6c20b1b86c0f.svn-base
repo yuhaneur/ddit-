@@ -1,0 +1,78 @@
+package kr.or.ddit.sns.controller;
+
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.sns.service.SnsService;
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+
+@Controller
+@RequestMapping("/sns")
+public class SnsController {
+	private static final String MODELNAME = "newFeed";
+	
+	@Autowired
+	private SnsService service;
+	
+	@ModelAttribute(MODELNAME)
+	public SnsFeedVO newFeed() {
+		return new SnsFeedVO();
+	}
+	
+	@GetMapping("/feedList.do")
+	public String snsFeedListTest(
+			Model model
+	) {
+		List<SnsFeedVO> feedList = service.readFeedList();
+		model.addAttribute("feedList", feedList);
+		return "sns/snsFeed";
+	}
+	
+	@ResponseBody
+	@GetMapping("/{snsFeedNo}")
+	public List<SnsAnswerVO> snsAnswerListTest(
+		@PathVariable int snsFeedNo
+	) {
+		List<SnsAnswerVO> answerList = service.readAnswerList(snsFeedNo);
+		return answerList;
+	}
+	
+	@PostMapping
+	public String snsFeedInsert(
+		@Valid @ModelAttribute(MODELNAME) SnsFeedVO newFeed
+		, BindingResult errors
+		, RedirectAttributes redirectAttributes
+	) {
+		service.createFeed(newFeed);
+		return "redirect:/sns/snsFeed";
+	}
+	
+	@GetMapping("/profile.do")
+	public String snsProfileTest() {
+		return "sns/snsProfile";
+	}
+	
+	@GetMapping("/myProfile.do")
+	public String snsMyProfileTest() {
+		return "sns/snsMyProfile";
+	}
+	
+	@GetMapping("/follow.do")
+	public String snsFriendTest() {
+		return "sns/snsFollow";
+	}
+}

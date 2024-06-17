@@ -1,0 +1,75 @@
+/* JSP */
+<div class="contents subNews">
+    <ul id="newslist">
+    <c:forEach items="${list}" var="li">
+        <li>
+            <h2>${li.create_dt}</h2>
+            <h3>${li.title}</h3>
+            <a href="/mobile/newsview.do?seq_no=${li.seq_no}"></a>
+        </li>
+    </c:forEach>
+    </ul>
+        <a id="moreView">더보기</a>
+</div>
+
+*/
+
+/* 스크립트 */
+$('#moreView').click(function(){
+	var startNum = $("#newslist li").length; // newslist안에 li태그의 길이
+	var addListHtml = "";
+	/* console.log(startNum); */
+	
+	$.ajax({
+		url : '/mobile/newsmoreview.do',
+		type : 'POST',
+		dataType : 'json',
+		data : {
+			"startNum" : startNum
+		},
+		success : function(data){
+			
+			for (var i = 0; i < data.length; i++) {
+				addListHtml += "<li>";
+				addListHtml += "<h2>"+data[i].create_dt+"</h2>";
+				addListHtml += "<h3>"+data[i].title+"</h3>";
+				addListHtml += "<a href=/mobile/newsview.do?seq_no="+data[i].seq_no+"></a>";
+				addListHtml += "</li>";
+				if(data[i].seq_no==1){
+					$("#moreView").remove();
+				} 
+			}
+			$("#newslist").append(addListHtml);
+			/* console.log(addListHtml); */
+		}
+	});
+	
+});
+
+
+/* 컨트롤러 */
+
+@RequestMapping(value = "/mobile/newsmoreview.do")
+	@ResponseBody //Ajax
+	public List<newsVO> newsMoreView(PagingVO vo, Model model
+			, @RequestParam(value="startNum", required=false)String startNum) throws Exception {
+		System.out.println("페이징 브이오다"+vo);
+		vo.setStart(Integer.parseInt(startNum));
+		vo.setEnd(5);
+		return service.selectBoard(vo);
+	}
+
+/* 쿼리문  */
+
+<select id="selectBoard" resultType="com.app.sechan.cmmn.com.dto.newsVO">
+	SELECT  seq_no,
+		title,
+		content,
+		DATE_FORMAT(create_dt,'%Y.%m.%d') AS create_dt,
+		update_dt,
+		del_yn 
+	FROM SC_NEWS 
+		WHERE DEL_YN = 'N'
+			ORDER BY SEQ_NO DESC 
+		LIMIT #{start}, #{end}
+</select>

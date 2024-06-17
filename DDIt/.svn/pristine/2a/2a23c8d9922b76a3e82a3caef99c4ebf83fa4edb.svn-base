@@ -1,0 +1,28 @@
+package kr.or.ddit.item.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.vo.ItemLikeVO;
+
+@Mapper
+public interface ItemLikeDAO {
+	/**
+	 * 아이템좋아요 등록,취소
+	 * @param itemLike
+	 * @return 등록된 레코드 수
+	 */
+	public int insertItemLike(ItemLikeVO itemLike);
+	
+	/**
+	 * 아이템좋아요 목록 조회
+	 * @param
+	 * @return 존재하지 않으면, list.size()==0
+	 */
+	public List<ItemLikeVO> selectItemLikeList();
+		
+
+	
+}

@@ -1,0 +1,22 @@
+package kr.or.ddit.vo;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "sjMappingCode")
+public class SjMapping {
+
+	@NotBlank @Size(max=50) private String sjMappingCode;
+	@NotBlank @Size(max=10) private String classCode;
+	@NotNull @Min(0) private Long sjNo;
+	@NotBlank @Size(max=30) private String userId;
+	@NotBlank @Size(max=10) private String edcCrseCode;
+	
+	private SjManagerVO sjManager;
+}

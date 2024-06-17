@@ -1,0 +1,40 @@
+package kr.or.ddit.item.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.ItemPresetDetailVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class ItemPresetDetailDAOTest extends AbstractRootContextTest{
+	
+	@Autowired
+	ItemPresetDetailDAO dao;
+	
+	@Test
+	void testUpdateItemPresetDetail() {
+		ItemPresetDetailVO detail = new ItemPresetDetailVO();
+		detail.setItemCode("");
+		
+	}
+
+	@Test
+	void testSelectItemPresetDetail() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testUpdateItemPresetDetailRandom() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testDeleteItemPresetDetail() {
+		fail("Not yet implemented");
+	}
+
+}

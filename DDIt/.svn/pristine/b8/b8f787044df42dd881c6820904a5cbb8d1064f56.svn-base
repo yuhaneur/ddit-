@@ -1,0 +1,36 @@
+package kr.or.ddit.vo;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "messageNo")
+public class MessageVO {
+	@NotNull
+	@Min(0)
+	private Long messageNo;
+	@Size(max = 80)
+	private String messageSj;
+	@Size(max = 4000)
+	private String messageCn;
+	@Size(max = 7)
+	private String messageSendDe;
+	@NotBlank
+	@Size(max = 1)
+	private String messageReceptionAt;
+	@NotBlank
+	@Size(max = 1)
+	private String messageImportant;
+	
+	// 메시지 수신을 위한 userId
+	@NotBlank @Size(max=30)
+	private String userId;
+	
+	// HAS A
+	private RecievemessageVO recievemessage;
+}

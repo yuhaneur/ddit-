@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sj.dao.SjDao">
+	<resultMap type="SjVO" id="sjMap" autoMapping="true">
+		<id property="sjNo" column="SJ_NO"/>
+		<association property="edcCrse" javaType="EdcCrseVO" autoMapping="true"></association>
+	</resultMap>
+	<select id="selectSjList" resultMap="sjMap">
+		SELECT A.SJ_NO,
+		A.EDC_CRSE_CODE,
+		A.SJ_NAME,
+		A.EDC_TIME,
+		A.SJ_ORDR,
+		B.EDC_CRSE_NAME
+		FROM SJ A INNER JOIN EDC_CRSE B ON(A.EDC_CRSE_CODE = B.EDC_CRSE_CODE)
+	</select>
+	<insert id="insertSj" parameterType="SjVO">
+		
+	</insert>
+</mapper>

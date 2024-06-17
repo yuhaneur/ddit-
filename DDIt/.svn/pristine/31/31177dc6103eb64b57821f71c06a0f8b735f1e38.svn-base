@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemPresetDetailDAO">
+<resultMap type="ItemPresetDetailVO" id="ItemPresetDetailMap" autoMapping="true">
+	<id property="detailNo" column="DETAIL_NO"/>
+	<id property="itemPresetCode" column="ITEM_PRESET_CODE"/>
+	<association property="item" javaType="ItemVO" autoMapping="true" />
+</resultMap>
+<update id="updateItemPresetDetail" parameterType="ItemPresetDetailVO">
+	MERGE INTO ITEM_PRESET_DETAIL
+	USING DUAL ON (ITEM_PRESET_CODE = #{itemPresetCode} AND DETAIL_NO = #{detailNo})
+	WHEN MATCHED THEN
+	UPDATE SET 
+		ITEM_CODE = #{itemCode}                             
+	WHERE NOT EXISTS(
+	    WITH CCA AS(
+	        SELECT 
+	            ITEM.ITEM_CTGRY
+	        FROM ITEM
+	        WHERE ITEM_CODE = #{itemCode}
+	        )
+	    SELECT 
+	        B.ITEM_CTGRY
+	    FROM ITEM_PRESET_DETAIL A, ITEM B, CCA C
+	    WHERE A.ITEM_CODE = B.ITEM_CODE
+	    AND A.ITEM_PRESET_CODE = #{itemPresetCode}
+	     <![CDATA[
+	    AND A.DETAIL_NO <> #{detailNo}
+	     ]]>
+	    AND B.ITEM_CTGRY = C.ITEM_CTGRY
+	)
+	AND ITEM_PRESET_CODE =  #{itemPresetCode}
+	AND DETAIL_NO = #{detailNo}
+	WHEN NOT MATCHED THEN
+	INSERT
+		(
+		DETAIL_NO, 
+		ITEM_PRESET_CODE, 
+		ITEM_CODE
+		)
+	VALUES
+		(
+		#{detailNo}, 
+		#{itemPresetCode}, 
+		#{itemCode}
+		)
+</update>
+<select id="selectItemPresetDetail" resultMap="ItemPresetDetailMap">
+	SELECT
+	    A.DETAIL_NO,
+	    A.ITEM_PRESET_CODE,
+	    A.ITEM_CODE,
+	    B.ITEM_CTGRY,
+	    B.ITEM_NM,
+	    B.ITEM_EFFECT
+	FROM ITEM_PRESET_DETAIL A, ITEM B
+	WHERE A.ITEM_CODE = B.ITEM_CODE 
+	AND A.ITEM_PRESET_CODE = #{presetCode}
+</select>
+
+<update id="updateItemPresetDetailRandom" parameterType="ItemPresetDetailVO">
+		UPDATE ITEM_PRESET_DETAIL
+	    SET ITEM_CODE = (WITH RCC AS(
+						    SELECT
+							    ITEM_PURCHASE_CODE,
+							    USER_ID,
+							    ITEM_PURCHASE.ITEM_CODE,
+							    ITEM_PURCHASE_DT,
+							    ITEM_BKMK,
+							    ITEM_HIDE,
+						        ITEM.ITEM_NM,
+						        ITEM.ITEM_EFFECT,
+						        ITEM.ITEM_CTGRY
+							FROM
+							    ITEM_PURCHASE
+						    INNER JOIN ITEM ON (ITEM_PURCHASE.ITEM_CODE = ITEM.ITEM_CODE)
+							WHERE ITEM_PURCHASE.USER_ID=#{userId} AND ITEM_HIDE = 'N'
+							UNION ALL
+							SELECT
+							    ITEM_GIFT_CODE AS ITEM_PURCHASE_CODE,
+							    ADDRSE_USER_ID AS USER_ID,
+							    ITEM_GIFT.ITEM_CODE,
+							    ITEM_GIFT_DT AS ITEM_PURCHASE_DT,
+							    ITEM_BKMK,
+							    ITEM_HIDE,
+						        ITEM.ITEM_NM,
+						        ITEM.ITEM_EFFECT,
+						        ITEM.ITEM_CTGRY
+							FROM
+							    ITEM_GIFT
+						    INNER JOIN ITEM ON (ITEM_GIFT.ITEM_CODE = ITEM.ITEM_CODE)
+							WHERE ITEM_GIFT.ADDRSE_USER_ID=#{userId} AND ITEM_HIDE = 'N'
+						    )
+						    SELECT * FROM
+					        (
+					        SELECT ITEM_CODE
+					        FROM RCC
+					        WHERE ITEM_CTGRY = #{param2.detailNo}
+					        ORDER BY DBMS_RANDOM.VALUE
+					        )
+					    	WHERE ROWNUM = 1)
+		WHERE ITEM_PRESET_CODE = #{param2.itemPresetCode}
+		AND DETAIL_NO = #{param2.detailNo}
+</update>
+<delete id="deleteItemPresetDetail" parameterType="ItemPresetDetailVO">
+	DELETE FROM ITEM_PRESET_DETAIL
+	WHERE
+    ITEM_PRESET_CODE = #{presetCode}
+</delete>
+
+</mapper>

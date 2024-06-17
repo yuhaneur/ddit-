@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sns.dao.SnsDAO">
+	
+	<resultMap type="SnsFeedVO" id="snsFeedMap" autoMapping="true">
+		<id property="snsFeedNo" column="SNS_FEED_NO"/>
+		<association property="snsHash" javaType="SnsHashtagVO" autoMapping="true"/>
+		<collection property="answerList" ofType="SnsAnswerVO" autoMapping="true" >
+			<result property="userId" column="ANSWER_ID"/>
+		</collection>
+		<collection property="atchList" javaType="java.util.List" ofType="AtchFileVO" autoMapping="true" />
+	</resultMap>
+	
+	<resultMap type="FollowVO" id="FollowMap" autoMapping="true">
+		<id property="followId" column="FOLLOW_ID" />
+	</resultMap>
+	
+	<sql id="searchFrag">
+		 <trim prefix="and">
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.simpleCondition.searchWord)">
+				<choose>
+					<when test="paging.simpleCondition.searchType eq 'sns'">
+						INSTR(USER_ID, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+				</choose>
+			</if>
+		</trim>
+	</sql>
+	
+	<insert id="insertFeed" parameterType="SnsFeedVO">
+		INSERT ALL INTO SNS_FEED
+		        (SNS_FEED_NO, SNS_FEED_CN, USER_ID, SNS_FEED_AT, AT_FILE_NO, SNS_FEED_CREAT_DE)
+		    VALUES
+		        ((SELECT MAX(SNS_FEED_NO) + 1 FROM SNS_FEED), #{snsFeedCn}, #{userId}, #{snsFeedAt}, (SELECT MAX(AT_FILE_NO) + 1 FROM SNS_FEED),  SYSDATE)
+		    INTO SNS_HASHTAG
+		        (SNS_TAG_NO, SNS_FEED_NO, SNS_TAG_CN)
+		    VALUES
+		        ((SELECT MAX(SNS_TAG_NO) + 1 FROM SNS_HASHTAG),
+		          (SELECT MAX(SNS_FEED_NO) + 1 FROM SNS_FEED), #{snsTagCn})
+		    SELECT *
+		    FROM DUAL
+	</insert>
+	
+	<select id="selectFeedList" resultMap="snsFeedMap">
+		WITH ORDERED AS (
+		  SELECT SNS_FEED.SNS_FEED_NO,
+		         SNS_FEED.SNS_FEED_CN,
+		         SNS_FEED.USER_ID,
+		         SNS_FEED.SNS_FEED_CREAT_DE,
+		         SNS_FEED.SNS_LIKE_COUNT,
+		         SNS_HASHTAG.SNS_TAG_CN,
+		         ATCH_FILE.ATCH_FILE_NO,
+		         ATCH_FILE.ATCH_FILE_TURN,
+		         ATCH_FILE.FILE_NAME,
+		         ATCH_FILE.STRE_FILE_NAME,
+		         ATCH_FILE.FILE_TY,
+		         ATCH_FILE.FILE_REGIST_DE,
+		         ATCH_FILE.FILE_FANCYSIZE,
+		         GR_ATCH_FILE.STRE_FILE_NAME AS GR_ATCH_FILE_STRE_FILE_NAME,
+		         STUDENT.USER_ID AS STUDENT_USER_ID,
+		         STUDENT.STUDENT_NAME
+		  FROM SNS_FEED
+		  INNER JOIN SNS_HASHTAG ON (SNS_FEED.SNS_FEED_NO = SNS_HASHTAG.SNS_FEED_NO)
+		  LEFT OUTER JOIN ATCH_FILE ON (SNS_FEED.AT_FILE_NO = ATCH_FILE.ATCH_FILE_NO)
+		  LEFT JOIN STUDENT ON (SNS_FEED.USER_ID = STUDENT.USER_ID)
+		  LEFT JOIN GR_ATCH_FILE ON (STUDENT.ATCH_FILE_NO = GR_ATCH_FILE.ATCH_FILE_NO)
+		  WHERE SNS_FEED.SNS_FEED_AT = 'A'
+		  AND SNS_FEED.SNS_FEED_DEL = 'N'
+		  AND 1=1
+		  ORDER BY SNS_FEED.SNS_FEED_CREAT_DE DESC
+		),
+		RNUMOREDERED AS (
+		  SELECT ROWNUM RNUM, ORDERED.*
+		  FROM ORDERED
+		)
+		SELECT *
+		FROM RNUMOREDERED
+		WHERE RNUM BETWEEN 1 AND 10
+	</select>
+	
+	<select id="selectMyFeedList" resultMap="snsFeedMap" parameterType="String">
+		WITH ORDERED AS (
+		  SELECT SNS_FEED.SNS_FEED_NO,
+		         SNS_FEED.SNS_FEED_CN,
+		         SNS_FEED.USER_ID,
+		         SNS_FEED.SNS_FEED_CREAT_DE,
+		         SNS_FEED.SNS_LIKE_COUNT,
+		         SNS_HASHTAG.SNS_TAG_CN,
+		         ATCH_FILE.ATCH_FILE_NO,
+		         ATCH_FILE.ATCH_FILE_TURN,
+		         ATCH_FILE.FILE_NAME,
+		         ATCH_FILE.STRE_FILE_NAME,
+		         ATCH_FILE.FILE_TY,
+		         ATCH_FILE.FILE_REGIST_DE,
+		         ATCH_FILE.FILE_FANCYSIZE,
+		         GR_ATCH_FILE.STRE_FILE_NAME AS GR_ATCH_FILE_STRE_FILE_NAME,
+		         STUDENT.USER_ID AS STUDENT_USER_ID,
+		         STUDENT.STUDENT_NAME
+		  FROM SNS_FEED
+		  INNER JOIN SNS_HASHTAG ON (SNS_FEED.SNS_FEED_NO = SNS_HASHTAG.SNS_FEED_NO)
+		  LEFT OUTER JOIN ATCH_FILE ON (SNS_FEED.AT_FILE_NO = ATCH_FILE.ATCH_FILE_NO)
+		  LEFT JOIN STUDENT ON (SNS_FEED.USER_ID = STUDENT.USER_ID)
+		  LEFT JOIN GR_ATCH_FILE ON (STUDENT.ATCH_FILE_NO = GR_ATCH_FILE.ATCH_FILE_NO)
+		  WHERE SNS_FEED.SNS_FEED_AT = 'A'
+		  AND SNS_FEED.SNS_FEED_DEL = 'N'
+		  AND 1=1
+		  AND SNS_FEED.USER_ID = #{userId}
+		  ORDER BY SNS_FEED.SNS_FEED_CREAT_DE DESC
+		),
+		RNUMOREDERED AS (
+		  SELECT ROWNUM RNUM, ORDERED.*
+		  FROM ORDERED
+		)
+		SELECT *
+		FROM RNUMOREDERED
+	</select>
+	
+	<select id="selectFeed" resultMap="snsFeedMap" parameterType="int">
+		WITH ORDERED AS (
+		  SELECT SNS_FEED.SNS_FEED_NO,
+		         SNS_FEED.SNS_FEED_CN,
+		         SNS_FEED.USER_ID,
+		         SNS_FEED.SNS_FEED_CREAT_DE,
+		         SNS_FEED.SNS_LIKE_COUNT,
+		         SNS_HASHTAG.SNS_TAG_CN,
+		         ATCH_FILE.ATCH_FILE_NO,
+		         ATCH_FILE.ATCH_FILE_TURN,
+		         ATCH_FILE.FILE_NAME,
+		         ATCH_FILE.STRE_FILE_NAME,
+		         ATCH_FILE.FILE_TY,
+		         ATCH_FILE.FILE_REGIST_DE,
+		         ATCH_FILE.FILE_FANCYSIZE,
+		         GR_ATCH_FILE.STRE_FILE_NAME AS GR_ATCH_FILE_STRE_FILE_NAME,
+		         STUDENT.USER_ID AS STUDENT_USER_ID,
+		         STUDENT.STUDENT_NAME
+		  FROM SNS_FEED
+		  INNER JOIN SNS_HASHTAG ON (SNS_FEED.SNS_FEED_NO = SNS_HASHTAG.SNS_FEED_NO)
+		  LEFT OUTER JOIN ATCH_FILE ON (SNS_FEED.AT_FILE_NO = ATCH_FILE.ATCH_FILE_NO)
+		  LEFT JOIN STUDENT ON (SNS_FEED.USER_ID = STUDENT.USER_ID)
+		  LEFT JOIN GR_ATCH_FILE ON (STUDENT.ATCH_FILE_NO = GR_ATCH_FILE.ATCH_FILE_NO)
+		  WHERE SNS_FEED.SNS_FEED_AT = 'A'
+		  AND SNS_FEED.SNS_FEED_DEL = 'N'
+		  AND 1=1
+          AND SNS_FEED.SNS_FEED_NO = #{snsFeedNo}
+		  ORDER BY SNS_FEED.SNS_FEED_CREAT_DE DESC
+		),
+		RNUMOREDERED AS (
+		  SELECT ROWNUM RNUM, ORDERED.*
+		  FROM ORDERED
+		)
+		SELECT *
+		FROM RNUMOREDERED
+	</select>
+	
+	<update id="updateFeed" parameterType="SnsFeedVO">
+		UPDATE SNS_FEED
+		SET SNS_FEED_CN = #{snsFeedCn}
+			,CREAT_UPDT_DE = SYSDATE
+		    ,AT_FILE_NO = #{atFileNo}
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+	
+	<update id="updateHashTag" parameterType="SnsFeedVO">
+		UPDATE SNS_HASHTAG
+		SET SNS_TAG_CN = #{snsTagCn}
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+	
+	<update id="deleteFeed" parameterType="Long">
+		UPDATE SNS_FEED
+		SET SNS_FEED_DEL = 'Y'
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+	
+	<update id="deleteHashTag" parameterType="Long">
+		UPDATE SNS_HASHTAG
+		SET SNS_TAG_DEL = 'Y'
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+	
+	<select id="selectAnswerList" resultType="SnsAnswerVO" parameterType="int">
+			SELECT SNS_ANSWER.ANSWER_NO
+			      ,SNS_ANSWER.ANSWER_TOP_NO
+			      ,SNS_ANSWER.SNS_FEED_NO
+			      ,SNS_ANSWER.USER_ID
+			      ,SNS_ANSWER.ANSWER_CN
+			      ,SNS_ANSWER.ANSWER_WRITING_TIME
+			      ,SNS_ANSWER.ANSWER_UPDATE_TIME
+			      ,SNS_ANSWER.ANSWER_DEPTH
+			FROM SNS_ANSWER
+			WHERE SNS_ANSWER.SNS_FEED_NO = #{snsFeedNo }
+			AND ANSWER_DELETE_AT = 'N'
+			START WITH ANSWER_TOP_NO IS null
+			CONNECT BY PRIOR ANSWER_NO = ANSWER_TOP_NO
+			ORDER SIBLINGS BY ANSWER_NO
+	</select>
+	
+	<insert id="insertAnswer" parameterType="SnsAnswerVO">
+		INSERT INTO SNS_ANSWER
+		    (
+		        ANSWER_NO
+		        ,ANSWER_TOP_NO
+		        ,SNS_FEED_NO
+		        ,USER_ID
+		        ,ANSWER_WRITING_TIME
+		        ,ANSWER_CN
+		        ,ANSWER_DEPTH
+		    )
+		VALUES
+		    (
+		        (SELECT MAX(ANSWER_NO) + 1 FROM SNS_ANSWER)
+		        ,#{answerTopNo}
+		        ,#{snsFeedNo}
+		        ,#{userId}
+		        ,SYSDATE
+		        ,#{answerCn}
+		        ,#{answerDepth}
+		    )
+	</insert>
+	
+	<update id="updateAnswer" parameterType="SnsAnswerVO">
+		UPDATE SNS_ANSWER
+		SET ANSWER_CN = #{answerCn}
+		    ,ANSWER_UPDATE_TIME = SYSDATE
+		WHERE ANSWER_NO = #{answerNo}
+		AND SNS_FEED_NO = #{snsFeedNo}
+		AND USER_ID = #{userId}
+	</update>
+	
+	<update id="deleteAnswer" parameterType="SnsAnswerVO">
+		UPDATE SNS_ANSWER 
+		SET ANSWER_DELETE_AT = 'Y'
+		WHERE ANSWER_NO = #{answerNo}
+	</update>
+	
+	<select id="selectUnFollowList" parameterType="String" resultMap="FollowMap">
+		WITH F AS (
+		  SELECT USER_ID2
+		  FROM USERS A, FOLLOW B
+		  WHERE A.USER_ID = B.USER_ID
+		  AND B.USER_ID = #{userId}
+		)
+		SELECT A.USER_ID,
+		       COALESCE(S.ATCH_FILE_NO, T.ATCH_FILE_NO) AS ATCH_FILE_NO,
+		       G.STRE_FILE_NAME
+		FROM USERS A
+		LEFT JOIN F ON (A.USER_ID = F.USER_ID2)
+		LEFT JOIN STUDENT S ON (A.USER_ID = S.USER_ID)
+		LEFT JOIN TEACHER T ON (A.USER_ID = T.USER_ID)
+		LEFT JOIN GR_ATCH_FILE G ON (COALESCE(S.ATCH_FILE_NO, T.ATCH_FILE_NO) = G.ATCH_FILE_NO)
+		<![CDATA[
+		WHERE A.USER_ID <> #{userId}
+		]]>
+		AND A.USER_USE_AT = 'Y'
+		AND F.USER_ID2 IS NULL
+		<![CDATA[
+		AND ROWNUM <= 5
+		]]>
+	</select>
+	
+	<insert id="insertFollow" parameterType="String">
+		INSERT INTO FOLLOW
+	    (FOLLOW_ID, USER_ID, USER_ID2)
+		VALUES
+	    ((SELECT MAX(FOLLOW_ID) + 1 FROM FOLLOW), #{userId}, #{userId2})
+	</insert>
+	
+	<select id="selectFollowingCount" parameterType="String" resultType="int">
+		SELECT  COUNT(*)
+		FROM USERS U
+		RIGHT JOIN FOLLOW F ON (F.USER_ID = U.USER_ID)
+		WHERE U.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectFollowerCount" parameterType="String" resultType="int">
+		SELECT  COUNT(*)
+		FROM USERS U
+		RIGHT JOIN FOLLOW F ON (F.USER_ID2 = U.USER_ID)
+		WHERE U.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectFollowingList" parameterType="String" resultMap="FollowMap">
+		SELECT  F.USER_ID2
+			        ,F.FOLLOW_REQUEST_DATE
+		FROM USERS U
+		RIGHT JOIN FOLLOW F ON (F.USER_ID = U.USER_ID)
+		WHERE U.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectFollowerList" parameterType="String" resultMap="FollowMap">
+		SELECT  F.USER_ID2
+                ,F.USER_ID
+                ,F.FOLLOW_REQUEST_DATE
+                ,(SELECT G2.STRE_FILE_NAME
+                 FROM GR_ATCH_FILE G2
+                 WHERE G2.ATCH_FILE_NO = T.ATCH_FILE_NO
+                ) AS TEACHER_PROFILE_IMAGE
+              ,G.STRE_FILE_NAME AS STUDENT_PROFILE_IMAGE
+              ,S.STUDENT_NAME
+              ,T.TEACHER_NAME
+		FROM USERS U
+            RIGHT JOIN FOLLOW F ON (F.USER_ID2 = U.USER_ID)
+			LEFT JOIN STUDENT S ON (S.USER_ID = F.USER_ID)
+			LEFT JOIN TEACHER T ON (T.USER_ID = F.USER_ID)
+			LEFT OUTER JOIN GR_ATCH_FILE G ON(S.ATCH_FILE_NO = G.ATCH_FILE_NO)
+		WHERE U.USER_ID = #{userId}
+	</select>
+	
+</mapper>

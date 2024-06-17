@@ -1,0 +1,30 @@
+const imgUp = document.querySelector(".imgUp");
+
+// 이미지 체인지
+imgUp.addEventListener('change', ()=> {
+	const previews = document.querySelector("#previews");
+	
+	let formData = new FormData();
+	let reader = new FileReader();
+	for(const file of $('.profileimg input[type="file"]')[0].files) {
+		formData.append('imgFile', file);
+		
+		reader.onloadend = ({ target }) => {
+			const preview = document.querySelector("#preview");
+			preview.src = target.result;
+			console.log("프리뷰 : ", preview);
+			// previews.appendChild(preview);
+		};
+		reader.readAsDataURL(file);
+	}
+	
+	console.log("해당 프로필 사용자 아이디 : ", userId);
+	/*
+	let url = `${cPath}/snsProfile/profileImg.do`;
+	
+	$.ajax({
+		
+	})
+	*/
+})
+

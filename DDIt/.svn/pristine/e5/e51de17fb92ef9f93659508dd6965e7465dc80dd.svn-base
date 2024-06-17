@@ -1,0 +1,88 @@
+package kr.or.ddit.item.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.item.service.ItemPresetService;
+import kr.or.ddit.item.service.ItemService;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.ItemPresetDetailVO;
+import kr.or.ddit.vo.ItemPresetVO;
+import kr.or.ddit.vo.ItemPurchaseVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/preset")
+public class ItemPresetController {
+
+	@Autowired
+	private ItemPresetService preService;
+	@Autowired
+	private ItemService iService;
+	
+	@GetMapping()
+	public String preset(
+			Model model
+	){
+		List<CmmnCodeVO> itemCmmnList = iService.readItemCmmnList();
+		model.addAttribute("itemCmmnList", itemCmmnList);
+		log.info("list : {}", itemCmmnList);
+		return "item/itemPreset";
+	}
+	
+	
+	@GetMapping("/Storage")
+	@ResponseBody
+	public List<ItemPurchaseVO> itemStorage(String hide, Long ctgry){
+		List<ItemPurchaseVO> storageList = preService.readItemStorage("A003", hide, ctgry);
+		log.info("list : {}", storageList);
+		return storageList;
+	}
+	
+	
+	@GetMapping("/presetList")
+	@ResponseBody
+	public List<ItemPresetVO> itemPresetList(){
+		List<ItemPresetVO> itemPresetList = preService.readItemPresetList("A003");
+		log.info("list : {}", itemPresetList);
+		return itemPresetList;
+	}
+	
+	@GetMapping("/presetDetail")
+	@ResponseBody
+	public List<ItemPresetDetailVO> itemPresetDetail(String presetCode){
+		List<ItemPresetDetailVO> itemPresetDetail = preService.readItemPresetDetail(presetCode);
+		log.info("list : {}", itemPresetDetail);
+		return itemPresetDetail;
+	}
+	
+	@PostMapping("/presetY")
+	@ResponseBody
+	public void itemPresetY(String presetCode) {
+		String userId = "A003";
+		preService.updateItemPresetY(userId, presetCode);
+	}
+	
+	
+	@PostMapping("/bkmk")
+	@ResponseBody
+	public void itemBkmk(ItemPurchaseVO itemPurchase) {
+		itemPurchase.setUserId("A003");
+		preService.updateItemPurchaseBkmk(itemPurchase);
+	}
+	
+	
+	
+}
+
+
+
+

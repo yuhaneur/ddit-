@@ -1,0 +1,42 @@
+package kr.or.ddit.school.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/school")
+public class SchoolController {
+	
+	@GetMapping
+	public String studentSchoolMain() {
+		return "school/studentSchoolMain";
+	}
+	
+	@GetMapping("info")
+	public String myInfo() {
+		return "school/myInfo";
+	}
+	
+	@GetMapping("class")
+	public String teaching() {
+		return "school/teaching";
+	}
+	
+	@GetMapping("consulting")
+	public String studentConsulting() {
+		return "school/studentConsulting";
+	}
+	
+	@GetMapping("sulmoon")
+	public String sulmoon() {
+		return "school/sulmoon";
+	}
+	
+	@GetMapping("insertSulmoon")
+	public String insertSulmoon() {
+		return "school/insertSulmoon";
+	}
+	
+	
+}

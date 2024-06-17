@@ -1,0 +1,40 @@
+package kr.or.ddit.item.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.ItemLikeVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class ItemLikeDAOTest extends AbstractRootContextTest{
+	
+	@Autowired
+	ItemLikeDAO dao;
+	
+	@Test
+	void testInsertItemLike() {
+		ItemLikeVO itemlike = new ItemLikeVO();
+		itemlike.setItemCode("ITEM1");
+		itemlike.setUserId("A003");
+		assertDoesNotThrow(()->dao.insertItemLike(itemlike));
+		log.info("list : {}", itemlike);
+		
+	}
+
+	@Test
+	void testSelectItemLikeList() {
+		List<ItemLikeVO> itemLikeList = dao.selectItemLikeList();
+		assertNotNull(itemLikeList);
+		log.info("list : {}", itemLikeList);
+	}
+
+
+
+
+}

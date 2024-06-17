@@ -1,0 +1,73 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    <!-- 부트스트랩 아이콘  -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
+    <!-- 수업 상단 시작-->
+<div class="card mb-3">
+       <div class="card-header bg-body-tertiary">
+         <div class="d-flex flex-between-center">
+	        <div class="card-header bg-body-tertiary d-flex flex-between-center py-2">
+	            <button class="btn btn-outline-primary me-7 mb-1" type="button">초급자바
+				</button>
+				<button class="btn btn-outline-secondary me-7 mb-1" type="button">데이터베이스
+				</button>
+				<button class="btn btn-outline-success me-7 mb-1" type="button">HTML/JS
+				</button>
+				<button class="btn btn-outline-info me-7 mb-1" type="button">고급자바
+				</button>
+				<button class="btn btn-outline-warning me-7 mb-1" type="button">PYTHON
+				</button>
+				<button class="btn btn-outline-danger me-7 mb-1" type="button">SPRING
+				</button>
+	         </div>
+         </div>
+       </div>
+</div>
+<!-- 수업 상단 끝-->
+<!-- 수업 리스트 시작 -->
+<div class="card mb-3">
+  <div class="card-header bg-body-tertiary">
+    <div class="mb-0" style="display:inline;">수업목차</div>
+    <button class="btn btn-dark me-5 mb-1" type="button" style="margin-left:81%; width:100px;">과제</button>
+  </div>
+  <!-- 수업목차리스트 시작-->
+  <div class="card-body p-0">
+    <div class="d-flex align-items-center px-x1 py-2 border-bottom border-200">
+        <div class="hoverbox me-3 my-1"><a class="text-decoration-none" href="../../../assets/video/beach.mp4" data-gallery="attachment-bg">
+            <div class="bg-attachment bg-attachment-square">
+              <div class="bg-holder" style="background-image:url(../../../assets/img/elearning/lessons/chapter1.png);">
+              </div>
+              <!--/.bg-holder-->
+
+            </div>
+          </a>
+          <div class="hoverbox-content flex-center pe-none bg-holder overlay overlay-1 rounded">
+            <div class="position-relative fs-7 text-white" data-bs-theme="light"><svg class="svg-inline--fa fa-play-circle fa-w-16" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="play-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm115.7 272l-176 101c-15.8 8.8-35.7-2.5-35.7-21V152c0-18.4 19.8-29.8 35.7-21l176 107c16.4 9.2 16.4 32.9 0 42z"></path></svg><!-- <span class="fas fa-play-circle"></span> Font Awesome fontawesome.com --></div>
+          </div>
+        </div>
+        <div class="flex-1">
+          <h5 class="fs-9"><a class="text-decoration-none" href="../../../assets/video/beach.mp4" data-gallery="attachment-title">Chapter 1</a>
+          </h5>
+          <p class="fs-10 mb-0">Tools, nothing more, nothing less</p>
+        </div>
+
+        <div class="flex-2">
+          <svg xmlns="http://www.w3.org/2000/svg" style="margin-right: 20px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clipboard text-900 fs-6"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" style="margin-right: 20px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pen-tool text-900 fs-6"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" style="margin-right: 20px;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-share text-900 fs-6"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+        </div>
+      </div>
+  </div>
+  <!-- 수업목차리스트 끝-->
+  <div class="card-footer text-end py-1 bg-body-tertiary"></div>
+</div>
+<!-- 수업 리스트 끝 -->
+
+<!-- 왜넣어놨지 -->
+<%-- <script src="${pageContext.request.contextPath}/resources/public/vendors/prism/prism.js"></script> --%>
+
+<!-- feather 아이콘 -->
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+<script>
+  feather.replace()
+</script>

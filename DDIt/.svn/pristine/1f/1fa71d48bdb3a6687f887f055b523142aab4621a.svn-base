@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.edcCrse.dao.EdcCrseDao">
+	<select id="selectEdcCrseList" resultType="EdcCrseVO">
+		SELECT EDC_CRSE_CODE, EDC_CRSE_NAME, EDC_DAY_CO, EDC_BEGIN_DE, EDC_END_DE 
+		FROM EDC_CRSE
+	</select>
+</mapper>

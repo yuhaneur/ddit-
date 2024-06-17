@@ -1,0 +1,38 @@
+package kr.or.ddit.project.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.project.dao.ProjectDao;
+import kr.or.ddit.vo.ProjectVO;
+
+@Service
+public class ProjectServiceImpl implements ProjectService{
+	
+		@Autowired
+		private ProjectDao dao;
+
+	
+		
+
+		@Override
+		public int createProject(ProjectVO projectVO) {
+			int cnt = dao.insertProject(projectVO);
+			if(cnt>0)return cnt;
+			return cnt;
+		}
+
+		@Override
+		public List<ProjectVO> retrieveProjectList(PaginationInfo paging) {
+			int totalRecord = dao.selectTotalRecord(paging);
+			paging.setTotalRecord(totalRecord);
+			List<ProjectVO> project = dao.selectProjectList(paging);
+			
+			return project;
+		}
+		
+		
+}

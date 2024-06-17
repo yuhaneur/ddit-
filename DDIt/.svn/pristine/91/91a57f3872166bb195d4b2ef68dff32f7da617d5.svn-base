@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sns.dao.SnsDAO">
+	
+	<resultMap type="SnsFeedVO" id="snsFeedMap" autoMapping="true">
+		<id property="snsFeedNo" column="SNS_FEED_NO"/>
+		<association property="snsHash" javaType="SnsHashtagVO" autoMapping="true"/>
+		<collection property="answerList" ofType="SnsAnswerVO" autoMapping="true" >
+			<result property="userId" column="ANSWER_ID"/>
+		</collection>
+	</resultMap>
+	
+	<select id="selectFeedList" resultMap="snsFeedMap">
+		SELECT SNS_FEED.SNS_FEED_NO
+		      ,SNS_FEED.SNS_FEED_CN
+		      ,SNS_FEED.USER_ID
+		      ,SNS_FEED.SNS_FEED_CREAT_DE
+		      ,SNS_FEED.SNS_LIKE_COUNT
+		      ,SNS_HASHTAG.SNS_TAG_CN
+		FROM SNS_FEED
+		INNER JOIN SNS_HASHTAG ON (SNS_FEED.SNS_FEED_NO = SNS_HASHTAG.SNS_FEED_NO)
+	</select>
+	
+	<select id="selectAnswerList" resultType="SnsAnswerVO" parameterType="int">
+			SELECT SNS_ANSWER.ANSWER_NO
+			      ,SNS_ANSWER.ANSWER_TOP_NO
+			      ,SNS_ANSWER.SNS_FEED_NO
+			      ,SNS_ANSWER.USER_ID
+			      ,SNS_ANSWER.ANSWER_CN
+			      ,SNS_ANSWER.ANSWER_WRITING_TIME
+			      ,SNS_ANSWER.ANSWER_UPDATE_TIME
+			      ,SNS_ANSWER.ANSWER_DEPTH
+			FROM SNS_ANSWER
+			WHERE SNS_ANSWER.SNS_FEED_NO = #{snsFeedNo }
+			START WITH ANSWER_TOP_NO IS null
+			CONNECT BY PRIOR ANSWER_NO = ANSWER_TOP_NO
+			ORDER SIBLINGS BY ANSWER_NO
+	</select>
+	
+	<select id="selectFeed" resultMap="snsFeedMap" parameterType="int">
+		WITH ANSWER_CNT AS (
+		    SELECT COUNT(*) AS ANSWER_CNT
+		    FROM SNS_ANSWER
+		    WHERE SNS_FEED_NO = #{snsFeedNo}
+		)
+		SELECT SNS_FEED.SNS_FEED_NO
+		       ,SNS_FEED.USER_ID
+		       ,SNS_FEED.SNS_FEED_CN
+		       ,SUBSTR(SNS_FEED.SNS_FEED_CREAT_DE, 1,19)
+		       ,SNS_ANSWER.USER_ID
+		       ,SNS_FEED.CREAT_UPDT_DE
+		       ,SNS_FEED.SNS_LIKE_COUNT
+		       ,SNS_ANSWER.ANSWER_CN
+		       ,SNS_ANSWER.ANSWER_WRITING_TIME
+		       ,SNS_HASHTAG.SNS_TAG_CN
+		       ,ANSWER_CNT
+		FROM SNS_FEED
+			INNER JOIN SNS_ANSWER ON (SNS_FEED.SNS_FEED_NO = SNS_ANSWER.SNS_FEED_NO)
+			INNER JOIN ANSWER_CNT ON (SNS_FEED.SNS_FEED_NO = SNS_ANSWER.SNS_FEED_NO)
+			LEFT JOIN SNS_HASHTAG ON (SNS_FEED.SNS_FEED_NO = SNS_HASHTAG.SNS_FEED_NO)
+		WHERE SNS_FEED.SNS_FEED_NO = #{snsFeedNo}
+	</select>
+	
+
+	
+	<insert id="insertFeed" parameterType="SnsFeedVO">
+		INSERT INTO SNS_FEED
+		(SNS_FEED_NO, SNS_FEED_SJ, SNS_FEED_CN, USER_ID)
+		VALUES
+		(#{snsFeedNo}, #{snsFeedSj}, #{snsFeedCn}, #{userId})
+	</insert>
+	
+	<update id="updateFeed" parameterType="SnsFeedVO">
+		UPDATE SNS_FEED
+		SET SNS_FEED_SJ = #{snsFeedSj}
+		    ,SNS_FEED_CN = #{snsFeedCn}
+		    ,AT_FILE_NO = #{atFileNo}
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+	
+	<update id="deleteFeed" parameterType="int">
+		UPDATE SNS_FEED
+		SET SNS_FEED_AT = 'Y'
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+	</update>
+</mapper>

@@ -1,0 +1,21 @@
+package kr.or.ddit.edcCrse.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.EdcCrseVO;
+
+@Mapper
+public interface EdcCrseDAO {
+
+		// 교육과정 조회
+		public List<EdcCrseVO> selectEdcCrseList();
+		
+		// 교육과정 등록
+		public int insertEdcCrse(EdcCrseVO edcCrseVO);
+		
+		// 교육과정 종료 삭제
+		public int updateEdcCrse(EdcCrseVO edcCrseVO);
+
+}

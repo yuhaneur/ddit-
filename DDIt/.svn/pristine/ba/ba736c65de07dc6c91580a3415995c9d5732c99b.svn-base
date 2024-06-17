@@ -1,0 +1,17 @@
+package kr.or.ddit.edcCrse.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.EdcCrseVO;
+
+public interface EdcCrseService {
+	// 교육과정 조회
+	public List<EdcCrseVO> retrieveEdcCrseList();
+	
+	// 교육과정 등록
+	public int createEdcCrse(EdcCrseVO edcCrseVO);
+	
+	// 교육과정 종료 삭제
+	public int modifyEdcCrse(EdcCrseVO edcCrseVO);
+		
+}

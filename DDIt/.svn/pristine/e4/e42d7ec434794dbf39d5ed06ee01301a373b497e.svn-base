@@ -1,0 +1,510 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.project.dao.ProjectDao">
+
+
+<sql id="searchFrag">
+		 <trim prefix="and">
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.simpleCondition.searchWord)">
+				<choose>
+					<when test="paging.simpleCondition.searchType eq 'work'">
+						INSTR(WORK_SJ, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'project'">
+						INSTR(PROJECT_NAME, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'user'">
+						INSTR(USER_ID, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'psm'">
+						INSTR(USER_ID, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'post'">
+						INSTR(PROJECT_POST_SJ, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					
+				</choose>
+			</if>
+		</trim>
+	</sql>
+	<select id="selectTotalRecordProject" resultType="int" parameterType="kr.or.ddit.paging.PaginationInfo">
+		SELECT COUNT(*) 
+		FROM PROJECT
+		WHERE 1=1
+		<include refid="searchFrag" />
+		
+	</select>
+	
+	
+<select id="projectList" resultType="ProjectVO" >
+	SELECT PROJECT_NO, PROJECT_NAME, PROJECT_CREAT_DATE, PROJECT_DUE_DATE, PROJECT_STATUS, PROJECT_DELYN, PROJECT_UPDT_DATE, PROJECT_DELETE_DATE, USER_ID, PROJECT_DELETE_PASSWORD, AUTH,PROJECT_CN,PROJECT_PARENT
+	FROM PROJECT
+	WHERE PROJECT_PARENT IS NULL
+
+</select>
+	
+	
+<select id="selectProjectList" resultType="ProjectVO">
+	WITH ORDERED AS (
+	SELECT PROJECT_NO, PROJECT_NAME, PROJECT_CREAT_DATE, PROJECT_DUE_DATE, PROJECT_STATUS, PROJECT_DELYN, PROJECT_UPDT_DATE, PROJECT_DELETE_DATE, USER_ID, PROJECT_DELETE_PASSWORD, AUTH,PROJECT_CN,PROJECT_PARENT
+	FROM PROJECT
+	WHERE 1=1
+<include refid="searchFrag"></include>
+    ORDER BY PROJECT.ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+
+</select>
+
+ <insert id="insertProject" parameterType="ProjectVO">
+ 	<selectKey order="BEFORE" resultType="long"
+ 		keyProperty="projectNo">
+ 	SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
+ 	</selectKey>
+INSERT INTO PROJECT (
+    PROJECT_NO,
+    PROJECT_NAME,
+    PROJECT_CREAT_DATE,
+    PROJECT_DUE_DATE,
+    PROJECT_STATUS,
+    PROJECT_DELYN,
+    PROJECT_UPDT_DATE,
+    PROJECT_DELETE_DATE,
+    USER_ID,
+    PROJECT_DELETE_PASSWORD,
+    AUTH,
+    PROJECT_CN,
+    PROJECT_PARENT
+) VALUES (
+    #{projectNo,jdbcType=NUMERIC},
+    #{projectName},
+    sysdate,
+    #{projectDueDate},
+    #{projectStatus},
+    #{projectDelyn},
+    #{projectUpdtDate}, 
+    #{projectDeleteDate},
+    #{userId},
+    #{projectDeletePassword},
+    #{auth},
+    #{projectCn},
+    #{projectParent,jdbcType=NUMERIC}
+)
+
+</insert> 
+
+
+
+
+<resultMap type="ProjectVO" id="projectMap" autoMapping="true">
+	<id property="projectNo" column="PROJECT_NO" />
+	<association property="parent" autoMapping="false">
+		<result property="projectNo" column="부모번호"/>
+		<result property="projectName" column="부모프로젝트이름"/>
+	</association>
+</resultMap>
+<sql id="projectSelectFrag">
+	PROJECT_NO,
+    PROJECT_NAME,
+    PROJECT_CREAT_DATE,
+    PROJECT_DUE_DATE,
+    PROJECT_STATUS,
+    PROJECT_DELYN,
+    PROJECT_UPDT_DATE,
+    PROJECT_DELETE_DATE,
+    USER_ID,
+    PROJECT_DELETE_PASSWORD,
+    AUTH,
+    PROJECT_CN,
+    PROJECT_PARENT
+	
+</sql>
+<select id="readProject" parameterType="int" resultMap="projectMap">
+SELECT c.*, 
+p.project_no as 부모번호,
+p.project_name as 부모프로젝트이름
+FROM PROJECT c left outer join project p on(c.project_parent =p.project_no)
+WHERE c.PROJECT_NO = #{projectNo}
+
+	
+</select>
+
+	<select id="selectTotalRecordWork" resultType="int" >
+		SELECT COUNT(*) 
+		FROM WORK
+		WHERE PROJECT_NO = #{projectNo}
+		<include refid="searchFrag" />
+		
+	</select>
+<select id="selectWokrList" resultType="WorkVO">
+WITH ORDERED AS (
+SELECT 
+    A.WORK_NO
+  , A.WORK_WRITER
+  , A.WORK_CHARGER
+  , A.WORK_SJ
+  , A.WORK_DC
+  , A.WORK_BEGIN_TIME
+  , A.WORK_COMPT
+  , A.WOKR_PRIORITY
+  , A.WORK_PROGRESS
+  , A.WORK_TY
+  , A.WORK_DELETE_DATE
+  , A.WOKR_DELETER
+  , A.WORK_NO2
+  ,B.PROJECT_NO
+  ,B.USER_ID
+FROM WORK A
+INNER JOIN PROJECT B ON (A.PROJECT_NO = B.PROJECT_NO)
+WHERE B.PROJECT_NO = #{projectNo}
+   <include refid="searchFrag"></include>
+    ORDER BY B.ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+
+</select>
+<select id="workList" resultType="WorkVO">
+SELECT 
+    A.WORK_NO
+  , A.WORK_WRITER
+  , A.WORK_CHARGER
+  , A.WORK_SJ
+  , A.WORK_DC
+  , A.WORK_BEGIN_TIME
+  , A.WORK_COMPT
+  , A.WOKR_PRIORITY
+  , A.WORK_PROGRESS
+  , A.WORK_TY
+  , A.WORK_DELETE_DATE
+  , A.WOKR_DELETER
+  , A.WORK_NO2
+  ,B.PROJECT_NO
+  ,B.USER_ID
+FROM WORK A
+INNER JOIN PROJECT_STUDENT_MAPPING B ON (A.WORK_NO = B.PROJECT_NO)
+WHERE B.PROJECT_NO = #{projectNo}
+
+</select>
+
+ <insert id="insertWork" parameterType="WorkVO">
+ 	<selectKey order="BEFORE" keyProperty="workNo" resultType="long">
+		select to_number(nvl(max(work_no),0)+1) from work 
+		
+	</selectKey>
+ 	INSERT INTO WORK (
+    WORK_NO,
+    WORK_WRITER,
+    WORK_CHARGER,
+    WORK_SJ,
+    WORK_DC,
+    WORK_BEGIN_TIME,
+    WORK_COMPT,
+    WOKR_PRIORITY,
+    WORK_PROGRESS,
+    WORK_TY,
+    WORK_DELETE_DATE,
+    WOKR_DELETER,
+    WORK_NO2,
+    PROJECT_NO
+	) VALUES (
+	#{workNo},
+	#{workWriter},
+	#{workCharger},
+	#{workSj},
+	#{workDc},
+	sysdate,
+	sysdate,
+	#{wokrPriority},
+	#{workProgress},
+	#{workTy},
+	#{workDeleteDate},
+	#{wokrDeleter},
+	#{workNo2},
+	#{projectNo}
+	)
+ </insert>
+
+<select id="selectTotalRecordTeam" resultType="int" >
+		SELECT COUNT(*) 
+		FROM USERS A
+		WHERE 1=1 AND A.USER_USE_AT ='Y'
+		<include refid="searchFrag" />
+		
+</select>
+<!--  
+<resultMap type="ProjectPostVO" id="postMap" autoMapping="true">
+	<id property="projectPostNo" column="PROJECT_POST_NO" />
+	<collection property="atchList" javaType="java.util.List" ofType="GrAtchFileVO" autoMapping="true"/>
+
+</resultMap>
+-->
+
+
+<!-- <association property="parent" autoMapping="false">
+		<result property="projectNo" column="부모번호"/>
+		<result property="projectName" column="부모프로젝트이름"/>
+	</association> -->
+
+<resultMap type="UsersVO" id="userMap" autoMapping="true">
+	<id property="userId" column="USER_ID"/>
+	<association property="student" javaType="StudentVO" autoMapping="true">
+		<result property="userId" column="USER_ID"/>
+		<result property="studentName" column="STUDENT_NAME"/>
+	</association>
+</resultMap>
+
+<select id="selectTeamList" resultMap="userMap">
+WITH ORDERED AS (
+    SELECT
+        A.USER_ID,
+        A.USER_PW,
+        A.USER_USE_AT,
+        B.STUDENT_NAME
+    FROM USERS A
+       inner join STUDENT B ON (A.USER_ID = B.USER_ID)
+    WHERE 1=1 AND A.USER_USE_AT = 'Y'
+),
+RNUMOREDERED AS (
+    SELECT ROWNUM AS RNUM, ORDERED.*
+    FROM ORDERED
+)
+SELECT
+    RNUMOREDERED.USER_ID,  
+    RNUMOREDERED.USER_PW,
+    RNUMOREDERED.USER_USE_AT,
+    RNUMOREDERED.STUDENT_NAME,
+    RNUMOREDERED.RNUM  
+FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+</select>
+
+<select id="CmmnCodeList" resultType="CmmnCodeVO">
+SELECT
+    CMMN_CODE,
+    CMMN_CODE_GR,
+    CMMN_CODE_NAME,
+    CMMN_CODE_DESC,
+    OUTPT_ORDR,
+    USE_AT,
+    UPPER_CMMN_CODE_GR,
+    UPPER_CMMN_CODE
+FROM
+    CMMN_CODE
+WHERE CMMN_CODE_GR = 'P001'
+
+
+</select>
+
+<insert id="insertTeam" parameterType="ProjectStudentMappingVO">
+	INSERT INTO project_student_mapping (
+    USER_ID,
+    PROJECT_NO,
+    PROJECT_ROLE,
+    DELETE_AT
+) VALUES (
+    #{userId},
+    #{projectNo},
+    #{projectRole},
+    #{deleteAt}
+)
+</insert>
+
+<select id="selectTotalRecordMyTeam" resultType="int" >
+		SELECT COUNT(*) 
+		FROM PROJECT_STUDENT_MAPPING A	
+		WHERE 1=1 AND DELETE_AT IS NULL AND PROJECT_NO=#{projectNo}
+		<include refid="searchFrag" />
+		
+</select>
+
+
+<resultMap type="ProjectStudentMappingVO" id="myTeamMap" autoMapping="true">
+	<id property="userId" column="USER_ID"/>
+	<association property="student" javaType="StudentVO" autoMapping="true">
+		<result property="userId" column="USER_ID"/>
+		<result property="studentName" column="STUDENT_NAME"/>
+	</association>
+</resultMap>
+
+
+<select id="MyTeamList" resultMap="myTeamMap">
+
+ WITH ORDERED AS ( SELECT A.USER_ID, A.PROJECT_NO, A.PROJECT_ROLE, A.DELETE_AT, B.STUDENT_NAME
+ <include refid="searchFrag"></include>
+FROM PROJECT_STUDENT_MAPPING A INNER JOIN STUDENT B ON(A.USER_ID =B.USER_ID) WHERE 1=1 AND 
+A.DELETE_AT IS NULL AND A.PROJECT_NO=3 ORDER BY A.ROWID DESC ),
+RNUMOREDERED AS( SELECT ROWNUM 
+RNUM, ORDERED.* FROM ORDERED ) 
+SELECT RNUMOREDERED.USER_ID, RNUMOREDERED.PROJECT_NO, RNUMOREDERED.PROJECT_ROLE, 
+RNUMOREDERED.DELETE_AT, RNUMOREDERED.STUDENT_NAME, RNUMOREDERED.RNUM FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+	
+
+</select>
+
+<delete id="deleteTeam" parameterType="ProjectStudentMappingVO">
+	UPDATE PROJECT_STUDENT_MAPPING SET
+	DELETE_AT = 'N'
+	WHERE USER_ID = #{userId} AND PROJECT_NO =#{projectNo}
+
+</delete>
+
+<update id="updateTeam" parameterType="ProjectStudentMappingVO" >
+	UPDATE PROJECT_STUDENT_MAPPING SET
+	PROJECT_ROLE = #{projectRole}
+	WHERE PROJECT_NO =#{projectNo} AND USER_ID=#{userId}
+</update>
+
+
+<select id="selectTotalRecordPost" resultType="int" >
+		SELECT COUNT(*) 
+		FROM PROJECT_POST
+		WHERE 1=1 AND PROJECT_NO = #{projectNo} AND PROJECT_POST_DELETE_AT IS NULL 
+		<include refid="searchFrag" />
+		
+	</select>
+
+<select id="selectPostList" resultType="ProjectPostVO" >
+
+WITH ORDERED AS ( 
+ SELECT
+    PROJECT_POST_NO,
+    PROJECT_POST_SJ,
+    PROJECT_BOARD_NO,
+    PROJECT_POST_CN,
+     to_char(project_post_writing_de,'yyyy-mm-dd') as project_post_writing_de,
+    PROJECT_POST_RDCNT,
+    PROJECT_POST_DELETE_AT,
+    ATCH_FILE_NO,
+    PROJECT_NO,
+   	PROJECT_COUNT
+	FROM
+    PROJECT_POST
+    WHERE 1=1 AND PROJECT_NO = #{projectNo} AND PROJECT_POST_DELETE_AT IS NULL 
+    <include refid="searchFrag"></include>
+    ORDER BY ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord} 
+
+</select>
+
+<update id="updateCount" parameterType="int">
+	UPDATE  PROJECT_POST
+	SET PROJECT_COUNT = PROJECT_COUNT+1
+	WHERE PROJECT_POST_NO  = #{projectPostNo}
+
+</update>
+
+
+<insert id="insertPost" parameterType="ProjectPostVO">
+	<selectKey order="BEFORE" keyProperty="projectPostNo" resultType="long">
+		select to_number(nvl(max(project_post_no),0)+1) from project_post 
+		
+		</selectKey>
+	INSERT INTO PROJECT_POST (
+	    PROJECT_POST_NO,
+	    PROJECT_POST_SJ,
+	    PROJECT_POST_CN,
+	    PROJECT_POST_WRITING_DE,
+	    ATCH_FILE_NO,
+	    PROJECT_NO,
+	    PROJECT_COUNT
+	) VALUES (
+	    #{projectPostNo},
+	    #{projectPostSj},
+	    #{projectPostCn},
+	    sysdate,
+	   		<if test="atchFileNo eq null">
+				#{atchFileNo},
+			</if>
+			<if test="atchFileNo neq null">
+				(SELECT NVL(MAX(ATCH_FILE_NO),0)FROM GR_ATCH_FILE),
+			</if> 
+	    #{projectNo},
+	   	0
+)
+
+</insert>
+
+
+<!-- <delete id="deleteTeam" parameterType="ProjectStudentMappingVO">
+	UPDATE PROJECT_STUDENT_MAPPING SET
+	DELETE_AT = 'N'
+	WHERE USER_ID = #{userId} AND PROJECT_NO =#{projectNo}
+
+</delete> -->
+<delete id="deletePost" parameterType="ProjectPostVO">
+	UPDATE PROJECT_POST SET
+	PROJECT_POST_DELETE_AT = 'N'
+	WHERE PROJECT_POST_NO = #{projectPostNo} AND PROJECT_NO =#{projectNo}
+</delete>
+
+
+
+<!-- <resultMap type="ProjectVO" id="projectMap" autoMapping="true">
+	<id property="projectNo" column="PROJECT_NO" />
+	<association property="parent" autoMapping="false">
+		<result property="projectNo" column="부모번호"/>
+		<result property="projectName" column="부모프로젝트이름"/>
+	</association>
+	<collection property="atchList" javaType="java.util.List" ofType="AtchFileVO" autoMapping="true" />
+</resultMap> -->
+<resultMap type="ProjectPostVO" id="postMap" autoMapping="true">
+	<id property="projectPostNo" column="PROJECT_POST_NO" />
+	<collection property="atchList" javaType="java.util.List" ofType="GrAtchFileVO" autoMapping="true"/>
+
+</resultMap>
+
+<select id="readPost" resultMap="postMap" parameterType="ProjectPostVO">
+	SELECT PROJECT_POST_NO
+	, PROJECT_POST_SJ,
+	 PROJECT_BOARD_NO, PROJECT_POST_CN, PROJECT_POST_WRITING_DE, PROJECT_POST_RDCNT, PROJECT_POST_DELETE_AT, PROJECT_NO, PROJECT_COUNT,
+	GA.ATCH_FILE_NO,ATCH_FILE_TURN,STRE_FILE_NAME,FILE_NAME,FILE_MG
+	FROM PROJECT_POST LEFT OUTER JOIN GR_ATCH_FILE GA ON (PROJECT_POST.ATCH_FILE_NO = GA.ATCH_FILE_NO)
+	WHERE PROJECT_POST.PROJECT_POST_NO =#{projectPostNo}
+</select>
+
+<!--  
+<update id="updateTeam" parameterType="ProjectStudentMappingVO" >
+	UPDATE PROJECT_STUDENT_MAPPING SET
+	PROJECT_ROLE = #{projectRole}
+	WHERE PROJECT_NO =#{projectNo} AND USER_ID=#{userId}
+</update>
+
+-->
+
+<update id="updatePost" parameterType="ProjectPostVO" >
+	UPDATE PROJECT_POST SET
+	PROJECT_POST_SJ = #{projectPostSj},
+	PROJECT_POST_CN = #{projectPostCn},
+	ATCH_FILE_NO = #{atchFileNo}
+	WHERE PROJECT_POST_NO = #{projectPostNo}
+	
+
+</update>
+
+<select id="ReadTeam" resultType="ProjectStudentMappingVO">
+select *
+from PROJECT_STUDENT_MAPPING B
+where B.PROJECT_NO = #{projectNo} and B.DELETE_AT IS NULL
+
+
+</select>
+
+
+</mapper>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.project.dao.ProjectDao">
+
+
+<sql id="searchFrag">
+		 <trim prefix="and">
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.simpleCondition.searchWord)">
+				<choose>
+					<when test="paging.simpleCondition.searchType eq 'work'">
+						INSTR(WORK_SJ, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'project'">
+						INSTR(PROJECT_NAME, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					<when test="paging.simpleCondition.searchType eq 'user'">
+						INSTR(USER_ID, #{paging.simpleCondition.searchWord}) > 0
+					</when>
+					
+				</choose>
+			</if>
+		</trim>
+	</sql>
+	<select id="selectTotalRecordProject" resultType="int" parameterType="kr.or.ddit.paging.PaginationInfo">
+		SELECT COUNT(*) 
+		FROM PROJECT
+		WHERE 1=1
+		<include refid="searchFrag" />
+		
+	</select>
+	
+	
+<select id="projectList" resultType="ProjectVO" >
+	SELECT PROJECT_NO, PROJECT_NAME, PROJECT_CREAT_DATE, PROJECT_DUE_DATE, PROJECT_STATUS, PROJECT_DELYN, PROJECT_UPDT_DATE, PROJECT_DELETE_DATE, USER_ID, PROJECT_DELETE_PASSWORD, AUTH,PROJECT_CN,PROJECT_PARENT
+	FROM PROJECT
+	WHERE PROJECT_PARENT IS NULL
+
+</select>
+	
+	
+<select id="selectProjectList" resultType="ProjectVO">
+	WITH ORDERED AS (
+	SELECT PROJECT_NO, PROJECT_NAME, PROJECT_CREAT_DATE, PROJECT_DUE_DATE, PROJECT_STATUS, PROJECT_DELYN, PROJECT_UPDT_DATE, PROJECT_DELETE_DATE, USER_ID, PROJECT_DELETE_PASSWORD, AUTH,PROJECT_CN,PROJECT_PARENT
+	FROM PROJECT
+	WHERE 1=1
+<include refid="searchFrag"></include>
+    ORDER BY PROJECT.ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+
+</select>
+
+ <insert id="insertProject" parameterType="ProjectVO">
+ 	<selectKey order="BEFORE" resultType="long"
+ 		keyProperty="projectNo">
+ 	SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
+ 	</selectKey>
+INSERT INTO PROJECT (
+    PROJECT_NO,
+    PROJECT_NAME,
+    PROJECT_CREAT_DATE,
+    PROJECT_DUE_DATE,
+    PROJECT_STATUS,
+    PROJECT_DELYN,
+    PROJECT_UPDT_DATE,
+    PROJECT_DELETE_DATE,
+    USER_ID,
+    PROJECT_DELETE_PASSWORD,
+    AUTH,
+    PROJECT_CN,
+    PROJECT_PARENT
+) VALUES (
+    #{projectNo,jdbcType=NUMERIC},
+    #{projectName},
+    sysdate,
+    #{projectDueDate},
+    #{projectStatus},
+    #{projectDelyn},
+    #{projectUpdtDate},
+    #{projectDeleteDate},
+    #{userId},
+    #{projectDeletePassword},
+    #{auth},
+    #{projectCn},
+    #{projectParent,jdbcType=NUMERIC}
+)
+
+</insert> 
+<resultMap type="ProjectVO" id="projectMap" autoMapping="true">
+	<id property="projectNo" column="PROJECT_NO" />
+	<association property="parent" autoMapping="false">
+		<result property="projectNo" column="부모번호"/>
+		<result property="projectName" column="부모프로젝트이름"/>
+	</association>
+</resultMap>
+<sql id="projectSelectFrag">
+	PROJECT_NO,
+    PROJECT_NAME,
+    PROJECT_CREAT_DATE,
+    PROJECT_DUE_DATE,
+    PROJECT_STATUS,
+    PROJECT_DELYN,
+    PROJECT_UPDT_DATE,
+    PROJECT_DELETE_DATE,
+    USER_ID,
+    PROJECT_DELETE_PASSWORD,
+    AUTH,
+    PROJECT_CN,
+    PROJECT_PARENT
+	
+</sql>
+<select id="readProject" parameterType="int" resultMap="projectMap">
+SELECT c.*, 
+p.project_no as 부모번호,
+p.project_name as 부모프로젝트이름
+FROM PROJECT c left outer join project p on(c.project_parent =p.project_no)
+WHERE c.PROJECT_NO = #{projectNo}
+
+	
+</select>
+
+	<select id="selectTotalRecordWork" resultType="int" >
+		SELECT COUNT(*) 
+		FROM WORK
+		WHERE PROJECT_NO = #{projectNo}
+		<include refid="searchFrag" />
+		
+	</select>
+<select id="selectWokrList" resultType="WorkVO">
+WITH ORDERED AS (
+SELECT 
+    A.WORK_NO
+  , A.WORK_WRITER
+  , A.WORK_CHARGER
+  , A.WORK_SJ
+  , A.WORK_DC
+  , A.WORK_BEGIN_TIME
+  , A.WORK_COMPT
+  , A.WOKR_PRIORITY
+  , A.WORK_PROGRESS
+  , A.WORK_TY
+  , A.WORK_DELETE_DATE
+  , A.WOKR_DELETER
+  , A.WORK_NO2
+  ,B.PROJECT_NO
+  ,B.USER_ID
+FROM WORK A
+INNER JOIN PROJECT B ON (A.WORK_NO = B.PROJECT_NO)
+WHERE B.PROJECT_NO = #{projectNo}
+   <include refid="searchFrag"></include>
+    ORDER BY B.ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+
+</select>
+<select id="workList" resultType="WorkVO">
+select * from work
+
+</select>
+
+ <!-- <insert id="insertWork" >
+
+</insert>  -->
+
+<select id="selectTotalRecordTeam" resultType="int" >
+		SELECT COUNT(*) 
+		FROM USERS	
+		WHERE 1=1
+		<include refid="searchFrag" />
+		
+</select>
+
+
+<select id="selectTeamList" resultType="UsersVO">
+WITH ORDERED AS (
+SELECT
+    USER_ID,
+    USER_PW,
+    USER_USE_AT
+    
+FROM
+    USERS
+    WHERE 1=1 
+ <include refid="searchFrag"></include>
+    ORDER BY ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+</select>
+
+<select id="CmmnCodeList" resultType="CmmnCodeVO">
+SELECT
+    CMMN_CODE,
+    CMMN_CODE_GR,
+    CMMN_CODE_NAME,
+    CMMN_CODE_DESC,
+    OUTPT_ORDR,
+    USE_AT,
+    UPPER_CMMN_CODE_GR,
+    UPPER_CMMN_CODE
+FROM
+    CMMN_CODE
+WHERE CMMN_CODE_GR = 'P001'
+
+
+</select>
+
+<insert id="insertTeam" parameterType="ProjectStudentMappingVO">
+	INSERT INTO project_student_mapping (
+    USER_ID,
+    PROJECT_NO,
+    PROJECT_ROLE,
+    DELETE_AT
+) VALUES (
+    #{userId},
+    #{projectNo},
+    #{projectRole},
+    #{deleteAt}
+)
+</insert>
+
+</mapper>

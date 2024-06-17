@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemPurchaseDAO">
+<resultMap type="ItemPurchaseVO" id="itemPurchaseMap" autoMapping="true">
+</resultMap>
+<select id="selectItemPurchaseList" resultMap="itemPurchaseMap">
+	SELECT
+	    ITEM_PURCHASE_CODE,
+	    USER_ID,
+	    ITEM_CODE,
+	    ITEM_PURCHASE_DT,
+	    ITEM_BKMK,
+	    ITEM_HIDE
+	FROM
+		ITEM_PURCHASE
+	WHERE USER_ID = #{userId}
+</select>
+
+<insert id="insertItemPurchase" parameterType="ItemPurchaseVO">
+	<selectKey order="BEFORE" resultType="string" keyProperty="itemPurchaseCode">
+		SELECT 'I_PUR' || 
+		LPAD(NVL(TO_NUMBER(SUBSTR(MAX(ITEM_PURCHASE_CODE), 6)), 0)+1, 5,'0')
+		FROM ITEM_PURCHASE
+	</selectKey>
+	INSERT INTO ITEM_PURCHASE (
+		ITEM_PURCHASE_CODE,
+		USER_ID,
+		ITEM_CODE,
+		ITEM_PURCHASE_DT,
+		ITEM_BKMK,
+		ITEM_HIDE
+	) VALUES (
+		#{itemPurchaseCode},
+		#{userId},
+		#{itemCode},
+		TO_DATE(SYSDATE, 'yyyy/mm/dd hh24:mi:ss'),
+		'N',
+		'N'
+	)
+</insert>
+	
+
+</mapper>

@@ -1,0 +1,106 @@
+package kr.or.ddit.project.controller;
+
+import java.util.List;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.paging.BootstrapPaginationRenderer;
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.paging.PaginationRenderer;
+import kr.or.ddit.paging.SimpleCondition;
+import kr.or.ddit.project.service.ProjectService;
+import kr.or.ddit.vo.ProjectStudentMappingVO;
+import kr.or.ddit.vo.ProjectVO;
+import kr.or.ddit.vo.WorkVO;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+@Controller
+@RequestMapping("/project")
+public class ProjectController {
+	public static final String MODELNAME="newProject";
+	
+	@Autowired
+	private ProjectService service;
+	
+	@ModelAttribute(MODELNAME)
+	public ProjectVO newProject() {
+		return new ProjectVO();
+	}
+
+	@GetMapping
+	public String projectList(Model model,
+			@RequestParam(required = false , defaultValue = "1") int currentPage 
+			,@ModelAttribute("condition")SimpleCondition simpleCondition
+			) { 
+		simpleCondition.setSearchType("project");
+		PaginationInfo paging = new PaginationInfo(5,3);
+		paging.setCurrentPage(currentPage);
+		paging.setSimpleCondition(simpleCondition);
+		
+		List<ProjectVO> project = service.retrieveProjectList(paging);
+		model.addAttribute("projectList",project);
+		
+		
+		PaginationRenderer render = new BootstrapPaginationRenderer();
+		model.addAttribute("pagingFunction", "paging");
+		String pagingHTML = render.renderPagination(paging, "paging");
+		model.addAttribute("pagingHTML",pagingHTML);
+		
+		return "project/projectList";
+	}
+	@GetMapping("insert")
+	public String handler1(Model model) {
+		List<ProjectVO> projectList = service.projectList();
+		model.addAttribute("projectList",projectList);
+		return "project/projectInsert";
+	}
+	@PostMapping("insert")
+	public String projectInsert(
+			@Valid @ModelAttribute(MODELNAME) ProjectVO newProject
+			, BindingResult errors
+			, RedirectAttributes redirectAttributes
+			
+			) {		
+			log.info("new Project :{}",newProject);
+		
+			if(errors.hasErrors()) {
+				System.out.println(errors.getAllErrors());
+				redirectAttributes.addFlashAttribute(MODELNAME, newProject);
+				redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + MODELNAME,errors
+						);
+				return "redirect:/project/insert";
+			}else {
+				service.createProject(newProject);
+				return "redirect:/project";
+			}
+	}
+	
+	@GetMapping("{projectNo}")
+	public String proejctDetail(@PathVariable int projectNo, Model model
+		 ) {
+		
+		ProjectVO project = service.readProject(projectNo);
+		
+		model.addAttribute("project", project);
+		
+		return "project/projectDetail";
+		
+	}
+	
+	
+	
+	
+}

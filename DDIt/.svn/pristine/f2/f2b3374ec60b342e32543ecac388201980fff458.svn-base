@@ -1,0 +1,34 @@
+package kr.or.ddit.school.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.vo.ConsultingVO;
+
+@Mapper
+public interface ConsultingDAO {
+	/** 선생님의 상담일정 조회 */
+	public List<ConsultingVO> selectCounsultingTeacherList(@Param("userId") String userId);
+	
+	/**
+	 * 상담일정 등록
+	 */
+	public int insertCounsulting(ConsultingVO consultingVO);
+	
+	/**
+	 * 대기중인 상담목록
+	 */
+	public List<ConsultingVO> selectDcounsultingList(@Param("userId2") String userId2);
+	
+	/**
+	 * 완료된 상담목록
+	 */
+	public List<ConsultingVO> selectFcounsultingList(@Param("userId2") String userId2);
+	/**
+	 * 진행중인상담목록
+	 */
+	public List<ConsultingVO> selectYcounsultingList(@Param("userId2") String userId2);
+	
+}

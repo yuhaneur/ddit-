@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+    
+<div class="card-body">
+		<div class="card-header bg-body-tertiary">
+			<h5>
+			<svg class="svg-inline--fa fa-flag fa-w-16 me-2" aria-hidden="true" focusable="false" data-prefix="far" data-icon="flag" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M336.174 80c-49.132 0-93.305-32-161.913-32-31.301 0-58.303 6.482-80.721 15.168a48.04 48.04 0 0 0 2.142-20.727C93.067 19.575 74.167 1.594 51.201.104 23.242-1.71 0 20.431 0 48c0 17.764 9.657 33.262 24 41.562V496c0 8.837 7.163 16 16 16h16c8.837 0 16-7.163 16-16v-83.443C109.869 395.28 143.259 384 199.826 384c49.132 0 93.305 32 161.913 32 58.479 0 101.972-22.617 128.548-39.981C503.846 367.161 512 352.051 512 335.855V95.937c0-34.459-35.264-57.768-66.904-44.117C409.193 67.309 371.641 80 336.174 80zM464 336c-21.783 15.412-60.824 32-102.261 32-59.945 0-102.002-32-161.913-32-43.361 0-96.379 9.403-127.826 24V128c21.784-15.412 60.824-32 102.261-32 59.945 0 102.002 32 161.913 32 43.271 0 96.32-17.366 127.826-32v240z"></path></svg>
+			<span>소그룹 제목</span>
+			</h5>
+		</div>
+		
+		<div class="d-md-flex d-xl-inline-block d-xxl-flex align-items-center justify-content-between mb-x1">
+		                    <div class="d-flex align-items-center gap-2">
+		                    <a href="/resources/public/app/support-desk/contact-details.html">
+		                        <div class="avatar avatar-2xl">
+		                          <img class="rounded-circle" src="/resources/public/assets/img/team/1-thumb.png" alt="">
+		                        </div>
+		                      </a>
+						<p class="mb-0"><a class="fw-semi-bold mb-0 text-800" href="/resources/public/app/support-desk/contact-details.html">Emma Waston</a></p>
+				</div>
+			<p class="mb-0 fs-11 fs-sm-10 fw-semi-bold mt-2 mt-md-0 mt-xl-2 mt-xxl-0 ms-5">작성일<span class="mx-1">|</span><span class="fst-italic">2024 / 05 / 05?</span></p>
+		</div>
+		
+		<div>
+		    <h6 class="mb-3 fw-semi-bold text-1000">Improve in A purposed Manner</h6>
+		    <p>Hi</p>
+		    <p>The television I ordered from your site was delivered with a cracked screen. I need some help with a refund or a replacement.</p>
+		    <p>Here is the order number FD07062010</p>
+		    <p class="mb-0">Thanks</p>
+		    <p class="mb-0">Emma Watson</p>
+		    
+		    <br>
+		    <p>
+		    <svg class="svg-inline--fa fa-id-card fa-w-18 me-2" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="id-card" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" data-fa-i2svg=""><path fill="currentColor" d="M528 32H48C21.5 32 0 53.5 0 80v16h576V80c0-26.5-21.5-48-48-48zM0 432c0 26.5 21.5 48 48 48h480c26.5 0 48-21.5 48-48V128H0v304zm352-232c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8H360c-4.4 0-8-3.6-8-8v-16zm0 64c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8H360c-4.4 0-8-3.6-8-8v-16zm0 64c0-4.4 3.6-8 8-8h144c4.4 0 8 3.6 8 8v16c0 4.4-3.6 8-8 8H360c-4.4 0-8-3.6-8-8v-16zM176 192c35.3 0 64 28.7 64 64s-28.7 64-64 64-64-28.7-64-64 28.7-64 64-64zM67.1 396.2C75.5 370.5 99.6 352 128 352h8.2c12.3 5.1 25.7 8 39.8 8s27.6-2.9 39.8-8h8.2c28.4 0 52.5 18.5 60.9 44.2 3.2 9.9-5.2 19.8-15.6 19.8H82.7c-10.4 0-18.8-10-15.6-19.8z"></path></svg>
+		    모집인원 : 0 / 5
+		    </p>
+		</div>
+		<br><br>
+		<div class="card-footer bg-body-tertiary pt-0">
+                  <form class="d-flex align-items-center border-top border-200 pt-3">
+                    <div class="avatar avatar-xl">
+                      <img class="rounded-circle" src="/resources/public/assets/img/team/3.jpg" alt="">
+                    </div>
+                    <input class="form-control rounded-pill ms-2 fs-10" type="text" placeholder="댓글 작성...">
+                  </form>
+                  <div class="d-flex mt-3">
+                    <div class="avatar avatar-xl">
+                      <img class="rounded-circle" src="/resources/public/assets/img/team/4.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2 fs-10">
+                      <p class="mb-1 bg-200 rounded-3 p-2"><a class="fw-semi-bold" href="/resources/public/pages/user/profile.html">Rowan Atkinson</a> She starred as Jane Porter in The <a href="#!">@Legend of Tarzan (2016)</a>, Tanya Vanderpoel in Whiskey Tango Foxtrot (2016) and as DC comics villain Harley Quinn in Suicide Squad (2016), for which she was nominated for a Teen Choice Award, and many other awards.</p>
+                      <div class="px-2"><a href="#!">좋아요</a> • <a href="#!">대댓글</a><a href="#!"> • 신고   </a>
+                       2024 / 05 / 13
+                      </div>
+                    </div>
+                  </div>
+                  <div class="d-flex mt-3">
+                    <div class="avatar avatar-xl">
+                      <img class="rounded-circle" src="/resources/public/assets/img/team/3.jpg" alt="">
+
+                    </div>
+                    <div class="flex-1 ms-2 fs-10">
+                      <p class="mb-1 bg-200 rounded-3 p-2"><a class="fw-semi-bold" href="/resources/public/pages/user/profile.html">Jessalyn Gilsig</a> Jessalyn Sarah Gilsig is a Canadian-American actress known for her roles in television series, e.g., as Lauren Davis in Boston Public, Gina Russo in Nip/Tuck, Terri Schuester in Glee, and as Siggy Haraldson on the History Channel series Vikings. 🏆</p>
+                      <div class="px-2"><a href="#!">좋아요</a> • <a href="#!">대댓글</a> • 3hrs </div>
+                    </div>
+                  </div><a class="fs-10 text-700 d-inline-block mt-2" href="#!">Load more 댓글 (2 of 34)</a>
+                </div>
+	</div>

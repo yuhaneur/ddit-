@@ -1,0 +1,61 @@
+package kr.or.ddit.sns.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+
+/**
+ *
+ */
+@Mapper
+public interface SnsDAO {
+	/**
+	 * @return 전체 피드 조회
+	 */
+	public List<SnsFeedVO> selectFeedList();
+	
+	/**
+	 * @return 해당 피드 전체댓글 조회
+	 */
+	public List<SnsAnswerVO> selectAnswerList(int snsFeedNo);
+	
+	/**
+	 * @param snsFeedNo (int)
+	 * @return 선택한 피드 하나를 조회
+	 */
+	public SnsFeedVO selectFeed(int snsFeedNo);
+	
+	/**
+	 * @param feedVo
+	 * @return Feed 작성
+	 */
+	public int insertFeed(SnsFeedVO feedVo);
+	
+	/**
+	 * @param feedVo
+	 * @return Feed 수정
+	 */
+	public int updateFeed(SnsFeedVO feedVo);
+	
+	/**
+	 * @param feedVo
+	 * @return HashTag 수정
+	 */
+	public int updateHashTag(SnsFeedVO feedVo);
+	
+	
+	/**
+	 * @param snsFeedNo (int)
+	 * @return Feed 삭제
+	 */
+	public int deleteFeed(Long snsFeedNo);
+	
+	/**
+	 * @param snsFeedNo
+	 * @return HashTag 삭제 ( 피드 삭제시 같이 활성화 )
+	 */
+	public int deleteHashTag(Long snsFeedNo);
+}

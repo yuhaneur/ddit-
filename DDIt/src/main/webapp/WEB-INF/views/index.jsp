@@ -1,0 +1,28 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%@ taglib prefix="security" uri="http://www.springframework.org/security/tags" %>
+<security:authentication property="principal" var="principal"/>
+    
+
+<script>
+	const userId = "${principal.realUser.userId }";
+</script>
+
+<div class="card" style="height:863px;">
+	<div class="card-body overflow-hidden p-lg-6">
+		<div class="row align-items-center">
+			<div class="col-lg-6">
+				<img class="img-fluid" src="${pageContext.request.contextPath}/resources/public/assets/img/icons/spot-illustrations/21.png" alt="" style="margin-top:80px;"/>
+				
+				<!-- 메인화면 gif 추가 -->
+				<%-- <img class="img-fluid" src="${pageContext.request.contextPath}/resources/images/giphy.gif" alt="" style="margin-top:80px;" loop=infinite /> --%>
+			</div>
+			<div class="col-lg-6 ps-lg-4 my-5 text-center text-lg-start">
+				<h3 class="text-primary" style="margin-left:50px;">${principal.realUser.userId } 님 환영합니다 ! </h3>
+				<p class="lead" style="margin-left:50px;">Create Something Beautiful.</p>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,250 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<style>
+	#studentModal{
+		position: fixed;
+        width:24vw;
+        height:45vh;
+        left:40%;
+        top:25%;
+        background-color:white;
+        z-index: 1000;
+        display: none;
+        overflow: auto;
+	}
+</style>
+<!-- 클래스 상세 헤더 시작  -->
+<div class="card mb-3">
+   <div class="bg-holder d-none d-lg-block bg-card" style="background-image:url(${pageContext.request.contextPath}/resources/public/assets/img/icons/spot-illustrations/corner-4.png);opacity: 0.7;">
+  </div>
+  <div class="card-body position-relative">
+    <h5>${classVO.className }-${classVO.edcCrseRound }회차</h5>
+    <input type="hidden" id="edcCrseCode" value="${classVO.edcCrseCode }">
+    <input type="hidden" id="classCode" value="${classVO.classCode }">
+    <p class="fs-10">${fn:substring(classVO.classCreationDe,0,10)} ~ ${fn:substring(classVO.classEndDe,0,10)}</p>
+    <div><strong class="me-2">담임:${classVO.teacher.teacherName } </strong>
+    </div>
+  </div>
+</div>
+<!-- 클래스 상세 중단 시작 -->
+<div class="card mb-3" style="height:740px;">
+  <div class="card-body">
+    <div class="table-responsive fs-10">
+      <table class="table table-bordered">
+		  <thead class="table-dark">
+		    <tr>
+		      <th scope="col">과목</th>
+		      <th scope="col" colspan="2">담당교사</th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		  <c:forEach items="${classVO.edcCrse.sjList }" var="sj">
+		  <c:choose>
+		  	<c:when test="${not empty sj.sjManagerList }">
+		  	<tr>
+		      <td>${sj.sjName }</td>
+			  <td>${sj.sjManagerList[0].teacher.teacherName }</td>
+		    </tr>
+		  	</c:when>
+		  	<c:otherwise>
+		    <tr>
+		      <td>${sj.sjName }</td>
+			  <td></td>
+		      <td><button class="btn btn-falcon-default btn-sm ms-2" data-sj-no="${sj.sjNo }" data-sj-name="${sj.sjName }" onclick="addClassTeacher(this)" type="button">추가하기</button></td>
+		    </tr>
+		  	</c:otherwise>
+		  </c:choose> 
+		  </c:forEach>
+		  </tbody>
+		</table>
+		<div class="card mb-3">
+  <div class="card-body">
+    <div class="row">
+      <div class="d-flex">
+      	<h5>학생 리스트</h5>
+      		<button class="btn btn-primary me-1 mb-1" onclick="studentModal()">등록</button>
+      </div>
+		<table class="table table-sm fs-10 mb-0">
+          <thead class="bg-body-tertiary">
+            <tr>
+              <th class="text-800 sort align-middle ps-2" data-sort="name">이름</th>
+              <th class="text-800 sort align-middle pe-5" data-sort="phone-number">전화번호</th>
+              <th class="text-800 sort align-middle pe-5" data-sort="report">이메일</th>
+            </tr>
+          </thead>
+          <tbody class="list">
+	          <c:forEach items="${studentList }" var="stu">
+		          	<tr>
+		              <td class="align-middle name white-space-nowrap pe-5 ps-2">
+		                <div class="d-flex align-items-center gap-2 position-relative">
+		                  <input type="hidden" class="userId" value="${stu.userId }">
+		                  <h6 class="teacherName mb-0">${stu.studentName }</h6>
+		                </div>
+		              </td>
+		              <td class="align-middle phone-number font-sans-serif white-space-nowrap">${stu.studentPhoneno }</td>
+		              <td class="align-middle report">${stu.studentMail }</td>
+		            </tr>
+	          	</c:forEach>
+            </tbody>
+        </table>
+    </div>
+  </div>
+</div>
+    </div>
+  <div>
+	  <button class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="outClassDetail()">나가기</button>
+  </div>
+  </div>
+</div>
+<!-- 학생등록 모달 시작 -->
+<div class="col-xxl-9 col-xl-9" id="studentModal">
+  <div class="card" id="allContactTable" style="height:100%;" data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;phone-number&quot;,&quot;report&quot;,&quot;subscription&quot;,&quot;social&quot;],&quot;page&quot;:11,&quot;pagination&quot;:true,&quot;fallback&quot;:&quot;contact-table-fallback&quot;}">
+    <div class="card-header border-bottom border-200 px-0">
+      <div class="d-lg-flex justify-content-between">
+        <div class="row flex-between-center gy-2 px-x1">
+          <div class="col-auto pe-0">
+            <h6 class="mb-0">학생이름검색</h6>
+          </div>
+          <div class="col-auto">
+            <form>
+              <div class="input-group input-search-width">
+                <input class="form-control form-control-sm shadow-none search" type="search" placeholder="Search  by name" aria-label="search">
+                <button class="btn btn-sm btn-outline-secondary border-300 hover-border-secondary"><svg class="svg-inline--fa fa-search fa-w-16 fs-10" aria-hidden="true" focusable="false" data-prefix="fa" data-icon="search" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg><!-- <span class="fa fa-search fs-10"></span> Font Awesome fontawesome.com --></button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="border-bottom border-200 my-3"></div>
+        <div class="d-flex align-items-center justify-content-between justify-content-lg-end px-x1">
+          <button class="btn btn-sm btn-falcon-default d-xl-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#allContactOffcanvas" aria-controls="allContactOffcanvas"><svg class="svg-inline--fa fa-filter fa-w-16" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(256 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fas fa-filter" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span class="ms-1 d-none d-sm-inline-block">Filter</span></button>
+          <div class="bg-300 mx-3 d-none d-lg-block d-xl-none" style="width:1px; height:29px"></div>
+          <div class="d-none" id="table-contact-actions">
+            <div class="d-flex">
+              <button class="btn btn-falcon-default btn-sm ms-2" onclick="addStudent()" type="button">추가하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive scrollbar">
+        <table class="table table-sm fs-10 mb-0">
+          <thead class="bg-body-tertiary">
+            <tr>
+              <th class="py-2 fs-9 pe-2" style="width: 28px;">
+                <div class="form-check d-flex align-items-center">
+                  <input class="form-check-input" id="checkbox-bulk-tickets-select" type="checkbox" data-bulk-select="{&quot;body&quot;:&quot;table-contact-body&quot;,&quot;actions&quot;:&quot;table-contact-actions&quot;,&quot;replacedElement&quot;:&quot;table-contact-replace-element&quot;}">
+                </div>
+              </th>
+              <th class="text-800 sort align-middle ps-2" data-sort="name">이름</th>
+              <th class="text-800 sort align-middle pe-5" data-sort="phone-number">전화번호</th>
+              <th class="text-800 sort align-middle pe-5" data-sort="report">이메일</th>
+            </tr>
+          </thead>
+          <tbody class="list" id="table-contact-body2">
+	          <c:forEach items="${stuList }" var="stu">
+		          	<tr>
+		              <td class="align-middle fs-9 py-3">
+		                <div class="form-check mb-0">
+		                  <input class="form-check-input" type="checkbox" data-bulk-select-row="data-bulk-select-row">
+		                </div>
+		              </td>
+		              <td class="align-middle name white-space-nowrap pe-5 ps-2">
+		                <div class="d-flex align-items-center gap-2 position-relative">
+		                  <input type="hidden" class="userId" value="${stu.userId }">
+		                  <h6 class="teacherName mb-0">${stu.studentName }</h6>
+		                </div>
+		              </td>
+		              <td class="align-middle phone-number font-sans-serif white-space-nowrap">${stu.studentPhoneno }</td>
+		              <td class="align-middle report">${stu.studentMail }</td>
+		            </tr>
+	          	</c:forEach>
+            </tbody>
+        </table>
+        <div class="text-center d-none" id="contact-table-fallback">
+          <p class="fw-bold fs-8 mt-3">No contact found</p>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer d-flex ">
+    	<button class="btn btn-primary me-1 mb-1" onclick="addStudent()">확인</button>
+    	<button class="btn btn-primary me-1 mb-1" onclick="closeStudentModal()">취소</button>
+    </div>
+  </div>
+</div>
+<!-- 학생등록 모달 끝 -->
+<!-- 클래스 상세 하단 시작 -->
+
+
+<!-- 과목선생님 등록하는 모달시작 -->
+<div class="modal fade show" id="addClassTeacherModal" tabindex="-1" style="display: none;" aria-modal="true" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 500px">
+    <div class="modal-content position-relative" id="curriculumDetailBody">
+     <div class="modal-body p-0" style="height: 500px; width: 500px;">
+     	<div>
+          <div  style="height: 500px;" class="card" id="allContactTable" data-list="{&quot;valueNames&quot;:[&quot;name&quot;,&quot;phone-number&quot;,&quot;report&quot;,&quot;subscription&quot;,&quot;social&quot;],&quot;page&quot;:11,&quot;pagination&quot;:true,&quot;fallback&quot;:&quot;contact-table-fallback&quot;}">
+            <div class="card-header border-bottom border-200 px-0">
+              <div class="d-lg-flex justify-content-between">
+                <div class="row flex-between-center gy-2 px-x1">
+                  <div class="col-auto">
+                  <h4 id="modalHead">담당과목 교사등록</h4>
+                  </div>
+                </div>
+                <div class="border-bottom border-200 my-3"></div>
+                <div class="d-flex align-items-center justify-content-between justify-content-lg-end px-x1">
+                  <button class="btn btn-sm btn-falcon-default d-xl-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#allContactOffcanvas" aria-controls="allContactOffcanvas"><svg class="svg-inline--fa fa-filter fa-w-16" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="filter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(256 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M487.976 0H24.028C2.71 0-8.047 25.866 7.058 40.971L192 225.941V432c0 7.831 3.821 15.17 10.237 19.662l80 55.98C298.02 518.69 320 507.493 320 487.98V225.941l184.947-184.97C520.021 25.896 509.338 0 487.976 0z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fas fa-filter" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span class="ms-1 d-none d-sm-inline-block">Filter</span></button>
+                  <div class="bg-300 mx-3 d-none d-lg-block d-xl-none" style="width:1px; height:29px"></div>
+                  <div class="d-none" id="table-contact-actions">
+                    <div class="d-flex">
+                      <button class="btn btn-falcon-default btn-sm ms-2" onclick="addClassTeacher()" type="button">잉</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive scrollbar">
+                <table class="table table-sm fs-10 mb-0">
+                  <thead class="bg-body-tertiary">
+                    <tr>
+                      <th class="py-2 fs-9 pe-2" style="width: 28px;">
+                      </th>
+                      <th class="text-800 sort align-middle ps-2" data-sort="name">이름</th>
+                      <th class="text-800 sort align-middle pe-5" data-sort="phone-number">전화번호</th>
+                      <th class="text-800 sort align-middle pe-5" data-sort="report">이메일</th>
+                      <th class="text-800 sort align-middle pe-5" data-sort="report">수업시간</th>
+                    </tr>
+                  </thead>
+                  <tbody class="list" id="table-contact-body">
+						
+                  </tbody>
+                </table>
+                <form id="teacherInfoForm" method="post" >
+                	<input type="hidden" name="classCode">
+                	<input type="hidden" name="sjNo">
+                	<input type="hidden" name="userId">
+                	<input type="hidden" name="edcCrseCode">
+                	<input type="hidden" name="mnOrAt">
+                </form>
+                <div class="text-center d-none" id="contact-table-fallback">
+                  <p class="fw-bold fs-8 mt-3">No contact found</p>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" type="button" onclick="outDetailModal()">나가기</button>
+              <button class="btn btn-primary" type="button" onclick="teachInsert()">등록 </button>
+          </div>
+          </div>
+        </div>
+       </div>
+     </div>
+   </div>
+</div>
+<!-- 과목선생님 등록하는 모달끝 -->
+
+<!-- 클래스 디테일 스크립트 -->
+<script src="${pageContext.request.contextPath}/resources/js/app/school/classDetail.js"></script>

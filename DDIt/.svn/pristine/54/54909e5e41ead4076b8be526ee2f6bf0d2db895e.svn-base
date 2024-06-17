@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemDAO">
+<select id="selectItemList" resultType="ItemVO">
+	WITH LVIEW AS(
+		SELECT
+		ITEM_CODE,
+		COUNT(*) CNT
+		FROM ITEM_LIKE
+		GROUP BY ITEM_CODE
+		HAVING COUNT(ITEM_CODE)>1
+		)
+	SELECT
+	    ITEM.ITEM_CODE,
+	    ITEM_CTGRY,
+	    ITEM_NM,
+	    ITEM_EFFECT,
+	    ITEM_PC,
+	    ITEM_RGS_DE,
+	    ITEM_END_DE,
+	    ITEM_DELETE_AT,
+	    NVL(CNT,0) LIKE_CNT
+	FROM ITEM LEFT OUTER JOIN LVIEW ON (ITEM.ITEM_CODE = LVIEW.ITEM_CODE)
+</select>
+
+<select id="selectItem" resultType="ItemVO">
+	WITH LVIEW AS(
+		SELECT
+		ITEM_CODE,
+		COUNT(*) CNT
+		FROM ITEM_LIKE
+		GROUP BY ITEM_CODE
+		HAVING COUNT(ITEM_CODE)>1
+		)
+	SELECT
+	    ITEM.ITEM_CODE,
+	    ITEM_CTGRY,
+	    ITEM_NM,
+	    ITEM_EFFECT,
+	    ITEM_PC,
+	    ITEM_RGS_DE,
+	    ITEM_END_DE,
+	    ITEM_DELETE_AT,
+	    NVL(CNT,0) LIKE_CNT
+	FROM ITEM LEFT OUTER JOIN LVIEW ON (ITEM.ITEM_CODE = LVIEW.ITEM_CODE)
+	WHERE ITEM.ITEM_CODE = #{itemCode}
+</select>
+
+
+<insert id="insertItem" parameterType="ItemVO">
+	<selectKey order="BEFORE" resultType="string" keyProperty="itemCode">
+		SELECT 'ITEM' || 
+		LPAD(NVL(TO_NUMBER(SUBSTR(MAX(ITEM_CODE), 5)), 0)+1, 5,'0')
+		FROM ITEM
+	</selectKey>
+	INSERT INTO ITEM (
+	    ITEM_CODE,
+	    ITEM_CTGRY,
+	    ITEM_NM,
+	    ITEM_EFFECT,
+	    ITEM_PC,
+	    ITEM_RGS_DE,
+	    ITEM_END_DE,
+	    ITEM_DELETE_AT
+	) VALUES (
+	    #{itemCode},
+	    #{itemCtgry},
+	    #{itemNm},
+	    #{itemEffect},
+	    #{itemPc},
+	    #{itemRgsDe},
+	    #{itemEndDe},
+	    #{itemDeleteAt}
+	)
+</insert>
+
+
+</mapper>

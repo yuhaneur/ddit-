@@ -1,0 +1,31 @@
+package kr.or.ddit.vo;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "followId")
+public class FollowVO {
+	@NotNull @Min(0)
+	private Long followId;
+	
+	@Size(max=1)
+	private String followAt;
+	
+	@Size(max=30)
+	private String userId; // 팔로우 신청 아이디
+	
+	@Size(max=30)
+	private String userId2; // 팔로우 받은 아이디
+	
+	@Size(max=7)
+	private String followRequestDate;
+	
+	private String userNm;
+	
+	private String streFileName;	// 서버에 저장 시 사용될 저장파일명 (경로포함)
+}

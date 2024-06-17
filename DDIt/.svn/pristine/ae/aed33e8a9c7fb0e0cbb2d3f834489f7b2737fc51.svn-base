@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sj.dao.SjDAO">
+	<resultMap type="SjVO" id="sjMap" autoMapping="true">
+		<id property="sjNo" column="SJ_NO" />
+		<id property="edcCrseCode" column="EDC_CRSE_CODE" />
+		<association property="edcCrse" javaType="EdcCrseVO" autoMapping="true">
+		</association>
+	</resultMap>
+	
+	<resultMap type="CurriculumVO" id="curriMap" autoMapping="true">
+		<id property="curriculumOrdr" column="CURRICULUM_ORDR"/>
+		<id property="sjNo" column="SJ_NO"/>
+		<id property="edcCrseCode" column="EDC_CRSE_CODE"/>
+		<collection property="atchList" ofType="AtchFileVO" autoMapping="true"></collection>
+	</resultMap>
+
+	<resultMap type="SjManagerVO" id="sjManagerMap"	autoMapping="true">
+		<association property="teacher" javaType="TeacherVO" autoMapping="true">
+		</association>
+	</resultMap>
+	
+	<!-- 교과목 리스트 출력 -->
+	<select id="selectSjList" resultMap="sjMap">
+		SELECT A.SJ_NO, A.EDC_CRSE_CODE, A.SJ_NAME, A.EDC_TIME,
+		A.SJ_ORDR, B.EDC_CRSE_NAME FROM SJ A INNER JOIN EDC_CRSE B
+		ON(A.EDC_CRSE_CODE = B.EDC_CRSE_CODE)
+	</select>
+
+<!-- 	교과목상세 출력 -->
+	<select id="selectSj" parameterType="SjVO" resultMap="sjMap">
+		SELECT A.SJ_NO, A.EDC_CRSE_CODE, A.SJ_NAME, A.EDC_TIME,
+		A.SJ_ORDR, B.EDC_CRSE_NAME FROM SJ A INNER JOIN EDC_CRSE B
+		ON(A.EDC_CRSE_CODE = B.EDC_CRSE_CODE) WHERE A.SJ_NO=#{sjNo} AND
+		A.EDC_CRSE_CODE=#{edcCrseCode}
+	</select>
+
+<!-- 	교과목 담당리스트 출력 -->
+	<select id="selectSjManagerList" parameterType="SjVO" resultMap="sjManagerMap">
+		SELECT A.SJ_NO, A.USER_ID, A.EDC_CRSE_CODE, A.SJ_DELETE_AT,
+		B.TEACHER_NAME FROM SJ_MANAGER A INNER JOIN TEACHER B
+		ON(A.USER_ID=B.USER_ID) 
+		WHERE A.SJ_NO=#{sjNo} 
+		AND	A.EDC_CRSE_CODE=#{edcCrseCode}
+		AND A.SJ_DELETE_AT='N'
+	</select>
+	
+<!-- 	교과목 담당상세출력 -->
+	<select id="selectSjManager" parameterType="SjManagerVO" resultType="SjManagerVO">
+		SELECT SJ_NO, USER_ID, EDC_CRSE_CODE, SJ_DELETE_AT
+		FROM SJ_MANAGER
+		WHERE SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+		AND USER_ID=#{userId}
+	</select>
+<!-- 	교과목 등록 -->
+	<insert id="insertSj" parameterType="SjVO">
+		<selectKey order="BEFORE" keyProperty="sjNo" resultType="long">
+			select nvl(max(sj_no),0)+1 from sj where
+			EDC_CRSE_CODE=#{edcCrseCode}
+		</selectKey>
+		INSERT INTO SJ ( SJ_NO, EDC_CRSE_CODE, SJ_NAME, EDC_TIME,
+		SJ_ORDR ) VALUES
+		(#{sjNo},#{edcCrseCode},#{sjName},#{edcTime},#{sjOrdr})
+	</insert>
+<!-- 	교과목담당 등록 -->
+	<insert id="insertSjManager" parameterType="SjManagerVO">
+		INSERT INTO SJ_MANAGER ( SJ_NO, USER_ID, EDC_CRSE_CODE,
+		SJ_DELETE_AT ) VALUES
+		(#{sjNo},#{userId},#{edcCrseCode},'N')
+	</insert>
+	<!-- 교과목담당 삭제 -->
+	<update id="deleteSjManager" parameterType="SjManagerVO">
+		UPDATE SJ_MANAGER SET
+			SJ_DELETE_AT='Y'
+		WHERE SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+		AND USER_ID=#{userId}
+	</update>
+	<!-- 교과목담당 수정 -->
+	<update id="updateSjManager" parameterType="SjManagerVO">
+		UPDATE SJ_MANAGER SET
+			SJ_DELETE_AT='N'
+		WHERE SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+		AND USER_ID=#{userId}
+	</update>
+	<!-- 수업내용리스트 보여주기 -->
+	<select id="selectCurriculumList" parameterType="SjVO" resultMap="curriMap">
+		SELECT 
+			CURRICULUM_ORDR, CLASS_TOPIC, CLASS_CN, 
+			ASSORTED_SN, A.ATCH_FILE_NO, SJ_NO, 
+			EDC_CRSE_CODE,B.ATCH_FILE_TURN,B.FILE_NAME,
+			B.STRE_FILE_NAME,B.FILE_TY,B.FILE_MG
+		FROM CURRICULUM A LEFT JOIN GR_ATCH_FILE B ON(A.ATCH_FILE_NO=B.ATCH_FILE_NO)
+		WHERE SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+		ORDER BY CURRICULUM_ORDR
+	</select>
+<!-- 	수업내용 단건조회 -->
+	<select id="selectCurriculum" parameterType="CurriculumVO" resultType="CurriculumVO">
+		SELECT CURRICULUM_ORDR, CLASS_TOPIC, CLASS_CN, ASSORTED_SN, ATCH_FILE_NO, SJ_NO, EDC_CRSE_CODE
+		FROM CURRICULUM
+		WHERE SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+		AND CURRICULUM_ORDR=#{curriculumOrdr} 
+	</select>
+	
+	<!-- 수업내용 수정 -->
+	<update id="updateCurriculum" parameterType="CurriculumVO">
+		UPDATE CURRICULUM SET
+		CURRICULUM_ORDR=#{curriculumOrdr},
+		CLASS_TOPIC=#{classTopic},
+		CLASS_CN=#{classCn}
+		WHERE EDC_CRSE_CODE=#{edcCrseCode}
+		AND SJ_NO=#{sjNo}
+		AND CURRICULUM_ORDR=#{oldCurriculumOrdr}
+	</update>
+	<!-- 교과목 수업리스트저장 -->
+	<insert id="insertCurriculum" parameterType="CurriculumVO">
+		<selectKey order="BEFORE" resultType="long" keyProperty="curriculumOrdr">
+			SELECT NVL(MAX(CURRICULUM_ORDR),0)+1 FROM CURRICULUM
+			WHERE SJ_NO=#{sjNo}
+		</selectKey>
+		INSERT INTO CURRICULUM(
+			CURRICULUM_ORDR, 
+			CLASS_TOPIC, 
+			CLASS_CN, 
+			ASSORTED_SN, 
+			ATCH_FILE_NO, 
+			SJ_NO, 
+			EDC_CRSE_CODE
+		)VALUES(
+			#{curriculumOrdr},
+			#{classTopic},
+			#{classCn},
+			#{assortedSn},
+			<if test="atchFileNo eq null">
+				#{atchFileNo},
+			</if>
+			<if test="atchFileNo neq null">
+				(SELECT NVL(MAX(ATCH_FILE_NO),0)FROM GR_ATCH_FILE),
+			</if>
+			#{sjNo},
+			#{edcCrseCode}
+		)
+	</insert>
+	<!-- 교과목 수업 삭제 -->
+	<delete id="deleteCurriculum" parameterType="CurriculumVO">
+		DELETE FROM CURRICULUM 
+		WHERE CURRICULUM_ORDR=#{curriculumOrdr}
+		AND SJ_NO=#{sjNo}
+		AND EDC_CRSE_CODE=#{edcCrseCode}
+	</delete>
+	
+	<!-- 파일저장 -->
+	<insert id="insertAttatchList">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(ATCH_FILE_NO), 0)+1 FROM GR_ATCH_FILE
+		</selectKey>
+		INSERT ALL
+		<foreach collection="curriculumVO.atchList" item="atch" index="idx">
+			INTO GR_ATCH_FILE (
+				ATCH_FILE_NO, 
+				ATCH_FILE_TURN, 
+				JOB_SE, 
+				FILE_COURS, 
+				FILE_NAME, 
+				STRE_FILE_NAME, 
+				FILE_TY, 
+				FILE_MG
+			)VALUES(
+				#{atchFileNo},
+				(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM GR_ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo}),
+				#{atch.jobSe},
+				#{atch.fileCours},
+				#{atch.fileName},
+				#{atch.streFileName},
+				#{atch.fileTy},
+				#{atch.fileMg}
+			 )
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+</mapper>

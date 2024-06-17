@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemGiftDAO">
+<insert id="insertItemGift" parameterType="ItemGiftVO">
+	INSERT INTO ITEM_GIFT (
+	    ITEM_GIFT_CODE,
+	    SENDER_USER_ID,
+	    ADDRSE_USER_ID,
+	    ITEM_CODE,
+	    ITEM_GIFT_DT,
+	    ITEM_BKMK,
+	    ITEM_HIDE
+	) SELECT
+		'GIFT' || ITEM_GIFT_SEQ.NEXTVAL,
+		#{senderUserId},
+		#{addrseUserId},
+		#{itemCode},
+		TO_DATE(SYSDATE, 'yyyy/mm/dd hh24:mi:ss'),
+		'N',
+		'N'
+	FROM 
+		DUAL
+    WHERE NOT EXISTS
+	    (
+	    SELECT 1
+	    FROM (SELECT
+              	ITEM_PURCHASE.ITEM_CODE
+              FROM 
+              	ITEM_PURCHASE
+              WHERE ITEM_PURCHASE.USER_ID=#{addrseUserId}
+              UNION
+              SELECT
+              	ITEM_GIFT.ITEM_CODE
+              FROM
+              	ITEM_GIFT
+              WHERE ITEM_GIFT.ADDRSE_USER_ID=#{addrseUserId}) A
+	    WHERE A.ITEM_CODE = #{itemCode}
+	    )
+</insert>
+<select id="selectItemGiftList" resultType="ItemGiftVO">
+	SELECT
+	    ITEM_GIFT_CODE,
+	    SENDER_USER_ID,
+	    ADDRSE_USER_ID,
+	    ITEM_CODE,
+	    ITEM_GIFT_DT,
+	    ITEM_BKMK,
+	    ITEM_HIDE
+	FROM
+	    ITEM_GIFT
+	<where>
+		<if test="senderUserId neq null">
+			SENDER_USER_ID = #{senderUserId}
+		</if>
+		<if test="addrseUserId neq null">
+			ADDRSE_USER_ID = #{addrseUserId}
+		</if>
+	</where>
+</select>
+
+<select id="selectGiftFollowList" resultType="FollowVO">
+	WITH TTE AS(
+	SELECT
+	    ITEM_CODE,
+	    USER_ID
+	FROM 
+	ITEM_PURCHASE
+	WHERE ITEM_CODE = #{itemCode}
+	UNION ALL
+	SELECT
+	    ITEM_CODE,
+	    ADDRSE_USER_ID
+	FROM
+	ITEM_GIFT
+	WHERE ITEM_CODE = #{itemCode}
+	),
+	TTR AS(
+	SELECT
+	    A.USER_ID2,
+	    B.TEACHER_NAME
+	FROM
+	    FOLLOW A, 
+	    (SELECT 
+	        USER_ID,
+	        TEACHER_NAME
+	    FROM TEACHER
+	    UNION
+	    SELECT
+	        USER_ID,
+	        STUDENT_NAME
+	    FROM STUDENT) B,
+	    (SELECT
+	        USER_ID
+	    FROM
+	        FOLLOW
+	    WHERE USER_ID2 = #{userId}) C          
+	WHERE A.USER_ID2 = B.USER_ID
+	AND A.USER_ID2 = C.USER_ID
+	AND A.USER_ID = #{userId}
+	)
+	SELECT 
+	USER_ID2 AS USER_ID,
+	TEACHER_NAME AS USER_NM
+	FROM TTR A LEFT JOIN TTE B ON(A.USER_ID2 = B.USER_ID)
+	WHERE B.USER_ID IS NULL
+</select>
+
+</mapper>
+

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.point.dao.PointHistoryDAO">
+<insert id="insertPointHistory" parameterType="PointHistoryVO">
+	INSERT INTO POINT_HISTORY (
+	    POINT_CODE,
+	    USER_ID,
+	    POINT_DT,
+	    POINT_CL_NM,
+	    POINT,
+	    POINT_ACCMLT
+	) SELECT 
+	    #{pointCode},
+	    #{userId},
+	    SYSDATE,
+	    POINT_CL_NM,
+	    POINT,
+	    (POINT+NVL((SELECT 
+	    				POINT_ACCMLT
+				    FROM(SELECT
+				            POINT_ACCMLT
+				        FROM
+				            POINT_HISTORY
+				        WHERE USER_ID = #{userId}
+				        ORDER BY POINT_DT DESC
+				    ) WHERE ROWNUM = 1),0))
+	FROM POINT_CL
+	WHERE POINT_CL_CODE = SUBSTR(#{pointCode},1,4)	
+</insert>
+
+<select id="selectPointHistoryListAll" resultType="PointHistoryVO">
+	SELECT
+	    POINT_CODE,
+	    USER_ID,
+	    POINT_DT,
+	    POINT_CL_NM,
+	    POINT,
+	    POINT_ACCMLT
+	FROM
+	    POINT_HISTORY
+	ORDER BY POINT_DT DESC
+</select>
+
+<select id="selectPointHistoryList" resultType="PointHistoryVO">
+		SELECT
+		    POINT_CODE,
+		    USER_ID,
+		    POINT_DT,
+		    POINT_CL_NM,
+		    POINT,
+		    POINT_ACCMLT
+		FROM
+		    POINT_HISTORY
+		WHERE USER_ID = #{userId}
+		<trim prefix="AND">
+		 <if test="clNm neq '전체' and clNm neq '적립'">
+         POINT_CL_NM LIKE '%' || #{clNm} || '%'
+        </if>
+        <if test="clNm eq '적립'">
+        (POINT_CL_NM NOT LIKE '%구매%' AND POINT_CL_NM NOT LIKE '%선물%')
+        </if>
+        </trim>
+		ORDER BY POINT_DT DESC
+</select>
+
+<select id="selectPoint" resultType="int">
+	SELECT 
+		NVL(MAX(POINT_ACCMLT), 0) AS POINT_ACCMLT
+	FROM
+	(
+	    SELECT
+	        POINT_ACCMLT
+	    FROM
+	        POINT_HISTORY
+	    WHERE USER_ID = #{userId}
+	    ORDER BY POINT_DT DESC
+	)
+	WHERE ROWNUM = 1
+</select>
+
+
+</mapper>

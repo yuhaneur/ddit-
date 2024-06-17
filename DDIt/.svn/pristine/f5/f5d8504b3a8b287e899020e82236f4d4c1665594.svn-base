@@ -1,0 +1,13 @@
+package kr.or.ddit.sj.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.SjVO;
+
+public interface SjService {
+	public List<SjVO> selectSjList();
+	
+	public SjVO selectSj(SjVO sjvo);
+	
+	public int createSj(SjVO sjvo);
+}

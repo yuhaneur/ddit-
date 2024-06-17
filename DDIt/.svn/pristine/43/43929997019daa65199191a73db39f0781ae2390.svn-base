@@ -1,0 +1,72 @@
+package kr.or.ddit.school.service;
+
+import java.io.File;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.school.dao.AssignmentDAO;
+import kr.or.ddit.sj.dao.SjDAO;
+import kr.or.ddit.vo.AssignmentVO;
+import kr.or.ddit.vo.CurriculumVO;
+import kr.or.ddit.vo.GrAtchFileVO;
+
+@Service
+public class AssignmentServiceImpl implements AssignmentService{
+
+	@Value("#{appInfo.atchSavePath}")
+	private File saveFolder;
+	
+	@Autowired
+	private AssignmentDAO dao;
+	
+	// 파일저장
+	private int saveAttatchList(AssignmentVO assignmentVO) {
+		List<GrAtchFileVO> atchList = assignmentVO.getAtchList();
+		int cnt = 0;
+		if(atchList!=null && !atchList.isEmpty()) {
+			// DB에 저장해야됨
+			cnt += dao.insertAttatchList(assignmentVO);
+			// 로컬에 저장함
+			for (GrAtchFileVO atchFileVO : atchList) {
+				atchFileVO.saveToFolder(saveFolder);
+			}
+		}
+		return cnt;
+	}
+	@Override
+	public int insertAssignment(AssignmentVO assignmentVO) {
+		// 파일을 먼저 저장하고 
+				int count = saveAttatchList(assignmentVO);
+				int cnt = 0 ;
+				// 파일 저장할게 있으면 MAX값 
+				if(count>0){
+					assignmentVO.setAtchFileNo(1l);
+					cnt = dao.insertAssignment(assignmentVO);
+				}else {
+					// 파일 저장할게없으면 vo안에있는 파일넘버를 null
+					cnt = dao.insertAssignment(assignmentVO);
+				}
+				// 수업주제 저장성공하면
+				if(cnt>0) {
+					// 파일 저장함
+				}
+				return cnt;
+	}
+	@Override
+	public List<AssignmentVO> selectAssignmentList() {
+		List<AssignmentVO> assignmentList = dao.selectAssignmentList();
+		return assignmentList;
+	}
+	@Override
+	public AssignmentVO selectAssignment(String assignmentCode) {
+		AssignmentVO assignmentVO = dao.selectAssignment(assignmentCode);
+		if (assignmentVO == null) {
+			throw new NullPointerException("존재하지 않는 과제입니다.");
+		}
+		return assignmentVO;
+	}
+
+}

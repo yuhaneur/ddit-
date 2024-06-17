@@ -1,0 +1,25 @@
+package kr.or.ddit.snsProfile.service;
+
+import kr.or.ddit.vo.StudentVO;
+import kr.or.ddit.vo.TeacherVO;
+import kr.or.ddit.vo.UsersVO;
+
+public interface SnsProfileService {
+	
+	/**
+	 * @return 유저조회
+	 */
+	public UsersVO readUser(String userId);
+	
+	/**
+	 * @param student
+	 * @return 학생 자기소개 수정
+	 */
+	public int updateStudent(StudentVO student);
+	
+	/**
+	 * @param teacher
+	 * @return 선생 자기소개 수정
+	 */
+	public int updateTeacher(TeacherVO teacher);
+}

@@ -1,0 +1,73 @@
+/**
+ * 
+ */
+const cPath =document.body.dataset.contextPath;
+const userId = document.querySelector("#userId").value;
+const classCode = document.querySelector("#classCode").value;
+// 메모 모달
+let memoModal = document.querySelector('#memoModal');
+// 메모 폼
+let memoForm = document.querySelector("#memoForm");
+// 출결 정보 찍어주는곳들
+let ok = document.querySelector("#ok");
+let late = document.querySelector("#late");
+let sick = document.querySelector("#sick");
+let no = document.querySelector("#no");
+
+// 학생 한명에대한 메모
+function studentMemo(memo){
+    let studentId = memo.dataset.studentNo;
+    console.log("studentId",studentId);
+    let url =`${cPath}/school/studentEvaluation/${studentId}`
+    $.ajax({
+        url:url,
+        dataType:"json",
+        success:function(resp){
+            console.log("resp",resp);
+            if(resp.evaluationVO!=null){
+                memoForm.tenacityScore.value=resp.evaluationVO.tenacityScore
+                memoForm.sincerityScore.value=resp.evaluationVO.sincerityScore
+                memoForm.humanRelationshipScore.value=resp.evaluationVO.humanRelationshipScore
+                memoForm.memo.value=resp.evaluationVO.memo
+            }
+            memoForm.userId.value=studentId;
+            ok.innerHTML=resp.attenanceMap.ok;
+            late.innerHTML=resp.attenanceMap.late;
+            sick.innerHTML=resp.attenanceMap.sick;
+            no.innerHTML=resp.attenanceMap.no;
+        }
+    })
+    memoModal.style.display="block";
+}
+
+// 메모 나가기
+function outMemo(){
+    memoModal.style.display="none";
+}
+// 메모 수정하기
+function updateMemo(){
+    let url = `${cPath}/school/studentEvaluation`
+    let data ={
+        userId : memoForm.userId.value,
+        tenacityScore : memoForm.tenacityScore.value,
+        sincerityScore : memoForm.sincerityScore.value,
+        humanRelationshipScore : memoForm.humanRelationshipScore.value,
+        memo : memoForm.memo.value
+    }
+    $.ajax({
+        url:url,
+        method:"put",
+        data : JSON.stringify(data),
+        dataType : "json",
+        contentType : "application/json",
+        success : function(resp){
+            console.log("resp",resp);
+            if(resp.result=="ok"){
+                alert("메모저장!");
+                location.href=`${cPath}/school/studentsInfo/${classCode}`;
+            }else{
+                alert("메모저장실패!!");
+            }
+        }
+    })
+}

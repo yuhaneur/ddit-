@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd" >
+<tiles-definitions>
+	<definition name="parent" template="/WEB-INF/views/templateBS.jsp">
+		<put-attribute name="preScript" value="/WEB-INF/includee/preScript.jsp" />
+		<put-attribute name="header"  value="/WEB-INF/includee/header.jsp" />
+		<put-attribute name="leftMenu"  value="/WEB-INF/includee/leftMenu.jsp" />
+		<put-attribute name="footer"  value="/WEB-INF/includee/footer.jsp" />
+		<put-attribute name="postScript"  value="/WEB-INF/includee/postScript.jsp" />
+	</definition>
+	<definition name="parent_apply" template="/WEB-INF/views/apply/template_apply.jsp">
+		<put-attribute name="preScript_apply" value="/WEB-INF/includee/apply/preScript_apply.jsp" />
+		<put-attribute name="header_apply"  value="/WEB-INF/includee/apply/header_apply.jsp" />
+		<put-attribute name="footer_apply"  value="/WEB-INF/includee/apply/footer_apply.jsp" />
+		<put-attribute name="postScript_apply"  value="/WEB-INF/includee/apply/postScript_apply.jsp" />
+	</definition>
+	
+	<definition name="parent_admin" template="/WEB-INF/views/admin/template_admin.jsp">
+		<put-attribute name="preScript_admin" value="/WEB-INF/includee/admin/preScript_admin.jsp" />
+		<put-attribute name="header_admin"  value="/WEB-INF/includee/admin/header_admin.jsp" />
+		<put-attribute name="leftMenu_admin"  value="/WEB-INF/includee/admin/leftMenu_admin.jsp" />
+		<put-attribute name="footer_admin"  value="/WEB-INF/includee/admin/footer_admin.jsp" />
+		<put-attribute name="postScript_admin"  value="/WEB-INF/includee/admin/postScript_admin.jsp" />
+	</definition>
+	<definition name="parent_auth" template="/WEB-INF/views/auth/templateAuth.jsp">
+		<put-attribute name="preScript" value="/WEB-INF/includee/preScript.jsp" />
+		<put-attribute name="postScript"  value="/WEB-INF/includee/postScript.jsp" />
+	</definition>
+	
+</tiles-definitions>

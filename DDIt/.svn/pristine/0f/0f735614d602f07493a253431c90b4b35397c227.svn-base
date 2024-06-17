@@ -1,0 +1,30 @@
+/**
+ * 
+ */
+const cPath =document.body.dataset.contextPath;
+const userId = document.querySelector("#userId").value;
+const classCode = document.querySelector("#classCode").value;
+// 메모 모달
+let memoModal = document.querySelector('#memoModal');
+// 메모 폼
+let memoForm = document.querySelector("#memoForm");
+
+// 학생 한명에대한 메모
+function studentMemo(memo){
+    let studentId = memo.dataset.studentNo;
+    console.log("studentId",studentId);
+    let url =`${cPath}/school/studentEvaluation/${studentId}`
+    $.ajax({
+        url:url,
+        dataType:"json",
+        success:function(resp){
+            console.log("resp",resp);
+            memoForm.tenacityScore.value=resp.tenacityScore
+            memoForm.sincerityScore.value=resp.sincerityScore
+            memoForm.humanRelationshipScore.value=resp.humanRelationshipScore
+            memoForm.memo.value=resp.memo
+
+        }
+    })
+    memoModal.style.display="block";
+}

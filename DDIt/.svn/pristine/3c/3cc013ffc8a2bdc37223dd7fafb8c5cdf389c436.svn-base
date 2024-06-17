@@ -1,0 +1,40 @@
+package kr.or.ddit.item.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.item.dao.ItemPurchaseDAO;
+import kr.or.ddit.vo.ItemPurchaseVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ItemPresetServiceImpl implements ItemPresetService {
+	
+	private final ItemPurchaseDAO itemPurchaseDao;
+
+	
+	@Override
+	public List<ItemPurchaseVO> readItemStorage(String userId, String hide, Long ctgry) {
+		List<ItemPurchaseVO> itemStorage = itemPurchaseDao.selectItemStorage(userId, hide, ctgry);
+		return itemStorage;
+	}
+
+	@Override
+	public int updateItemPurchaseBkmk(ItemPurchaseVO itemPurchase) {
+		int cnt = itemPurchaseDao.updateItemPurchaseBkmk(itemPurchase);
+		return cnt;
+	}
+
+	@Override
+	public int updateItemPurchaseHide(ItemPurchaseVO itemPurchase) {
+		int cnt = itemPurchaseDao.updateItemPurchaseHide(itemPurchase);
+		return cnt;
+	}
+	
+	
+	
+
+	
+}

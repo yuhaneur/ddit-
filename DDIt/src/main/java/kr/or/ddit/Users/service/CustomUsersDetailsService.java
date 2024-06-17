@@ -1,0 +1,44 @@
+package kr.or.ddit.Users.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.Users.dao.UsersDAO;
+import kr.or.ddit.vo.AuthorityVO;
+import kr.or.ddit.vo.UsersVO;
+import kr.or.ddit.vo.UsersVOWrapper;
+
+@Service
+public class CustomUsersDetailsService implements UserDetailsService {
+	
+	@Autowired
+	private UsersDAO dao;
+	
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UsersVO realUser = dao.selectUsersForAuth(username);
+		if(realUser==null) {
+			throw new UsernameNotFoundException(String.format("%s 사용자 없음.", username));
+		}
+		List<AuthorityVO> authorityList = realUser.getAuthorityList();
+
+		String[] memRoles = new String[authorityList.size()]; 
+		
+		for(int i=0; i<authorityList.size(); i++ ) {
+			memRoles[i] = authorityList.get(i).getAuthorGr().getAuthName();
+		}
+		
+		List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(memRoles);
+		
+		UsersVOWrapper userDetails = new UsersVOWrapper(realUser, authorities);
+		return userDetails;
+	}
+	
+}

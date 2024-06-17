@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemPresetDAO">
+<select id="selectItemPresetList">
+	SELECT
+	    ITEM_PRESET_CODE,
+	    USER_ID,
+	    ITEM_PRESET_APPLC
+	FROM
+	    ITEM_PRESET
+</select>
+
+</mapper>

@@ -1,0 +1,143 @@
+/**
+ * 
+ */
+const cPath = document.body.dataset.contextPath;
+let insertBtn= document.querySelector("#insertBtn");
+let sulmoonInsertModal = document.querySelector("#sulmoonInsertModal");
+let qustnrInsertBtn = document.querySelector("#qustnrInsertBtn");
+let qustnrForm = document.querySelector("#qustnrForm");
+let classCodeTag = document.querySelector("#classCode");
+// 설문대상자 나오는 리스트 폼
+let selectList = document.querySelector("#selectList");
+// 설문대상자 닫기 버튼
+let closeSelecter = document.querySelector("#closeSelecter");
+// 설문대상자 모달
+let selectModal = document.querySelector("#error-modal");
+console.log("closeSelecter",closeSelecter);
+
+// 설문답변유형 처음부터 나오게하는 함수
+surveyAnswer(document.querySelector("[name='answerType']"));
+
+// 전체선택하는 함수
+function selectAll(selectAll){
+	let checkbox = document.querySelectorAll('input[type="checkbox"]');
+	checkbox.forEach(checkbox=>{
+		checkbox.checked = selectAll.checked;
+	})
+}
+
+// 설문대상자 모달 닫기버튼눌렀을떄
+selectModal.addEventListener('hidden.bs.modal', function () {
+	// 선택된것들 다 취소
+	selectList.reset();
+});
+
+// 설문대상자 추가버튼 눌렀을떄
+function addSelecter(){
+
+}
+
+// 설문등록 모달창 보여주기
+insertBtn.addEventListener("click",function(){
+	sulmoonInsertModal.style.display="block";
+})
+// 설문등록 모달창 닫기
+function cancelModal(){
+	qustnrForm.reset();
+	selectList.reset();
+	sulmoonInsertModal.style.display="none";
+}
+
+// 설문 등록 버튼
+qustnrInsertBtn.addEventListener("click",function(){
+	let qustnrSj = qustnrForm.qustnrSj.value;	// 설문제목
+	let qustnrEndDt = qustnrForm.qustnrEndDt.value;	// 설문 종료날짜
+	let qustnrCn = {};
+	qustnrCn = qustnrForm.qustnrCn.value;// 설문내용
+	console.log("qustnrSj",qustnrSj);
+	console.log("qustnrEndDt",qustnrEndDt);
+	console.log("qustnrCn",qustnrCn);
+	qustnrForm.submit();
+})
+
+
+
+// 설문내용작성 폼
+	let surveyContent = document.querySelector("#surveyContent");
+	// 설문내용 추가 함수
+	function addSurvey(){
+		$.ajax({
+			url : `${cPath}/school/codeGr`,
+			dataType:"json",
+			success: function(resp){
+				let rowDiv = document.createElement('div');
+				rowDiv.className= "row";
+				let text = `
+							<div class="col-6 mb-3">
+								<h5>설문내용</h5>
+								<input class="form-control" name="qustnrCn" type="text">
+							</div>
+							<div class="col-2">
+							<h5>답변유형</h5>
+								<select class="form-select" name="answerType" onchange="surveyAnswer(this)">
+							`
+						resp.forEach(function(i,v){
+							text += `<option value="${i.cmmnCodeGr}">${i.cmmnCodeGrName}</option>`
+						})
+						text += `
+						</select>
+							</div>
+							<div class="col-2">
+								<button class="btn btn-danger me-1 mb-1" type="button" style="margin-top:11% !important" onclick="delSurvey(this)">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus text-900 fs-6"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+								</button>
+						</div>
+				`
+				rowDiv.innerHTML = text;
+				surveyContent.appendChild(rowDiv);
+				surveyAnswer(rowDiv.querySelector("[name='answerType']"));
+			}
+			
+		})
+		
+		
+	}
+	
+	// 설문지 답변유형에 따른 선택지 보여주기
+	function surveyAnswer(asnwerType){
+		let atValue = asnwerType.value;
+		let rowDiv = asnwerType.closest('.row');
+		// 선택된 답변유형
+		console.log("atValue",atValue);
+		
+		let surveyAnswerDiv = rowDiv.querySelector('.surveyAnswer');
+	    if (!surveyAnswerDiv) {
+	        surveyAnswerDiv = document.createElement('div');
+	        surveyAnswerDiv.className = 'surveyAnswer col-12 mb-1 d-flex';
+	        rowDiv.appendChild(surveyAnswerDiv);
+	    }
+	    $.ajax({
+			url : `${cPath}/school/codeGr/${atValue}`,
+			dataType:"json",
+			success:function(resp){
+			let txt="";
+				resp.forEach(function(i,v){
+					txt+=`
+					<div style="margin-top:1%;">
+			        <span class="number" >${v+1}.</span>
+					</div>
+					<div class="form-check form-check-inline" style="padding-right:3%;">
+					<input class="form-control"  type="text" value="${i.cmmnCodeName}" />
+					</div>
+					`
+				})
+			surveyAnswerDiv.innerHTML = txt;
+			}
+		})
+		
+	}
+	// 설문 내용 삭제 함수
+	function delSurvey(delBtn){
+		let parentDiv = delBtn.closest('.row');
+		parentDiv.remove();
+	}

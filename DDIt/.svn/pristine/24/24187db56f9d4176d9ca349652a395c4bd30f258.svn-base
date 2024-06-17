@@ -1,0 +1,120 @@
+/**
+ * 
+ */
+let addClassTeacherModal = document.querySelector("#addClassTeacherModal");
+let edcCrseCodeInputTag = document.querySelector("#edcCrseCode");
+let classCodeInputTag = document.querySelector("#classCode");
+let teacherTbody = document.querySelector("#table-contact-body");
+let modalHead = document.querySelector("#modalHead");
+let teacherInfoForm = document.querySelector("#teacherInfoForm");
+console.log("teacherTbody",teacherTbody);
+const cPath = document.body.dataset.contextPath;
+
+// 오전오후버튼 바뀌는 함수
+function monOrAt(event){
+    // <input class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="monOrAt(this)" value="오전"></input>
+    if(event.value == "오전"){
+      event.value = "오후";
+    }else{
+      event.value="오전";
+    }
+console.log(event.value);
+	return event.value;
+  }
+// 교과목 선생님 추가하는 모달창띄우기
+function addClassTeacher(addBtn){
+    let sjName = addBtn.dataset.sjName;
+    modalHead.innerHTML=sjName;
+    addClassTeacherModal.style.display="block";
+    let sjNo = addBtn.dataset.sjNo;
+    let edcCrseCode = edcCrseCodeInputTag.value;
+    let url = `${cPath}/school/teachList`
+    $.ajax({
+        url:url,
+        method:'get',
+        data:{
+            sjNo:sjNo,
+            edcCrseCode:edcCrseCode
+        },
+        dataType:"JSON",
+        success:function(resp){
+            console.log(resp);
+            let teacher = resp.teachList;
+            let txt = "";
+            for(let i=0; i<teacher.length; i++){
+                let tc = teacher[i].sjManagerList;
+                console.log("tc",tc);
+                for(let j=0; j <tc.length;j++){
+                    txt += `
+                    <tr>
+                        <td class="align-middle fs-9 py-3">
+                        <div class="form-radio mb-0">
+                            <input class="form-radio-input" type="radio" name="userId" data-bulk-select-row="data-bulk-select-row">
+                        </div>
+                        </td>
+                        <td class="align-middle name white-space-nowrap pe-5 ps-2">
+                        <div class="d-flex align-items-center gap-2 position-relative">
+                            <input type="hidden" class="userId" value=${tc[j].teacher.userId}>
+                            <input type="hidden" class="sjNo" value=${tc[j].sjNo}>
+                            <h6 class="teacherName mb-0">${tc[j].teacher.teacherName }</h6>
+                        </div>
+                        </td>
+                        <td class="align-middle phone-number font-sans-serif white-space-nowrap">${tc[j].teacher.teacherPhoneno }</td>
+                        <td class="align-middle report">${tc[j].teacher.teacherMail }</td>
+                        <td class="align-middle subscription fs-9 text-end"><input class="btn btn-falcon-default btn-sm ms-2 mnOrAt" type="button" onclick="monOrAt(this)" value="오전"></input>
+                        </td>
+                    </tr>
+                    `
+            }
+        }
+        teacherTbody.innerHTML=txt;
+
+        }
+    })
+}
+// 교과목 선생님 저장
+function teachInsert(){
+    let checkBoxs = document.querySelectorAll(".form-radio-input");
+    let classCode= classCodeInputTag.value;
+    let edcCrseCode = edcCrseCodeInputTag.value;
+    let url = `${cPath}/school/teachInsert`;
+	console.log("url",url);
+    console.log("checkBoxs",checkBoxs);
+    checkBoxs.forEach(function(i,v){
+        if(i.checked==true && !(i.id)){
+          let teacherInfo = findElement(i);
+          console.log("teacherInfo",teacherInfo);
+          let userId = teacherInfo[0];
+          let sjNo = teacherInfo[1];
+		  let ma = teacherInfo[2];
+		  let mnOrAt = "M";
+		  if(ma=="오후"){
+			mnOrAt="F";
+		  }
+          teacherInfoForm.classCode.value = classCode;
+          teacherInfoForm.sjNo.value = sjNo;
+          teacherInfoForm.userId.value = userId;
+          teacherInfoForm.edcCrseCode.value = edcCrseCode;
+          teacherInfoForm.mnOrAt.value = mnOrAt;
+		  teacherInfoForm.action = url;
+          teacherInfoForm.submit();
+        
+        }
+    })
+}
+// 요소 찾는 함수
+function findElement(i){
+  let tr = i.closest("tr");
+      let userId = tr.querySelector(".userId");
+      let sjNo = tr.querySelector(".sjNo");
+	  let mnOrAt = tr.querySelector(".mnOrAt")
+      let info = []
+      info.push(userId.value);
+      info.push(sjNo.value);
+      info.push(mnOrAt.value);
+      console.log("info",info);
+      return info;
+}
+function outDetailModal(){
+    addClassTeacherModal.style.display="none";
+}

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.item.dao.ItemLikeDAO">
+<select id="selectItemLikeList" resultType="ItemLikeVO">
+	SELECT
+	    ITEM_LIKE_CODE,
+	    ITEM_CODE,
+	    USER_ID
+	FROM
+	    ITEM_LIKE
+</select>
+
+<insert id="insertItemLike" parameterType="ItemLikeVO">	
+	MERGE INTO ITEM_LIKE
+	USING DUAL ON (ITEM_CODE=#{itemCode} AND USER_ID=#{userId})
+	WHEN MATCHED THEN 
+	UPDATE SET 
+		ITEM_LIKE_DL = DECODE(ITEM_LIKE_DL, 'N', 'Y', 'N')
+	WHEN NOT MATCHED THEN
+	INSERT
+		(
+		ITEM_LIKE_CODE,
+		ITEM_CODE,
+		USER_ID
+		)
+	VALUES
+		(
+		'I_LIKE' || ITEM_LIKE_SEQ.NEXTVAL,
+		#{itemCode},
+		#{userId}
+		)
+</insert>
+
+
+</mapper>

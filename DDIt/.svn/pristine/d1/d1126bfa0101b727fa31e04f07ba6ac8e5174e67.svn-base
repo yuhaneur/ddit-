@@ -1,0 +1,284 @@
+/**
+ * 
+ */
+const itemV = document.querySelector("#itemV");
+const cPath = document.body.dataset.contextPath;
+const pointSpan = document.querySelector("#pointSpan");
+/*사용가능 포인트 */
+function myPoint(){
+	$.ajax({
+        url: cPath+"/item/point",
+        method: "GET",
+		dataType : "json",
+        success: function(point) {
+		pointSpan.innerText = point+"P"
+		}
+	});
+}
+
+
+/*아이템 목록*/
+function itemList(){
+	$.ajax({
+        url: cPath+"/item/list",
+        method: "GET",
+		dataType : "json",
+        success: function(itemList) {
+				let itemStr = "";
+				for (var i = 0; i < itemList.length; i++) {
+					let item = itemList[i];
+					let likeCode = "rgba(255, 0, 0, 1)"; // 빨간색
+					if(item.itemLike.itemLikeCode==null){
+						likeCode = "rgba(255, 255, 255, 1)";
+					}
+					let itemMyitem = "구매";
+					let aStyle = "";
+					if(item.itemMyitem=="Y"){
+						itemMyitem = "보유";
+						aStyle = "pointer-events:none;background-color:#C3C3C3;border-color:#C3C3C3;"
+					}
+					
+					itemStr += 
+				     ` <div class="mb-7 col-md-6 col-lg-3">
+				        <div class="border rounded-1 h-100 d-flex flex-column justify-content-between pb-4">
+				          <div class="overflow-hidden">
+
+				            <div class="position-relative rounded-top overflow-hidden" style="">
+								
+								
+								<div class="p-4 pb-4 pv">
+									<div id="itemDiv">
+										<div id="itemImgDiv">
+										
+											<div id="itemCtgry1Div" >
+											</div>
+										
+											<div id="itemCtgry2Div">
+												
+												<div class="itemCtgry2-item10">
+													<img id="profileImg" class="rounded-circle"
+														src="${cPath}/resources/public/assets/img/elearning/avatar/trainer.png" alt="">
+												  <div class="itemCtgry2-item10-1">
+												    <div class="itemCtgry2-item10-2">이름출력</div>
+												  </div>
+												</div>
+												
+											</div>
+											
+											
+											<div id="itemCtgry3Div" class="dynamic-div">
+												<svg id="itemSvg" viewBox="-200 -200 2000 2000" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"  x="0" y="0"  xml:space="preserve" class=""><g transform="matrix(-1,0,0,-1,512.000301361084,511.99988555908203)"><path fill="#fff0ce" d="M458.007 257.666c-1.824 26.204-10.986 46.064-27.039 58.139-19.979 15.024-45.916 15.239-62.758 8.786-13.838-5.301-29.357 1.618-34.657 15.457-5.303 13.839 1.617 29.356 15.456 34.658 63.364 24.276 156.055-8.371 162.616-115.04-17.899-10.846-39.462-9.696-53.618-2z" opacity="1" data-original="#fff0ce" class=""></path><path fill="#ffddb9" d="M465.103 357.144c-.681-4.281-1.515-8.403-2.315-12.361-3.125-15.484-8.728-29.757-18.126-43.535-3.796 5.674-8.362 10.548-13.693 14.558-19.979 15.024-45.916 15.239-62.758 8.786-13.838-5.301-29.357 1.618-34.657 15.457-5.303 13.839 1.617 29.356 15.456 34.658 36.308 13.91 82.244 9.121 116.093-17.563z" opacity="1" data-original="#ffddb9"></path><path fill="#e9a982" d="M511.18 228.399c-1.255-14.766-14.235-25.708-29.011-24.464-14.767 1.256-25.719 14.244-24.464 29.011.746 8.767.837 17.015.301 24.72 13.167 4.844 33.282 7.18 53.618 2 .604-9.798.497-20.206-.444-31.267z" opacity="1" data-original="#e9a982" class=""></path><path fill="#fff0ce" d="M161.095 360.979c-21.592-42.223-4.867-93.955 37.356-115.546 42.223-21.593 93.955-4.867 115.546 37.356.335.656.642 1.207.911 1.664 2.646.139 7.761.011 16.129-1.679 34.874-7.041 69.063 8.115 87.939 35.743 6.292 9.21.567 24.125 2.915 35.746 2.224 11.011 8.176 5.207 12.661 14.138 14.353 48.714-34.042 75.545-69.515 82.71-95.551 19.295-167.214-18.309-203.942-90.132z" opacity="1" data-original="#fff0ce" class=""></path><path fill="#ffddb9" d="M331.037 282.774c-8.368 1.69-13.483 1.818-16.129 1.679a32.822 32.822 0 0 1-.911-1.664c-21.591-42.223-73.323-58.95-115.546-37.356-42.223 21.591-58.949 73.323-37.357 115.546 11.111 21.728 25.424 40.318 42.624 55.154 24.755-10.519 50.044-28.451 74.903-53.309 26.979-26.979 45.652-54.037 55.699-80.648a88.5 88.5 0 0 0-3.283.598z" opacity="1" data-original="#ffddb9"></path><path fill="#fff0ce" d="M205.288 169.631c10.998-39.666 14.609-60.089 10.998-79.326-13.849-10.856-34.218-6.76-42.857 8.571-16.148 28.658-25.756 62.571-25.335 75.63z" opacity="1" data-original="#fff0ce" class=""></path><path fill="#ffddb9" d="M205.288 169.631c4.887-17.626 8.311-31.446 10.296-43.057-19.324-1.071-39.183 1.641-58.39 8.157-6.073 16.961-9.349 32.033-9.099 39.775z" opacity="1" data-original="#ffddb9"></path><path fill="#ffbbd5" d="M248.552 132.289c-5.038-17.144-18.809-31.435-32.266-41.984-8.004-.332-18.084 13.433-18.929 36.367 14.592 9.502 35.835 11.188 51.195 5.617z" opacity="1" data-original="#ffbbd5"></path><path fill="#ff96c0" d="M248.552 132.289c3.032 10.317 2.902 21.666-2.364 33.857l-40.9 3.486c-6.276-16.37-8.375-30.927-7.931-42.96 17.481-1.165 34.828.709 51.195 5.617z" opacity="1" data-original="#ff96c0"></path><path fill="#fff0ce" d="M85.429 289.49c-39.666 10.998-60.089 14.609-79.326 10.998-10.856-13.849-6.76-34.218 8.571-42.857 28.658-16.148 62.571-25.756 75.63-25.335z" opacity="1" data-original="#fff0ce" class=""></path><path fill="#ffddb9" d="M85.429 289.49c-17.626 4.887-31.446 8.312-43.057 10.296-1.071-19.324 1.641-39.183 8.156-58.39 16.961-6.073 32.033-9.349 39.775-9.099z" opacity="1" data-original="#ffddb9"></path><path fill="#ffbbd5" d="M48.087 332.754c-17.144-5.038-31.435-18.809-41.984-32.266-.332-8.004 13.433-18.084 36.367-18.929 9.502 14.593 11.188 35.835 5.617 51.195z" opacity="1" data-original="#ffbbd5"></path><path fill="#ff96c0" d="M48.087 332.754c10.317 3.031 21.666 2.902 33.857-2.364l3.486-40.9c-16.37-6.276-30.927-8.375-42.96-7.931-1.165 17.481.709 34.828 5.617 51.195z" opacity="1" data-original="#ff96c0"></path><path fill="#fff0ce" d="M287.442 181.688c-46.582-46.582-126.867-41.821-179.322 10.634s-57.216 132.74-10.634 179.322 106.827 21.78 159.282-30.674 77.256-112.7 30.674-159.282z" opacity="1" data-original="#fff0ce" class=""></path><g fill="#425460"><path d="m133.563 326.667-8.741-8.742a7.5 7.5 0 0 1 10.606-10.607l8.741 8.742a7.5 7.5 0 0 1-10.606 10.607zM224.546 235.684l-8.742-8.741c-2.929-2.929-2.929-7.677 0-10.606s7.678-2.93 10.606 0l8.742 8.741a7.5 7.5 0 0 1-10.606 10.606zM216.066 254.588a7.5 7.5 0 0 0-10.606 10.608 7.389 7.389 0 0 1 0 10.454 7.388 7.388 0 0 1-10.454 0l-14.848-14.848c-2.929-2.929-6.017-1.268-8.945 1.661-2.929 2.929-4.59 6.017-1.661 8.945l14.848 14.848a7.388 7.388 0 0 1 0 10.454 7.389 7.389 0 0 1-10.454 0 7.501 7.501 0 0 0-10.608 10.607c8.751 8.751 22.916 8.751 31.667 0a22.306 22.306 0 0 0 6.512-14.549 22.306 22.306 0 0 0 14.549-6.512c8.752-8.752 8.752-22.917 0-31.668z" fill="#425460" opacity="1" data-original="#425460"></path></g><path fill="#ffbbd5" d="M170.746 277.712a7.474 7.474 0 0 1-5.303-2.197 7.5 7.5 0 0 1 0-10.606l8.078-8.077a7.5 7.5 0 0 1 10.607 10.607l-8.078 8.077a7.481 7.481 0 0 1-5.304 2.196z" opacity="1" data-original="#ffbbd5"></path><path fill="#00d6d3" d="M416.425 299.226a63.457 63.457 0 0 0 2.015-15.904c0-34.98-28.357-63.337-63.337-63.337a63.038 63.038 0 0 0-29.303 7.19c-29.205 45.771 1.908 130.576 90.625 72.051z" opacity="1" data-original="#00d6d3"></path><path fill="#00bed6" d="M416.425 299.226c-80.709 15.426-97.997-36.285-90.624-72.051-20.224 10.577-34.034 31.743-34.034 56.147 0 34.98 28.357 63.337 63.337 63.337 29.486 0 54.265-20.151 61.321-47.433z" opacity="1" data-original="#00bed6"></path><path fill="#e9a982" d="M304.149 393.564c-14.448 3.3-28.835-5.736-32.136-20.183-4.195-18.365-4.397-47.631 7.62-74.687 6.017-13.545 21.871-19.648 35.416-13.632 13.544 6.015 19.647 21.871 13.633 35.415-7.144 16.083-6.095 33.308-4.349 40.951 3.3 14.448-5.736 28.835-20.184 32.136zM383.034 383.439c-7.443-25.499-8.792-47.367-4.243-68.818 3.073-14.498 17.322-23.761 31.816-20.684 14.497 3.074 23.758 17.318 20.684 31.816-2.637 12.44-1.602 25.992 3.26 42.648 4.153 14.226-4.014 29.125-18.24 33.278-14.225 4.153-29.125-4.015-33.277-18.24z" opacity="1" data-original="#e9a982" class=""></path><path fill="#ff6e80" d="M331.768 93.601c0 26.159 25.425 52.888 51.558 66.54a27.148 27.148 0 0 0 25.109 0c26.133-13.652 51.558-40.381 51.558-66.54 0-20.841-16.895-37.736-37.736-37.736a37.574 37.574 0 0 0-23.992 8.611 3.756 3.756 0 0 1-4.77 0 37.572 37.572 0 0 0-23.992-8.611c-20.84 0-37.735 16.895-37.735 37.736z" opacity="1" data-original="#ff6e80"></path><path fill="#f8475e" d="M374.663 56.216a38.01 38.01 0 0 0-5.159-.351c-20.841 0-37.736 16.895-37.736 37.736 0 26.159 25.425 52.888 51.558 66.54a27.148 27.148 0 0 0 25.109 0c7.76-4.054 15.457-9.26 22.444-15.262-66.275-6.824-64.451-64.541-56.216-88.663z" opacity="1" data-original="#f8475e"></path></g>
+												</svg>
+											</div>
+											
+										</div>
+									</div>
+								</div>
+								
+								
+								
+				            </div>
+
+				            <div class="p-3">
+				              <h5 class="fs-9">
+					              <a  class="text-1100 ${item.itemCode}" data-bs-toggle="modal" data-bs-target="#tooltippopovers" data-item-code="${item.itemCode }" >
+									${item.itemNm}
+					              </a>
+				              </h5>
+				              <p class="fs-10 mb-1">
+					              <a class="text-500" href="#!">
+									${item.itemCtgry}
+					              </a>
+				              </p>
+				              <h5  class="fs-md-7 text-warning mb-0 d-flex align-items-center mb-3 ${item.itemCode}">
+								${item.itemPc}P
+				              </h5>
+				            </div>
+				          </div>
+				
+				          <div class="d-flex flex-between-center px-3">
+				            <div class="itemEvent">
+				                <a class="likeA" href="#!" aria-label="like" onclick="fLike(this)" data-item-code="${item.itemCode }">
+					          		<svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+								    <path fill="${likeCode}" class="line-heart1 stroke1 fill1" d="M48.1819 24.4658L48.182 24.4659L48.1821 24.466L48.9727 25.5905L49.799 24.492L49.7991 24.4919L49.7991 24.4918L49.7997 24.491L49.8034 24.4862L49.8196 24.4649C49.8343 24.4455 49.857 24.416 49.8872 24.3769C49.9476 24.2987 50.0383 24.1823 50.1572 24.0329C50.3951 23.734 50.7454 23.3031 51.1909 22.7807C52.0829 21.7347 53.3518 20.3275 54.86 18.8802C57.9232 15.9409 61.7981 13.0105 65.4225 12.3757C69.9542 11.5819 76.7167 12.4021 81.9639 15.7348C85.9753 18.2826 88.5888 21.3569 90.2121 24.9598C91.8428 28.5792 92.5 32.79 92.5 37.6407C92.5 42.2838 90.2513 47.1467 87.5986 51.2345C84.9613 55.2986 82.012 58.4644 80.7929 59.6835C70.6643 69.8121 54.2708 83.3102 49.6249 87.0957C49.2611 87.3922 48.7576 87.3889 48.3971 87.0871C43.8546 83.2839 28.0406 69.8642 18.7372 59.7149C18.5919 59.5565 18.4481 59.3996 18.3056 59.2443C14.5991 55.2024 11.8255 52.1779 9.93661 49.016C8.0088 45.789 7 42.4056 7 37.6407C7 32.7889 7.65223 28.5697 9.28036 24.9464C10.9009 21.3401 13.5134 18.2672 17.5328 15.7369C23.6572 11.8815 28.5473 11.5353 33.3269 12.3756C36.8219 12.99 40.5051 15.9039 43.4103 18.848C44.8388 20.2956 46.0352 21.7045 46.8748 22.7522C47.2941 23.2755 47.6232 23.7071 47.8464 24.0065C47.958 24.1562 48.0431 24.2727 48.0997 24.351C48.128 24.3901 48.1491 24.4197 48.1629 24.439L48.1781 24.4603L48.1814 24.465L48.1819 24.4658Z" stroke="rgba(0,0,0,1)" stroke-width="2px" style="animation-duration: 2s;">
+								    </path>
+								    </svg>
+									<span id="cntSpan">${item.likeCnt}</span>
+					            </a>
+					            <br>
+					            <a style="${aStyle}" class="btn btn-sm btn-falcon-default" href="#!" aria-label="purchase" onclick="fBuy(this)" data-i-buy-code="${item.itemCode }">
+									${itemMyitem}
+					            </a>
+					            <a class="btn btn-sm btn-falcon-default" data-bs-toggle="modal" onclick="fGift(this)" data-bs-target="#error-modal" aria-label="gift"  data-i-gift-code="${item.itemCode }">
+									선물
+					            </a>
+				            </div>
+				          </div>
+				        </div>
+				      </div>`
+			}
+			itemV.innerHTML =itemV.innerHTML + itemStr;
+		 }
+    });
+}
+
+/*아이템 좋아요 등록, 취소*/
+function fLike(element){
+	let itemCode = element.dataset.itemCode;
+ 
+	 $.ajax({
+		url: cPath+"/item/like",
+		data : "itemCode="+itemCode,
+        method: "POST",
+        success: function() {
+			let pathElement =  element.querySelector(".line-heart1");
+			let cntSpan = element.querySelector("#cntSpan")
+			if(pathElement.getAttribute("fill") == "rgba(255, 0, 0, 1)"){
+				pathElement.setAttribute("fill","rgba(255, 255, 255, 1)");
+				cntSpan.innerText = parseInt(cntSpan.innerText)-1;
+			}else{
+				pathElement.setAttribute("fill","rgba(255, 0, 0, 1)");
+				cntSpan.innerText = parseInt(cntSpan.innerText)+1;
+			}
+		},
+		error : function(){alert("error")}
+    });
+};	
+
+
+/*아이템 구매*/
+function fBuy(element){
+	let iBuyCode = element.dataset.iBuyCode;
+ 	console.log(element);
+	 $.ajax({
+		url: cPath+"/item/purchase",
+		data : "itemCode="+iBuyCode,
+        method: "POST",
+		success: function(data) {
+			if(data=="success"){
+				swal("구매 성공!", `아이템 구매에 성공했습니다.`, "success");
+				element.style="pointer-events:none;background-color:#C3C3C3;border-color:#C3C3C3;"
+				element.innerText ="보유";
+				
+			}else{
+				swal ( "구매 실패" ,  "아이템 구매에 실패했습니다." ,  "error" )
+			}
+			myPoint();
+		}, error :function(){
+			swal("error");
+		} 
+    });
+};	
+
+/*아이디를 받는사람에 옮기는 기능*/
+function fCopy(element){
+	document.querySelector("#addrse").value = element.innerText;
+};
+
+
+/*아이템 선물 정보입력 모달*/
+function fGift(element){
+	let iGiftCode = element.dataset.iGiftCode;
+	let itemInfo = document.querySelectorAll("."+iGiftCode);
+	let itemName = itemInfo[0].innerText;
+	let itemPc = itemInfo[1].innerText;
+	document.querySelector("#pItemName").innerText = itemName;
+	document.querySelector("#pItemPc").innerText = itemPc;
+	document.querySelector("#sendBtn").dataset.gItemCode = iGiftCode;
+	
+	giftFollow(iGiftCode);
+};
+
+
+function giftFollow(iGiftCode){
+	let giftFollowDiv = document.querySelector("#giftFollowDiv");
+	$.ajax({
+			url: cPath+"/item/giftFollow",
+			data : "itemCode="+iGiftCode,
+	        method: "GET",
+			dataType : "json",
+			success: function(giftFollowList) {
+				let followStr = "";
+					followStr +=`<table class="table table-bordered">
+									<thead class="table table-dark">
+										<tr>
+											<th scope="col">아이디</th>
+											<th scope="col">이름</th>
+										</tr>
+									</thead>
+									<tbody>
+									`
+									if(giftFollowList.length>0){
+										for (var i = 0; i < giftFollowList.length; i++) {
+											let follow = giftFollowList[i];
+										followStr +=`
+													<tr>
+														<td><a href="javascript:;" onclick="fCopy(this);">${follow.userId}</a></td>
+														<td>${follow.userNm}</td>
+													</tr>
+													`
+										}
+									}else{
+										followStr +=`
+													<tr>
+														<td colspan="2">선물받기 가능한 사용자가 없습니다.</td>
+													</tr>
+													`
+									}
+					followStr +=
+								`</tbody>
+								</table>`
+				giftFollowDiv.innerHTML = followStr
+			},
+			error :function(){
+				swal("error");
+			} 
+	   	});
+};
+
+/*아이템 선물 보내기*/
+function fSend(element){
+	let input = document.querySelector("#addrse");
+	let iGiftCode = element.dataset.gItemCode;
+	let addrse = input.value;
+	console.log(iGiftCode);
+	console.log(addrse);
+	if(!addrse){
+		swal ( "선물실패" ,  "아이디를 선택해 주세요" ,  "error" )
+		return;
+	}
+	 $.ajax({
+		url: cPath+"/item/gift",
+		data : {itemCode : iGiftCode,
+				addrseUserId : addrse},
+        method: "POST",
+		success: function(data) {
+			if(data=="success"){
+				swal("선물 성공!", "아이템 선물에 성공했습니다.", "success");		
+			}else{
+				swal ( "선물 실패" ,  "아이템 선물에 실패했습니다." , "error" )
+			}
+			myPoint();
+			giftFollow(iGiftCode);
+			input.value="";
+		}, error :function(){
+			swal("error");
+		} 
+    });
+	
+};
+
+
+
+
+/*첫 실행*/
+$(function() {
+	myPoint()
+	itemList()
+});				
+			
+			
+			
+/*swal("Good job!", "You clicked the button!", "success");
+swal ( "Oops" ,  "Something went wrong!" ,  "error" )*/
+			

@@ -1,0 +1,74 @@
+package kr.or.ddit.school.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.school.service.ConsultingService;
+import kr.or.ddit.school.service.SchoolService;
+import kr.or.ddit.vo.ClassVO;
+import kr.or.ddit.vo.ConsultingVO;
+
+@Controller
+@RequestMapping("/school")
+public class StudentConsultingController {
+
+	@Autowired
+	private SchoolService schoolService; 
+	@Autowired
+	private ConsultingService consultingService;
+	
+	// 학생 상담화면
+	@GetMapping("consulting/{userId}/{classInfo}")
+	public String studentConsulting(
+			Model model ,
+			@PathVariable String userId,
+			@PathVariable String classInfo) {
+		
+		// 상담 선생님 이름 표출하기위함
+		ClassVO classVO =  schoolService.selectClass(classInfo);
+		// 대기중상담
+		List<ConsultingVO> dConsultingList= consultingService.selectDcounsultingList(userId);
+		// 완료 상담
+		List<ConsultingVO> fConsultingList =consultingService.selectFcounsultingList(userId);
+		// 진행중 상담
+		List<ConsultingVO> yConsultingList =consultingService.selectYcounsultingList(userId);
+		
+		model.addAttribute("classVO", classVO);
+		model.addAttribute("dConsultingList", dConsultingList);
+		model.addAttribute("fConsultingList", fConsultingList);
+		model.addAttribute("yConsultingList", yConsultingList);
+		
+		return "school/studentConsulting";
+	}
+	// 선택한 선생님의 상담일정
+	@GetMapping("consulting/{teacherId}")
+	@ResponseBody
+	public List<ConsultingVO> teacherConsultingList(@PathVariable String teacherId) {
+		List<ConsultingVO> consultingList =  consultingService.selectCounsultingTeacherList(teacherId);
+		return consultingList;
+	}
+	
+	@PostMapping("consulting")
+	@ResponseBody
+	public Map<String, String> insertConsulting(@RequestBody ConsultingVO consultingVO) {
+		Map<String, String> map = new HashMap<String, String>();
+		int cnt = consultingService.insertCounsulting(consultingVO);
+		if(cnt >0) {
+			map.put("result", "ok");
+		}else {
+			map.put("result", "fail");
+		}
+		return map;
+	}
+}

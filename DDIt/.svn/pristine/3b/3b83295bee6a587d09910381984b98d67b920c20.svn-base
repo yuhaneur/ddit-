@@ -1,0 +1,22 @@
+package kr.or.ddit.point.service;
+
+import kr.or.ddit.vo.PointHistoryVO;
+
+public interface PointService {
+	
+	/**
+	 * 사용가능 포인트 조회
+	 * @param userId
+	 * @return
+	 */
+	public int readPoint(String userId);
+	
+	/**
+	 * 포인트 이력 등록
+	 * @param pointHistory
+	 * @return
+	 */
+	public int creatPointHistory(PointHistoryVO pointHistory);
+	
+	
+}

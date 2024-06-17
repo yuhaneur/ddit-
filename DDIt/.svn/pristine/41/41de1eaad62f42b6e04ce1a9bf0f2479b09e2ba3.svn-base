@@ -1,0 +1,223 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
+
+<security:authentication property="principal" var="principal" />
+
+<input type="hidden" id="userId" value="${principal.realUser.userId }">
+ 
+
+
+<div class="card" id="ticketsTable" >
+	<div class="card-header border-bottom border-200 px-0">
+		<div class="d-lg-flex justify-content-between">
+			<div class="row flex-between-center gy-2 px-x1" id=searchUI>
+
+
+				<!-- 검색 -->
+				<div class="row flex-between-center gy-2 px-x1">
+
+					<div class="col-auto pe-0">
+						<h6 class="mb-0">검색</h6>
+					</div>
+					<div class="col-auto">
+						<form>
+							<div class="input-group input-search-width">
+
+								<input class="form-control form-control-sm shadow-none search"
+									type="search" placeholder="Search..." aria-label="search"
+									name="searchWord">
+								<button
+									class="btn btn-sm btn-outline-secondary border-300 hover-border-secondary"
+									id="searchWord">
+									<svg class="svg-inline--fa fa-search fa-w-16 fs-10"
+										aria-hidden="true" focusable="false" data-prefix="fa"
+										data-icon="search" role="img"
+										xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+										data-fa-i2svg="">
+									<path fill="currentColor"
+											d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.2-128-128 0-70.7 57.2-128 128-128 70.7 0 128 57.2 128 128 0 70.7-57.2 128-128 128z"></path></svg>
+									<!-- <span class="fa fa-search fs-10"></span> Font Awesome fontawesome.com -->
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+				<div>
+					<a class="fs-9 mb-0 text-nowrap py-2 py-xl-0"  href="<c:url value='/project/${projectNo }/' />">일감 </a>
+
+				</div>
+			</div>
+
+			<!-- 검색끝 -->
+
+			<div class="row flex-between-center">
+				<div class="col-4 col-sm-auto d-flex align-items-center pe-0">
+
+				</div>
+				<div class="col-8 col-sm-auto ms-auto text-end ps-0">
+
+					<div id="orders-actions">
+						<a href="<c:url value='/project/${projectNo}/workinsert'/>"
+							class="btn btn-falcon-default btn-sm mx-2"> <svg
+								class="svg-inline--fa fa-plus fa-w-14"
+								data-fa-transform="shrink-3 down-2" aria-hidden="true"
+								focusable="false" data-prefix="fas" data-icon="plus" role="img"
+								xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+								data-fa-i2svg="" style="transform-origin: 0.4375em 0.625em;">
+								<g transform="translate(224 256)">
+								<g
+									transform="translate(0, 64)  scale(0.8125, 0.8125)  rotate(0 0 0)">
+								<path fill="currentColor"
+									d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"
+									transform="translate(-224 -256)"></path></g></g></svg> <!-- <span class="fas fa-plus" data-fa-transform="shrink-3 down-2"></span> Font Awesome fontawesome.com -->
+							<span class="d-none d-sm-inline-block ms-1">일감생성하기</span></a>
+
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card-body p-0">
+
+		<div class="table-responsive scrollbar">
+			<table
+				class="table table-sm table-striped fs-10 mb-0 overflow-hidden">
+				<thead class="bg-200">
+					<tr>
+						<th>
+							<div class="form-check fs-9 mb-0 d-flex align-items-center">
+								<input class="form-check-input"
+									id="checkbox-bulk-customers-select" type="checkbox"
+									data-bulk-select="{&quot;body&quot;:&quot;table-orders-body&quot;,&quot;actions&quot;:&quot;orders-bulk-actions&quot;,&quot;replacedElement&quot;:&quot;orders-actions&quot;}">
+							</div>
+						</th>
+						<th class="text-900 sort pe-1 align-middle white-space-nowrap"
+							data-sort="order">일감번호</th>
+						<th
+							class="text-900 sort pe-1 align-middle white-space-nowrap pe-7"
+							data-sort="date">우선순위</th>
+						<th class="text-900 sort pe-1 align-middle white-space-nowrap"
+							data-sort="address" style="min-width: 12.5rem;">제목</th>
+						<th
+							class="text-900 sort pe-1 align-middle white-space-nowrap text-center"
+							data-sort="status">상태</th>
+						<th
+							class="text-900 sort pe-1 align-middle white-space-nowrap text-end"
+							data-sort="amount">담당자</th>
+						<th class="no-sort"></th>
+					</tr>
+				</thead>
+
+
+				<tbody class="list" id="table-orders-body">
+					<c:if test="${not empty workList }">
+						<c:forEach items="${workList }" var="work">
+							<tr class="btn-reveal-trigger">
+								<td class="align-middle" style="width: 28px;">
+									<div class="form-check fs-9 mb-0 d-flex align-items-center">
+										<input class="form-check-input" type="checkbox"
+											id="checkbox-0" data-bulk-select-row="data-bulk-select-row">
+									</div>
+								</td>
+								<td class="order py-2 align-middle white-space-nowrap">
+								<a href="<c:url value='/project/${work.projectNo }' />">${work.workNo } </a>
+								</td>
+								<td class="date py-2 align-middle">${work.wokrPriority }</td>
+								<td class="address py-2 align-middle white-space-nowrap">${work.workSj } </td>
+								<td
+									class="status py-2 align-middle text-center fs-9 white-space-nowrap">
+									<span class="badge badge rounded-pill d-block badge-subtle-success">${work.workTy }<svg
+											class="svg-inline--fa fa-check fa-w-16 ms-1"
+											data-fa-transform="shrink-2" aria-hidden="true"
+											focusable="false" data-prefix="fas" data-icon="check"
+											role="img" xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 512 512" data-fa-i2svg=""
+											style="transform-origin: 0.5em 0.5em;">
+									<g transform="translate(256 256)">
+									<g
+												transform="translate(0, 0)  scale(0.875, 0.875)  rotate(0 0 0)">
+									<path fill="currentColor"
+												d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
+												transform="translate(-256 -256)"></path></g></g></svg> <!-- <span class="ms-1 fas fa-check" data-fa-transform="shrink-2"></span> Font Awesome fontawesome.com --></span>
+								</td>
+								<td class="amount py-2 align-middle text-end fs-9 fw-medium">
+								
+								 ${work.student.studentName } 
+								
+								
+								
+								</td>
+									<%-- ${team.userId } --%>
+								<td class="py-2 align-middle white-space-nowrap text-end">
+									<div class="dropdown font-sans-serif position-static">
+										<button class="btn btn-tertiary btn-sm" type="button"
+											data-bs-toggle="tooltip" data-bs-placement="top"
+											aria-label="Delete" data-bs-original-title="Delete">
+											<svg class="svg-inline--fa fa-trash fa-w-14"
+												aria-hidden="true" focusable="false" data-prefix="fas"
+												data-icon="trash" role="img"
+												xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+												data-fa-i2svg="">
+										<path fill="currentColor"
+													d="M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z"></path></svg>
+											<!-- <span class="fas fa-trash"></span> Font Awesome fontawesome.com -->
+										</button>
+										<div class="dropdown-menu dropdown-menu-end border py-0"
+											aria-labelledby="order-dropdown-0">
+											<div class="py-2">
+												<a class="dropdown-item" href="#!">Completed</a><a
+													class="dropdown-item" href="#!">Processing</a><a
+													class="dropdown-item" href="#!">On Hold</a><a
+													class="dropdown-item" href="#!">Pending</a>
+												<div class="dropdown-divider"></div>
+												<a class="dropdown-item text-danger" href="#!">Delete</a>
+											</div>
+										</div>
+									</div>
+								</td>
+							</tr>
+						</c:forEach>
+					</c:if>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+	<c:if test="${empty workList }">
+		<td colspan="6">일감 없음</td>
+		<div class="card-footer">${pagingHTML }</div>
+	</c:if>
+</div>
+
+<form action="<c:url value='/project/workList'/>" id="searchForm">
+	<input type="hidden" name="searchType" /> <input type="hidden"
+		name="searchWord" /> <input type="hidden" name="currentPage" />
+</form>
+
+<script>
+	$("[name='searchType']").val("${condition.searchType}")
+	$("[name='searchWord']").val("${condition.searchWord}")
+	function paging(page) {
+		//	location.href = "?currentPage=" + page;
+		searchForm.currentPage.value = page;
+		$searchForm.submit();
+	}
+
+	const $searchForm = $("#searchForm");
+	$("#searchBtn").on("click", function(event) {
+		let $searchUI = $(this).parents("#searchUI");
+		$searchUI.find(":input[name]").each(function(idx, ipt) {
+			let name = this.name;
+			let value = $(this).val();
+			searchForm[name].value = value;
+		});
+		$searchForm.submit();
+	});
+</script>

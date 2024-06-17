@@ -1,0 +1,28 @@
+package kr.or.ddit.message.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.MessageVO;
+
+public interface MessageService {
+	
+	/**
+	 * @return 메세지 리스트
+	 */
+	public List<MessageVO> readMessageList();
+	
+	/**
+	 * @return 메세지 상세보기
+	 */
+	public MessageVO readMessage();
+	
+	/**
+	 * @return 메세지 발신
+	 */
+	public int createMessage();
+	
+	/**
+	 * @return 메세지 삭제
+	 */
+	public int deleteMessage();
+}

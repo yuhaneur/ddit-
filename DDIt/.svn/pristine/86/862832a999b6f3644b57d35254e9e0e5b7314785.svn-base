@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sj.dao.SjDAO">
+	<resultMap type="SjVO" id="sjMap" autoMapping="true">
+		<id property="sjNo" column="SJ_NO" />
+		<id property="edcCrseCode" column="EDC_CRSE_CODE" />
+		<association property="edcCrse" javaType="EdcCrseVO" autoMapping="true">
+		</association>
+	</resultMap>
+
+	<resultMap type="SjManagerVO" id="sjManagerMap"	autoMapping="true">
+		<association property="teacher" javaType="TeacherVO" autoMapping="true">
+		</association>
+	</resultMap>
+	<select id="selectSjList" resultMap="sjMap">
+		SELECT A.SJ_NO, A.EDC_CRSE_CODE, A.SJ_NAME, A.EDC_TIME,
+		A.SJ_ORDR, B.EDC_CRSE_NAME FROM SJ A INNER JOIN EDC_CRSE B
+		ON(A.EDC_CRSE_CODE = B.EDC_CRSE_CODE)
+	</select>
+
+	<select id="selectSj" parameterType="SjVO" resultMap="sjMap">
+		SELECT A.SJ_NO, A.EDC_CRSE_CODE, A.SJ_NAME, A.EDC_TIME,
+		A.SJ_ORDR, B.EDC_CRSE_NAME FROM SJ A INNER JOIN EDC_CRSE B
+		ON(A.EDC_CRSE_CODE = B.EDC_CRSE_CODE) WHERE A.SJ_NO=#{sjNo} AND
+		A.EDC_CRSE_CODE=#{edcCrseCode}
+	</select>
+
+	<select id="selectSjManagerList" parameterType="SjVO" resultMap="sjManagerMap">
+		SELECT A.SJ_NO, A.USER_ID, A.EDC_CRSE_CODE, A.SJ_DELETE_AT,
+		B.TEACHER_NAME FROM SJ_MANAGER A INNER JOIN TEACHER B
+		ON(A.USER_ID=B.USER_ID) WHERE A.SJ_NO=#{sjNo} AND
+		A.EDC_CRSE_CODE=#{edcCrseCode}
+	</select>
+	<insert id="insertSj" parameterType="SjVO">
+		<selectKey order="BEFORE" keyProperty="sjNo" resultType="long">
+			select nvl(max(sj_no),0)+1 from sj where
+			EDC_CRSE_CODE=#{edcCrseCode}
+		</selectKey>
+		INSERT INTO SJ ( SJ_NO, EDC_CRSE_CODE, SJ_NAME, EDC_TIME,
+		SJ_ORDR ) VALUES
+		(#{sjNo},#{edcCrseCode},#{sjName},#{edcTime},#{sjOrdr})
+	</insert>
+
+	<insert id="insertSjManager" parameterType="SjManagerVO">
+		INSERT INTO SJ_MANAGER ( SJ_NO, USER_ID, EDC_CRSE_CODE,
+		SJ_DELETE_AT ) VALUES
+		(#{sjNo},#{userId},#{edcCrseCode},'N')
+	</insert>
+</mapper>

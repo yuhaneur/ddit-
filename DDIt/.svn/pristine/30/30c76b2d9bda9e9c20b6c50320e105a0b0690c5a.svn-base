@@ -1,0 +1,25 @@
+package kr.or.ddit.snsFollower.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.vo.FollowVO;
+
+@Mapper
+public interface SnsFollowerDao {
+	/**
+	 * @param userId
+	 * @return 팔로워 리스트
+	 */
+	public List<FollowVO> selectFollowerList(@Param("paging")PaginationInfo paging, String userId);
+	public int selectTotalRecordFollowerList(@Param("paging")PaginationInfo paging, String userId);
+	
+	/**
+	 * @param userId
+	 * @return 학생인지 선생인지 검증.
+	 */
+	public int validateUser(String userId);
+}

@@ -1,0 +1,25 @@
+package kr.or.ddit.sns.service;
+
+import java.util.List;
+
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+
+public interface SnsService{
+	
+	/**
+	 * @return Feed 리스트 전체출력
+	 */
+	public List<SnsFeedVO> readFeedList();
+	
+	/**
+	 * @param snsFeedNo
+	 * @return 선택한 feed 댓글 전체출력
+	 */
+	public List<SnsAnswerVO> readAnswerList(int snsFeedNo);
+	
+	/**
+	 * @param feedVo 피드 작성
+	 */
+	public void createFeed(SnsFeedVO feedVo);
+}

@@ -1,0 +1,134 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="row g-3 mb-3">
+            <div class="col-xxl-6">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="card font-sans-serif">
+                    <div class="card-body d-flex gap-3 flex-column flex-sm-row align-items-center"><img class="rounded-3" src="../../assets/img/elearning/avatar/student.png" alt="" width="112">
+                      <table class="table table-borderless fs-10 fw-medium mb-0">
+                        <tbody>
+                          <tr>
+                            <td class="p-1" style="width: 35%;">퇴실시간:</td>
+                            <td class="p-1 text-600">3 hours ago</td>
+                          </tr>
+                          <tr>
+                            <td class="p-1" style="width: 35%;">출석시간:</td>
+                            <td class="p-1 text-600">2021/01/12 23:13</td>
+                          </tr>
+                          <tr>
+                            <td class="p-1" style="width: 35%;">이메일:</td>
+                            <td class="p-1"><a class="text-600 text-decoration-none" href="mailto:goodguy@nicemail.com">goodguy@nicemail.com </a><span class="badge rounded-pill badge-subtle-success d-none d-md-inline-block ms-2"><span>Verified</span><svg class="svg-inline--fa fa-check fa-w-16 ms-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="check" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(256 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fas fa-check ms-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --></span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="p-1" style="width: 35%;">핸드폰번호:</td>
+                            <td class="p-1"><a class="text-600 text-decoration-none" href="tel:+01234567890 ">+012-345-67890 </a><span class="badge rounded-pill badge-subtle-primary d-none d-md-inline-block ms-2"><span>2-step verification</span><svg class="svg-inline--fa fa-link fa-w-16 ms-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="link" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg="" style="transform-origin: 0.5em 0.5em;"><g transform="translate(256 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z" transform="translate(-256 -256)"></path></g></g></svg><!-- <span class="fas fa-link ms-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --></span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div class="dropdown btn-reveal-trigger position-absolute top-0 end-0 m-3">
+                        <button class="btn btn-link btn-reveal text-600 btn-sm dropdown-toggle dropdown-caret-none" type="button" id="studentInfoDropdown" data-bs-toggle="dropdown" data-boundary="viewport" aria-haspopup="true" aria-expanded="false"><svg class="svg-inline--fa fa-ellipsis-h fa-w-16 fs-11" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="ellipsis-h" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M328 256c0 39.8-32.2 72-72 72s-72-32.2-72-72 32.2-72 72-72 72 32.2 72 72zm104-72c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72zm-352 0c-39.8 0-72 32.2-72 72s32.2 72 72 72 72-32.2 72-72-32.2-72-72-72z"></path></svg><!-- <span class="fas fa-ellipsis-h fs-11"></span> Font Awesome fontawesome.com --></button>
+                        <div class="dropdown-menu dropdown-menu-end border py-2" aria-labelledby="studentInfoDropdown"><a class="dropdown-item" href="#!">View Profile</a><a class="dropdown-item" href="#!">Enrolled Courses</a>
+                          <div class="dropdown-divider"></div><a class="dropdown-item text-danger" href="#!">Logout</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card font-sans-serif">
+                    <div class="card-header pb-0">
+                      <h6 class="mb-0">교육시작일</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row g-0">
+                        <div class="col-6">
+                          <h4 class="text-700 lh-1 mb-1">
+                            $1971.52</h4><span class="badge rounded-pill badge-subtle-danger fs-11 align-bottom"><svg class="svg-inline--fa fa-caret-down fa-w-10 me-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5em;"><g transform="translate(160 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-caret-down me-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span>5.1% last month</span></span>
+                        </div>
+                        <div class="col-6 mt-n4 d-flex justify-content-end">
+                          <div class="echart-default" data-echart-responsive="true" data-echarts="{&quot;xAxis&quot;:{&quot;data&quot;:[&quot;Day 1&quot;,&quot;Day 2&quot;,&quot;Day 3&quot;,&quot;Day 4&quot;,&quot;Day 5&quot;,&quot;Day 6&quot;,&quot;Day 7&quot;,&quot;Day 8&quot;,&quot;Day 9&quot;,&quot;Day 10&quot;]},&quot;series&quot;:[{&quot;type&quot;:&quot;line&quot;,&quot;data&quot;:[85,60,120,70,100,15,65,80,60,75,45],&quot;smooth&quot;:true,&quot;lineStyle&quot;:{&quot;width&quot;:2}}],&quot;grid&quot;:{&quot;bottom&quot;:&quot;2%&quot;,&quot;top&quot;:&quot;2%&quot;,&quot;right&quot;:&quot;0px&quot;,&quot;left&quot;:&quot;0px&quot;}}" _echarts_instance_="ec_1715250739331" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;"><div style="position: relative; width: 124px; height: 80px; padding: 0px; margin: 0px; border-width: 0px; cursor: pointer;"><canvas data-zr-dom-id="zr_0" width="124" height="80" style="position: absolute; left: 0px; top: 0px; width: 124px; height: 80px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card font-sans-serif">
+                    <div class="card-header pb-0">
+                      <h6 class="mb-0">교육종료일</h6>
+                    </div>
+                    <div class="card-body">
+                      <div class="row g-0">
+                        <div class="col-6">
+                          <h4 class="text-700 lh-1 mb-1">
+                            121h 11m</h4><span class="badge rounded-pill badge-subtle-success fs-11 align-bottom"><svg class="svg-inline--fa fa-caret-up fa-w-10 me-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5em;"><g transform="translate(160 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-caret-up me-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span>3.6% last month</span></span>
+                        </div>
+                        <div class="col-6 mt-n4 d-flex justify-content-end">
+                          <div class="echart-default" data-echart-responsive="true" data-echarts="{&quot;xAxis&quot;:{&quot;data&quot;:[&quot;Day 1&quot;,&quot;Day 2&quot;,&quot;Day 3&quot;,&quot;Day 4&quot;,&quot;Day 5&quot;,&quot;Day 6&quot;,&quot;Day 7&quot;,&quot;Day 8&quot;]},&quot;series&quot;:[{&quot;type&quot;:&quot;line&quot;,&quot;data&quot;:[55,60,40,120,70,80,35,80,85],&quot;smooth&quot;:true,&quot;lineStyle&quot;:{&quot;width&quot;:2}}],&quot;grid&quot;:{&quot;bottom&quot;:&quot;2%&quot;,&quot;top&quot;:&quot;2%&quot;,&quot;right&quot;:&quot;0px&quot;,&quot;left&quot;:&quot;10px&quot;}}" _echarts_instance_="ec_1715250739332" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;"><div style="position: relative; width: 124px; height: 80px; padding: 0px; margin: 0px; border-width: 0px; cursor: pointer;"><canvas data-zr-dom-id="zr_0" width="124" height="80" style="position: absolute; left: 0px; top: 0px; width: 124px; height: 80px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class=""></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-xxl-6">
+              <div class="card h-100 font-sans-serif">
+                <div class="card-header bg-body-tertiary d-flex flex-between-center py-2">
+                  <h6 class="mb-0">출석</h6><a class="btn btn-link btn-sm px-0 fw-medium" href="#!">Individual results<svg class="svg-inline--fa fa-angle-right fa-w-8 ms-1 fs-10" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 512" data-fa-i2svg=""><path fill="currentColor" d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path></svg><!-- <span class="fas fa-angle-right ms-1 fs-10"></span> Font Awesome fontawesome.com --></a>
+                </div>
+                <div class="card-body">
+                  <div class="row g-0 h-100">
+                    <div class="col-sm-7 order-1 order-sm-0">
+                      <div class="row g-sm-0 gy-4 row-cols-2 h-100 align-content-between">
+                        <div class="col">
+                          <div class="d-flex gap-2 mb-3">
+                            <div class="vr rounded ps-1 bg-success"></div>
+                            <h6 class="lh-base text-700 mb-0">90-100%</h6>
+                          </div>
+                          <h5 class="fw-normal"> 10 Courses</h5>
+                          <h6 class="mb-0"><span class="text-500 me-2">this week</span><span class="badge rounded-pill badge-subtle-success"><svg class="svg-inline--fa fa-caret-up fa-w-10 me-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5em;"><g transform="translate(160 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M288.662 352H31.338c-17.818 0-26.741-21.543-14.142-34.142l128.662-128.662c7.81-7.81 20.474-7.81 28.284 0l128.662 128.662c12.6 12.599 3.676 34.142-14.142 34.142z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-caret-up me-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span>2.1%</span></span>
+                          </h6>
+                        </div>
+                        <div class="col">
+                          <div class="d-flex gap-2 mb-3">
+                            <div class="vr rounded ps-1 bg-primary"></div>
+                            <h6 class="lh-base text-700 mb-0">70-90%</h6>
+                          </div>
+                          <h5 class="fw-normal"> 16 Courses</h5>
+                          <h6 class="mb-0"><span class="text-500 me-2">this week</span><span class="badge rounded-pill badge-subtle-danger"><svg class="svg-inline--fa fa-caret-down fa-w-10 me-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="caret-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg="" style="transform-origin: 0.3125em 0.5em;"><g transform="translate(160 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M31.3 192h257.3c17.8 0 26.7 21.5 14.1 34.1L174.1 354.8c-7.8 7.8-20.5 7.8-28.3 0L17.2 226.1C4.6 213.5 13.5 192 31.3 192z" transform="translate(-160 -256)"></path></g></g></svg><!-- <span class="fas fa-caret-down me-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span>5.1%</span></span>
+                          </h6>
+                        </div>
+                        <div class="col">
+                          <div class="d-flex gap-2 mb-3">
+                            <div class="vr rounded ps-1 bg-info"></div>
+                            <h6 class="lh-base text-700 mb-0">40-70%</h6>
+                          </div>
+                          <h5 class="fw-normal"> 12 Courses</h5>
+                          <h6 class="mb-0"><span class="text-500 me-2">this week</span><span class="badge rounded-pill badge-subtle-secondary"><span>0.0%</span><span class=" ms-1" data-fa-transform="shrink-4"></span></span>
+                          </h6>
+                        </div>
+                        <div class="col">
+                          <div class="d-flex gap-2 mb-3">
+                            <div class="vr rounded ps-1 bg-warning"></div>
+                            <h6 class="lh-base text-700 mb-0">0-40%</h6>
+                          </div>
+                          <h5 class="fw-normal"> 2 Courses</h5>
+                          <h6 class="mb-0"><span class="text-500 me-2">this week</span><span class="badge rounded-pill badge-subtle-primary"><svg class="svg-inline--fa fa-plus fa-w-14 me-1" data-fa-transform="shrink-4" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg="" style="transform-origin: 0.4375em 0.5em;"><g transform="translate(224 256)"><g transform="translate(0, 0)  scale(0.75, 0.75)  rotate(0 0 0)"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" transform="translate(-224 -256)"></path></g></g></svg><!-- <span class="fas fa-plus me-1" data-fa-transform="shrink-4"></span> Font Awesome fontawesome.com --><span>3.5%</span></span>
+                          </h6>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-5 mb-5 mb-sm-0">
+                      <!-- Find the JS file for the following chart at: src/js/charts/echarts/assignment-scores.js-->
+                      <!-- If you are not using gulp based workflow, you can find the transpiled code at: public/assets/js/theme.js-->
+                      <div class="echart-assignment-scores" data-echart-responsive="true" _echarts_instance_="ec_1715250739333" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;"><div style="position: relative; width: 230px; height: 200px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="230" height="200" style="position: absolute; left: 0px; top: 0px; width: 230px; height: 200px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; z-index: 9999999; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; background-color: rgb(249, 250, 253); border-width: 1px; border-radius: 4px; color: rgb(11, 23, 39); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 7px 10px; top: 0px; left: 0px; transform: translate3d(-42px, 83px, 0px); border-color: rgb(216, 226, 239); pointer-events: none; visibility: hidden; opacity: 0;"><strong>40-70%:</strong> 12 courses</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>

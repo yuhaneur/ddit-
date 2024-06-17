@@ -1,0 +1,79 @@
+package kr.or.ddit.school.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.vo.CmmnCodeGrVO;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.QustnrAnswerDetailGrVO;
+import kr.or.ddit.vo.QustnrAnswerDetailVO;
+import kr.or.ddit.vo.QustnrAnswerTyVO;
+import kr.or.ddit.vo.QustnrQuestionsVO;
+import kr.or.ddit.vo.QustnrSelectorVO;
+import kr.or.ddit.vo.QustnrTrgterVO;
+import kr.or.ddit.vo.QustnrVO;
+
+@Mapper
+public interface QustnrDAO {
+	
+	/** 자신이 포함된 설문 리스트 조회
+	 * @param userId 접속한 유저
+	 */
+	public List<QustnrVO> selectQustnrList(@Param("userId") String userId); 
+	
+	/**
+	 * 설문 답변유형 공통코드 가져오기
+	 */
+	public List<QustnrAnswerDetailGrVO> selectCodeGrList();
+	
+	/**
+	 * @param codeGr
+	 * @return 답변유형에 따른 코드리스트
+	 */
+	public List<QustnrAnswerDetailVO> selectCodeList(@Param("qustnrAnswerCode") String qustnrAnswerCode);
+	
+	/**
+	 * 설문 저장
+	 * @param qustnrVO
+	 * @return
+	 */
+	public int insertQustnr(QustnrVO qustnrVO);
+	
+	/**
+	 * 설문에있는 설문내용저장
+	 * @param qustnrQuestionsVO
+	 * @return
+	 */
+	public int insertQustnrQuestions(QustnrQuestionsVO qustnrQuestionsVO);
+	
+	/**
+	 * 설문 내용에 답변유형 저장
+	 * @param qustnrAnswerTyVO
+	 * @return
+	 */
+	public int insertQustnrAnswer(QustnrAnswerTyVO qustnrAnswerTyVO);
+	
+	/**
+	 * 설문 대상자 불러오는 리스트 (클래스에 포함된사람들)
+	 * @param classCode
+	 * @return
+	 */
+	public List<QustnrSelectorVO> qustnrSelectorList(@Param("classCode") String classCode);
+	
+	/**
+	 * 설문 대상자 저장
+	 * @param qustnrSelectorVO
+	 * @return
+	 */
+	public int insertQustnrSelector(QustnrTrgterVO qustnrTrgterVO);
+	
+	/**
+	 * 설문 상세보기
+	 * @param qustnrNo
+	 * @return
+	 */
+	public QustnrVO selectQustnr(@Param("qustnrNo") Long qustnrNo);
+	
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.Users.dao.UsersDAO">
+
+<resultMap type="UsersVO" id="UsersMap" autoMapping="true">
+	<id property="userId" column="USER_ID"/>
+	<association property="student" javaType="StudentVO" autoMapping="true"/>
+	<collection property="authorityList" ofType="AuthorityVO" autoMapping="true">
+		<id property="authorityNo" column="AUTHORITY_NO"/>
+		<association property="authorGr" javaType="AuthorGrVO" autoMapping="true"/>
+	</collection>
+	
+</resultMap>
+
+<select id="selectUsersForAuth" resultMap="UsersMap" parameterType="String">
+		SELECT * FROM USERS
+		INNER JOIN AUTHORITY ON USERS.USER_ID = AUTHORITY.USER_ID
+		INNER JOIN AUTHOR_GR ON AUTHORITY.AUTH = AUTHOR_GR.AUTH
+		LEFT OUTER JOIN STUDENT ON USERS.USER_ID = STUDENT.USER_ID
+		
+		WHERE USERS.USER_ID = #{userId} AND USER_USE_AT  = 'Y'
+</select>
+
+<select id="selectUsers" resultType="UsersVO" parameterType="String">
+		SELECT  *                                      
+		FROM USERS                   
+		WHERE USER_ID = #{userId}    
+</select>
+
+<select id="selectUsersAll" resultType="UsersVO">
+		SELECT  *                                      
+		FROM USERS                   
+</select>
+
+<insert id="insertUsers" parameterType="UsersVO">
+	INSERT INTO USERS (
+    USER_ID,
+    USER_PW
+) VALUES (
+    #{userId},
+    #{userPw}
+)
+</insert>
+
+<update id="updateUsersPw" parameterType="UsersVO">
+UPDATE USERS
+    SET
+        USER_PW = #{userPw}
+WHERE
+    USER_ID = #{userId}
+</update>
+
+	
+</mapper>

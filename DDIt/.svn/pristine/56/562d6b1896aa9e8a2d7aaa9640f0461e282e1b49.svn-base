@@ -1,0 +1,290 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<style>
+.likeA:hover .line-heart1 {
+	animation: line-heart1-pulse 2s infinite;
+}
+
+@keyframes line-heart1-pulse { 
+	0% {transform: scale3d(1, 1, 1);}
+	20% {transform : scale3d(0.9, 0.9, 0.9);}
+	35% {transform : scale3d(1, 1, 1);}
+	50% {transform : scale3d(0.9, 0.9, 0.9);}
+	75% {transform : scale3d(1, 1, 1);}
+	100% {transform : scale3d(1, 1, 1);}
+}
+
+.itemEvent a {
+	font-size: 12px;
+	font-weight: bolder;
+	margin-top: 20px;
+}
+
+#itemDiv{
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+
+}
+
+#itemImgDiv {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	width: 200px;
+	height: 200px;
+	display: inline-block;
+}
+
+#itemCtgry1Div{
+	position: absolute;
+	top: 0;
+    left: 0;
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	border:10px solid #F361A6;
+	display: inline-block;
+	pointer-events: none;
+	z-index: 2;
+
+}
+
+#itemCtgry2Div {
+	position: relative;
+	top: 0;
+    left: 0;
+	top: 50%; 
+	left: 50%; 
+	transform: translate(-50%, -50%);
+	z-index: 1;
+}
+
+
+#itemCtgry3Div{
+	position: absolute;
+	top: 0;
+    left: 0;
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+	pointer-events: none;
+	z-index: 3;
+}
+
+
+#itemImgDiv img{
+	position: relative;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+}
+
+#itemImgDiv svg{
+	position: absolute;
+	width: 200px;
+	height: 200px;
+	transform: translate(-50%, -50%); 
+	animation: rotation 5s linear infinite;
+
+}
+
+/* 회전 애니메이션*/
+@keyframes rotation {
+  from {
+    transform: rotate(0deg); /* 0도 회전부터 시작 */
+  }
+  to {
+    transform: rotate(360deg); /* 한 번 회전을 위해 360도 회전 */
+  }
+}
+
+#pointMainDiv{
+	position: fixed; 
+	z-index: 100; 
+	top: 10; 
+	width: 80%;
+}
+#itemMainDiv{
+	padding-top: 4.5rem;
+}
+
+
+
+
+</style>
+
+<div class="card mb-1" id="pointMainDiv">
+	<div class="card-body">
+		<div class="row flex-between-center">
+
+			<!-- 보유포인트 출력 시작 -->
+			<div class="col-sm-auto mb-2 mb-sm-0">
+				<h4 class="mb-0">
+					<svg fill="none" height="40" viewBox="0 0 512 512" width="40"
+						xmlns="http://www.w3.org/2000/svg">
+	    			<path clip-rule="evenodd"
+							d="m455.778 248.317 7.684 7.684c27.441 25.247 28.539 68.056 3.293 95.498l-103.182 109.767c-25.246 27.442-68.056 28.54-95.498 3.293l-7.683-7.684-7.684 7.684c-25.246 27.442-68.056 28.54-95.498 3.293l-109.7671-103.181c-27.4418-25.247-28.5395-68.056-3.293-95.498l7.6837-7.684-7.6837-7.683c-27.4419-25.247-28.5395-68.056-3.293-95.498l103.1811-109.7674c25.247-27.4419 68.056-28.5396 95.498-3.2931l7.684 7.6838 7.683-7.6838c25.247-27.4418 68.056-28.5395 95.498-3.293l109.767 103.1815c27.442 25.246 28.54 68.056 3.294 95.498zm-117.033 11.404c6.779-12.027 10.168-25.365 10.168-40.016 0-24.272-7.653-43.624-22.96-58.056-15.088-14.432-36.845-21.648-65.272-21.648h-101.68v232.224h72.816v-73.8h28.864c18.805 0 34.768-3.499 47.888-10.496 13.339-6.997 23.397-16.4 30.176-28.208zm-63.632-40.016c0 14.213-7.544 21.32-22.632 21.32h-20.664v-42.64h20.664c15.088 0 22.632 7.107 22.632 21.32z"
+							fill="#fb8500" fill-rule="evenodd" />
+	    			</svg>
+					<span>보유포인트 : </span> <span id="pointSpan"></span>
+				</h4>
+			</div>
+			<!-- 보유포인트 출력 끝 -->
+
+			<div class="col-sm-auto">
+				<div class="row gx-2 align-items-center">
+					<div class="col-auto">
+						<form class="row gx-2">
+							<div class="col-auto">
+								<small>Sort by:</small>
+							</div>
+							<div class="col-auto">
+								<select class="form-select form-select-sm"
+									aria-label="Bulk actions">
+									<option selected="">Best Match</option>
+									<option value="Refund">Newest</option>
+									<option value="Delete">Price</option>
+								</select>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="card" id="itemMainDiv">
+	<div class="card-body">
+		<div class="row" id="itemV">
+			<!-- 아이템 목록 출력 -->
+		</div>
+	</div>
+</div>
+
+<!-- 아이템 미리보기 모달 시작 -->
+<div class="modal fade" id="tooltippopovers" tabindex="-1"
+	aria-labelledby="tooltippopoversLabel" aria-hidden="true">
+	<div class="modal-dialog mt-6" role="document">
+		<div class="modal-content border-0">
+			<div class="position-absolute top-0 end-0 mt-2 me-2 z-1">
+				<button
+					class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+					data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-0">
+				<div class="bg-body-tertiary rounded-top-3 py-3 ps-4 pe-6">
+					<h4 class="mb-1" id="tooltippopoversLabel">아이템미리보기</h4>
+				</div>
+				
+				<div class="p-4 pb-4 pv">
+					<div id="itemDiv">
+						<div id="itemImgDiv">
+						
+							<!-- 아이템 카테고리1번 출력 -->
+							<div id="itemCtgry1Div">
+								<div id="item2effect-main">
+									<div id="item2effect">
+										<img id="profileImg" class="rounded-circle"
+											src="${pageContext.request.contextPath}/resources/public/assets/img/elearning/avatar/trainer.png"
+											alt="">
+										<p>이름나와랑</p>
+									</div>
+								</div>
+							</div>
+							
+							<!-- 아이템 카테고리2번 출력 -->
+							<div id="itemCtgry2Div">
+								<svg id="itemSvg" id="itemSvg" width="20" height="20" viewBox="-50 -50 450 450" enable-background="new 0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+								<path d="m256 80.28 91.34 5.06c28.62 1.59 55.83 12.97 77.06 32.23 42.07 38.18 55.09 98.94 32.36 151.01-36.45 83.5-92.5 156.99-163.39 214.22-21.8 17.6-52.93 17.6-74.74 0-6.65-5.37-13.18-10.89-19.57-16.54-54.08-73.77-89.58-122.12-122.61-197.78l-1.21.1c-22.26-51-22.48-80.49 9.81-148.63.84-.8 1.69-1.6 2.55-2.38 21.23-19.27 48.44-30.65 77.06-32.23z" fill="#f72f2f"/>
+								<path d="m373.85 159.28-.01-.01z" fill="#ff4b4b"/>
+								<path d="m390.63 112.03c-.26-.2-.53-.41-.79-.61-1.58-1.2-3.72-1.39-5.5-.5l-1.66.84c-3.18 1.6-3.87 5.85-1.33 8.35 5.57 5.49 11.13 11.56 16.75 18.28 6.5 7.77 7.22 19.05 1.34 27.3-5.89 8.26-16.22 11.4-25.72 7.81-17.81-6.73-36.7-13.06-56.38-18.89-7.86-2.33-16.29 1.49-19.59 9-5.95 13.54-14.26 28.43-25.54 45.96-3.86 5.99-10.42 9.76-17.55 10.08-.32.01-.65.02-.97.02-6.77 0-13.2-3.13-17.37-8.49-10.73-13.8-19.05-26.39-25.29-38.36-4.81-9.22-15.63-13.54-25.53-10.32-17.02 5.53-35.08 13.4-54.61 23.78-7.71 4.1-17.13 3.25-24-2.15-6.84-5.39-9.86-14.31-7.7-22.74 3.19-12.41 6.97-23.13 11.53-32.55 1.53-3.16-.71-6.84-4.22-6.88-3.86-.04-7.92-.05-12.2-.01-.05 0-.11 0-.17 0-3.2 0-6.27-.7-9.06-1.97-40.03 38.29-52.09 97.62-29.83 148.61 33.03 75.66 82.15 143.1 143.83 197.68 18.42 3.98 39.03-.38 54.92-12.74 72.26-56.2 129.72-126.49 167.52-204.91 23.57-48.92 11.14-103.88-30.88-136.59z" fill="#ff4b4b"/>
+								<path d="m386.14 149.03c-9.97-11.96-20.46-22.61-31.74-31.32-3.5-2.7-2.96-8.15 1-10.13l15.59-7.85 3.77-8.68c4.56-2.3 7.06-2.18 2.37-4.21-.35-.15-8.47-4.72-8.82-4.87-20.06-8.57-27.61-8.85-49.38-7.37l-56.35 2.9 6.85-45.82c1.08-6.78.25-9.95-6.58-10.53l-2.53-3.15-22.78-1.95c-5.22-.45-8.53 5.47-5.42 9.68 6.41 8.7 9.83 19.23 9.74 30.04l-.13 16.77-25.49 4.18c-40.99-9.23-72.32-11.42-106.78 12.62-2.62 1.83-9.11 2.39-11.59 4.37-4.47 3.57-5.45 8.6.26 8.56 13.99-.11 29.87 1.49 41.48 2.37 4.34.33.03 7.25-1.71 10.92-.21.44-.47.86-.8 1.26-11.2 13.72-17.76 30.51-22.4 48.57-1.3 5.06 4.07 9.23 8.69 6.78 29.1-15.46 57.81-26.98 85.89-32.31 3.02-.57 6.03 1.19 6.95 4.13 6.12 19.69 18.18 38.69 32.73 57.4 2.54 3.27 7.57 3.03 9.81-.45 14.23-22.09 26.11-43.74 31.74-64.22.87-3.15 4.2-5.04 7.35-4.19 28.63 7.68 55.84 16.34 81.53 26.05 5.79 2.14 10.72-4.78 6.75-9.55z" fill="#35a700"/>
+								<g fill="#fc760a">
+								<path d="m170.4 177.17c11.28 7.56 17.88 23.04 10.3 35.26-1.17 1.91-2.55 3.85-4.85 5.97-.98.91-2.38 1.1-3.52.57-4.77-2.3-7.85-5.17-10.41-9.09-4.9-8.25-3.77-18.3.71-26.56 1.07-1.88 2.32-3.78 4.22-5.76.95-.98 2.45-1.12 3.55-.39z"/>
+								<path d="m340.2 173.04c7.97 8.56 10.97 22.08 4.93 32.32-2.56 3.92-5.64 6.79-10.41 9.09-1.21.56-2.6.3-3.52-.57-3.8-3.63-5.92-7.12-7.32-11.52-2.48-9.09 1.14-18.27 7.35-25.12 1.48-1.57 3.13-3.12 5.42-4.6 1.15-.75 2.64-.55 3.55.4z"/>
+								<path d="m95.63 223.52c11.28 7.56 17.88 23.04 10.3 35.26-1.17 1.91-2.55 3.85-4.85 5.97-.98.91-2.38 1.1-3.52.57-4.77-2.3-7.85-5.17-10.41-9.09-4.9-8.25-3.77-18.3.71-26.56 1.07-1.88 2.32-3.78 4.22-5.76.95-.98 2.45-1.12 3.55-.39z"/>
+								<path d="m164.17 325.11c11.28 7.56 17.88 23.04 10.3 35.26-1.17 1.91-2.55 3.85-4.85 5.97-.98.92-2.38 1.1-3.52.57-4.77-2.3-7.85-5.17-10.41-9.09-4.9-8.25-3.77-18.3.71-26.56 1.07-1.88 2.32-3.78 4.22-5.76.95-.98 2.45-1.12 3.55-.39z"/>
+								<path d="m407.37 223.92c7.97 8.56 10.97 22.08 4.94 32.32-2.56 3.92-5.64 6.79-10.41 9.09-1.22.56-2.6.3-3.52-.57-3.8-3.63-5.92-7.12-7.32-11.52-2.48-9.09 1.14-18.27 7.35-25.12 1.48-1.57 3.13-3.12 5.42-4.6 1.14-.75 2.63-.56 3.54.4z"/>
+								<path d="m350.21 325.5c7.97 8.56 10.97 22.08 4.93 32.32-2.56 3.92-5.64 6.79-10.41 9.09-1.22.56-2.6.3-3.52-.57-3.8-3.63-5.92-7.12-7.32-11.52-2.48-9.09 1.14-18.27 7.35-25.12 1.48-1.57 3.13-3.12 5.42-4.6 1.14-.74 2.63-.55 3.55.4z"/>
+								<path d="m257.48 414.44c9.2 7.22 14.27 20.1 9.9 31.16-1.92 4.27-4.51 7.58-8.87 10.6-1.11.74-2.53.7-3.57-.01-4.32-2.99-6.95-6.11-9.02-10.25-3.86-8.6-1.72-18.22 3.36-25.95 1.21-1.78 2.61-3.56 4.64-5.38 1.01-.93 2.51-.97 3.56-.17z"/>
+								</g>
+								<path d="m241.71 72.51-25.05-5.64c-40.99-9.23-84.23-1.41-118.7 22.63-2.62 1.83-5.17 3.73-7.64 5.71-4.47 3.57-1.87 10.77 3.85 10.73 13.99-.11 27.08.16 38.68 1.04 4.34.33 6.75 4.88 5.02 8.54.01-.01.02-.02.03-.03 13.45-18.62 83.71-23 94.39-25.47 10.67-2.47 9.42-17.51 9.42-17.51z" fill="#41c004"/>
+								<path d="m261.49 85.29c17.31 5.25 74.64-4.68 109.5 14.44l12.58-6.33c4.56-2.3 4.39-8.89-.3-10.92-.35-.15-.71-.31-1.06-.46-20.06-8.57-41.94-12.02-63.7-10.54l-52.99 3.6 6.91-43.35c1.08-6.78-3.82-13.04-10.66-13.63l-1.47-.13s3.61 7.91 1.92 17.48-13.43 45.98-.73 49.84z" fill="#339102"/>
+								<path d="m254.99 92.14c3.56-.74 22.68 12.47 17.33 54.27s-35.42 24.46-38.48 5.86 8.19-57.45 21.15-60.13z" fill="#41c004"/>
+								<ellipse cx="177.2" cy="279.87" fill="#fff" opacity=".5" rx="22.62" ry="14.39"/>
+								<ellipse cx="335.71" cy="270.26" fill="#fff" opacity=".5" rx="22.62" ry="14.39"/>
+								<path d="m246.67 332.64c-4.69 0-8.87-1.89-12.1-5.49-13.47-14.97-8.36-57.72-7.73-62.55.32-2.45 2.55-4.17 5.01-3.86 2.45.32 4.18 2.56 3.86 5.01-1.55 11.98-3.59 45.3 5.51 55.41 1.6 1.78 3.37 2.61 5.65 2.53 18.04-.42 23.21-36.56 23.43-57.85.02-2.45 2.02-4.43 4.47-4.43h.05c2.47.03 4.45 2.05 4.43 4.52-.07 6.54-.7 23.39-5.16 38.55-6.74 22.91-18.41 27.95-27.01 28.16-.13-.01-.27 0-.41 0z"/>
+								<path d="m219.3 249.75c-.31 0-.63-.03-.95-.1-2.41-.52-3.95-2.9-3.43-5.31.56-2.66 1.52-11.02-1.38-14.53-.59-.71-1.68-1.67-4.35-1.59-9.38.22-12.42 4.27-12.55 16.66-.03 2.47-2.03 4.48-4.52 4.43-2.47-.03-4.45-2.05-4.43-4.52.07-7.49.25-25.03 21.29-25.52 6-.12 9.56 2.56 11.45 4.85 6.17 7.47 3.55 20.63 3.23 22.1-.45 2.1-2.3 3.53-4.36 3.53z"/>
+								<path d="m315.68 244.98c-.31 0-.63-.03-.95-.1-2.41-.52-3.95-2.9-3.43-5.31.56-2.66 1.52-11.03-1.38-14.53-.59-.72-1.69-1.67-4.34-1.59-9.38.22-12.42 4.27-12.55 16.66-.03 2.45-2.02 4.43-4.47 4.43-.02 0-.03 0-.05 0-2.47-.03-4.45-2.05-4.43-4.52.07-7.49.25-25.03 21.29-25.52 6.05-.13 9.56 2.56 11.45 4.85 6.17 7.47 3.55 20.63 3.23 22.1-.46 2.1-2.31 3.53-4.37 3.53z"/>
+								</svg>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 아이템 미리보기 모달 끝 -->
+
+<!-- 아이템 선물하기 모달 시작 -->
+<div class="modal fade" id="error-modal" tabindex="-1" role="dialog"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document"
+		style="max-width: 500px">
+		<div class="modal-content position-relative">
+			<div class="position-absolute top-0 end-0 mt-2 me-2 z-1">
+				<button
+					class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base"
+					data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body p-0">
+				<div class="rounded-top-3 py-3 ps-4 pe-6 bg-body-tertiary">
+					<h4 class="mb-1" id="modalExampleDemoLabel">아이템 선물하기</h4>
+				</div>
+				<div class="p-4 pb-0">
+					<form>
+						<div class="mb-3">
+							<h5 style="display: inline;" id="pItemName">
+								<!-- 아이템명 -->
+							</h5>
+							<h5 style="display: inline;" id="pItemPc">
+								<!-- 아이템가격 -->
+							</h5>
+							<div id="giftFollowDiv" style="overflow: auto; height: 200px;">
+								<!-- 선물가능한 친구목록 -->
+							</div>
+						</div>
+						<div class="row g-3">
+							<div class="col-auto">
+								<label class="col-form-label" for="recipient-name">받는사람 :</label>
+							</div>
+							<div class="col-9">
+								<input id="addrse" class="form-control" id="recipient-name"
+									type="text" readonly="readonly" />
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-outline-dark me-1 mb-1" type="button"
+					data-bs-dismiss="modal">취소</button>
+				<button id="sendBtn" data-g-item-code=""
+					class="btn btn-outline-dark me-1 mb-1" type="button"
+					onclick="fSend(this);">보내기</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- 아이템 선물하기 모달 끝 -->
+
+
+<script src="<c:url value='/resources/js/app/item/itmeShop.js'/>"></script>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sns.dao.SnsLikeDAO">
+
+<select id="selectFeedLikeList" resultType="SnsLikeVO">
+	SELECT
+	    SNS_LIKE_NO
+	    ,SNS_FEED_NO
+	    ,SNS_LIKE_USER_ID
+	FROM
+	    SNS_LIKE
+</select>
+
+<insert id="insertFeedLike" parameterType="SnsLikeVO">
+	MERGE INTO SNS_LIKE
+	USING DUAL ON (SNS_FEED_NO=#{snsFeedNo} AND SNS_LIKE_USER_ID=#{snsLikeUserId})
+	WHEN MATCHED THEN 
+	UPDATE SET
+		SNS_LIKE_DELETE_AT = DECODE(SNS_LIKE_DELETE_AT, 'N', 'Y', 'N')
+	WHEN NOT MATCHED THEN
+	INSERT
+		(
+			SNS_LIKE_NO,
+			SNS_FEED_NO,
+			SNS_LIKE_USER_ID
+		)
+	VALUES
+		(
+			(SELECT MAX(SNS_LIKE_NO) + 1 FROM SNS_LIKE),
+			#{snsFeedNo},
+			#{snsLikeUserId}
+		)
+</insert>
+
+<update id="insertFeedLikeCount" parameterType="Long">
+	UPDATE SNS_FEED
+		SET SNS_LIKE_COUNT = (SELECT MAX(SNS_LIKE_COUNT) + 1 FROM SNS_FEED)
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+</update>
+
+<update id="insertFeedLikeMinus" parameterType="Long">
+	UPDATE SNS_FEED
+		SET SNS_LIKE_COUNT = (SELECT MAX(SNS_LIKE_COUNT) - 1 FROM SNS_FEED)
+		WHERE SNS_FEED_NO = #{snsFeedNo}
+</update>
+</mapper>

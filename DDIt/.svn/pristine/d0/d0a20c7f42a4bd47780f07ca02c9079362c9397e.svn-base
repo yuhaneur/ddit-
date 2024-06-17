@@ -1,0 +1,37 @@
+package kr.or.ddit.message.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/message")
+public class MessageController {
+	
+	@GetMapping("/list.do")
+	public String messageListTest() {
+		return "message/messageList";
+	}
+	
+	@GetMapping("/important.do")
+	public String messageImportantTest() {
+		return "message/messageImportant";
+	}
+	
+	@GetMapping("/del.do")
+	public String messageDelTest() {
+		return "message/messageDel";
+	}
+	
+	@GetMapping("/detail.do")
+	public String messageDetailTest() {
+		return "message/messageDetail";
+	}
+	
+	@GetMapping("/write.do")
+	public String messageInsertTest() {
+		return "message/messageWrite";
+	}
+	
+	
+}

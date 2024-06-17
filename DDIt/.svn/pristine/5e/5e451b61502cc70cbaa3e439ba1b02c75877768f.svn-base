@@ -1,0 +1,24 @@
+package kr.or.ddit.vo;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+
+@Data
+public class UsersVO {
+
+	@NotBlank 
+	@Size(max=30) 
+	private String userId;
+	
+	@NotBlank 
+	@Size(max=30) 
+	private String userPw;
+	
+	@Size(max=1) 
+	private String userUseAt;
+	
+	
+	
+}

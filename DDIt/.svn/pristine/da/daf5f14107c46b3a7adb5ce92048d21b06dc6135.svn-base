@@ -1,0 +1,29 @@
+package kr.or.ddit.item.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.ItemPresetVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class ItemPresetDAOTest extends AbstractRootContextTest{
+
+	@Autowired
+	ItemPresetDAO dao;
+	
+	@Test
+	void testSelectItemPresetList() {
+		List<ItemPresetVO> preset = dao.selectItemPresetList("A005");
+		assertNotNull(preset);
+		log.info("list : {}", preset);
+		
+		
+	}
+
+}

@@ -1,0 +1,31 @@
+/**
+ * 
+ */
+const modal = document.querySelector("#curriculumModal");
+
+
+function insertCurriBtn(){
+	modal.style.display="block";
+}
+function outModal(){
+    modal.style.display="none";
+}
+function submitCurriculum(){
+    let curriculumForm = document.forms.curriculumForm;
+    console.log("curriculumForm",curriculumForm);
+    let url = `${cPath}/subject/curriculumInsert`;
+    let method = curriculumForm.method;
+    let data = new FormData(curriculumForm);
+    console.log("data",data);
+    $.ajax({
+        url:url,
+        method:method,
+        data: JSON.stringify(data),
+        dataType:"JSON",
+        contentType:"application/json",
+        succsess: function(resp){
+            console.log(resp);
+        }
+    })
+    
+}

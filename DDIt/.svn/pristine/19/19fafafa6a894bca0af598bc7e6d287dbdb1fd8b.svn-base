@@ -1,0 +1,66 @@
+/**
+ * 
+ */
+const cPath = document.body.dataset.contextPath;
+let checkBoxs = document.querySelectorAll(".form-check-input");
+let teacherList = document.querySelector("#teacherList");
+
+let sjNo = document.querySelector("#sjNo").value;
+let edcCrseCode = document.querySelector("#edcCrseCode").value;
+console.log("sjNo",sjNo);
+console.log("edcCrseCode",edcCrseCode);
+let tId =[];
+// 선생님 추가
+function addTeacher(){
+
+  checkBoxs.forEach(function(i,v){
+    if(i.checked==true && !(i.id)){
+      let teacherId = findElement(i);
+	tId.push(teacherId);
+	console.log("tId : ", tId);
+     
+    }
+  })
+  console.log("tId",tId);
+	let sjvo =	{
+			sjNo:sjNo,
+			edcCrseCode:edcCrseCode,
+			userIds:tId
+		}
+	$.ajax({
+		url:`${cPath}/subject/detail`,
+		method:'POST',
+    contentType:"application/json",
+		data:JSON.stringify(sjvo),
+		dataType: "JSON",
+		success:function(resp){
+			console.log("resp",resp);
+		}
+	})
+}
+
+function delTeacher(delBtn){
+  let pDiv = delBtn.closest(".mb-3");
+  pDiv.remove();
+}
+
+// 요소 찾는 함수
+function findElement(i){
+  let tr = i.closest("tr");
+      let nameTag = tr.querySelector(".teacherName");
+      let teacherId = tr.querySelector(".teacherId").value;
+	  
+      return teacherId;
+}
+// 담당교사 리스트 보여주기
+//function sjManagerList(){
+//	$.ajax({
+//		url:`${cPath}/`,
+//		method:,
+//		data:,
+//		dataType:,
+//		success:function(resp){
+//			
+//		}
+//	})
+//}

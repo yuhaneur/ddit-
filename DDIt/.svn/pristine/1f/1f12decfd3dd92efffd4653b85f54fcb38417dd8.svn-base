@@ -1,0 +1,20 @@
+package kr.or.ddit.school.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/school")
+public class SchoolController {
+	
+	@GetMapping
+	public String school() {
+		return "school/studentSchoolMain";
+	}
+	
+	@GetMapping("info")
+	public String info() {
+		return "school/myInfo";
+	}
+}

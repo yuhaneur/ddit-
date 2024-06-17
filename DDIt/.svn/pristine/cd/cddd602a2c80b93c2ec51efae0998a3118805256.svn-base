@@ -1,0 +1,36 @@
+/**
+ * 
+ */
+
+let checkBoxs = document.querySelectorAll(".form-check-input");
+        let teacherList = document.querySelector("#teacherList");
+        // 선생님 추가
+        function addTeacher(){
+          checkBoxs.forEach(function(i,v){
+            if(i.checked==true && !(i.id)){
+              let name = findElement(i);
+              console.log("name",name);
+              let txt = `
+                <div class="mb-3">
+                  <span>${name}</span>
+                  <button class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="delTeacher(this)">삭제</button>
+                </div>
+                `
+              teacherList.innerHTML +=txt;
+            }
+          })
+        }
+
+        function delTeacher(delBtn){
+          let pDiv = delBtn.closest(".mb-3");
+          pDiv.remove();
+        }
+        
+        // 요소 찾는 함수
+        function findElement(i){
+          let tr = i.closest("tr");
+              console.log("tr",tr);
+              let nameTag = tr.querySelector(".teacherName");
+              let name = nameTag.innerHTML;
+              return name;
+        }

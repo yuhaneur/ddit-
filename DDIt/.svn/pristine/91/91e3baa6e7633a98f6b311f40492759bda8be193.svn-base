@@ -1,0 +1,45 @@
+package kr.or.ddit.paging;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class BootstrapPaginationRenderer implements PaginationRenderer {
+
+	@Override
+	public String renderPagination(PaginationInfo paging, String funcName) {
+		int firstPage = paging.getFirstPage();
+		int lastPage = paging.getLastPage();
+		int totalPage = paging.getTotalPage();
+		lastPage = lastPage > totalPage ? totalPage : lastPage;
+		int pageSize = paging.getPageSize();
+		int currentPage = paging.getCurrentPage();
+		
+		StringBuffer html = new StringBuffer();
+		
+		html.append(String.format("<nav aria-label='Page navigation example'><ul class='pagination'>"));
+		
+
+
+		String pattern = "<li class='page-item'><a class='page-link' href='javascript:;' onclick='%s(%d);'>%s</a></li>";
+		if(firstPage > pageSize) {
+			html.append( String.format(pattern, funcName, firstPage - pageSize, "<<") );
+		}
+		for(int page = firstPage; page <= lastPage; page++) {
+			if(page==currentPage) {
+				html.append(String.format("<li class='page-item active'><a class='page-link' href='javascript:;' onclick='%s(%d);'>%s</a></li>", funcName, page, page));
+			}else {
+				html.append( String.format(pattern, funcName, page, page) );
+			}
+		}
+		if(lastPage < totalPage) {
+			html.append( String.format(pattern, funcName, lastPage + 1, ">>") );
+		}
+		
+		html.append(String.format("</ul></nav>"));
+		
+		log.info(html.toString());
+		
+		return html.toString();
+	}
+
+}

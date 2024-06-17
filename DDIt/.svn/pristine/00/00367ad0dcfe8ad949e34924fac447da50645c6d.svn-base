@@ -1,0 +1,54 @@
+package kr.or.ddit.snsProfile.service;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.snsProfile.dao.SnsProfileDAO;
+import kr.or.ddit.vo.StudentVO;
+import kr.or.ddit.vo.TeacherVO;
+import kr.or.ddit.vo.UsersVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class SnsProfileServiceImpl implements SnsProfileService {
+	private final SnsProfileDAO snsProfileDao;
+
+	@Override
+	public UsersVO readUser(String userId) {
+		UsersVO user = snsProfileDao.selectUser(userId);
+		return user;
+	}
+
+	@Override
+	public int updateStudent(StudentVO student) {
+		int chk = 0;
+		chk = snsProfileDao.updateStudent(student);
+		if(chk > 0) {
+			return chk;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return chk;
+		}
+	}
+
+	@Override
+	public int updateTeacher(TeacherVO teacher) {
+		int chk = 0;
+		chk = snsProfileDao.updateTeacher(teacher);
+		if(chk > 0) {
+			return chk;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return chk;
+		}
+	}
+
+	@Override
+	public int validateUser(String userId) {
+		int chk = 0;
+		chk = snsProfileDao.validateUser(userId);
+		return chk;
+	}
+	
+	
+}

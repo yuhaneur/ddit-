@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.SchoolDAO">
+	<resultMap id="SjMap" type="SjVO" autoMapping="true">
+	    <id property="sjNo" column="SJ_NO"/>
+	    <id property="edcCrseCode" column="EDC_CRSE_CODE"/>
+	    <result property="sjName" column="SJ_NAME"/>
+	    <result property="edcTime" column="EDC_TIME"/>
+	    <result property="sjOrdr" column="SJ_ORDR"/>
+	
+	    <collection property="sjManagerList" ofType="SjManagerVO" autoMapping="true">
+	        <id property="sjNo" column="SJ_NO"/>
+	        <result property="userId" column="USER_ID"/>
+	        <result property="edcCrseCode" column="EDC_CRSE_CODE"/>
+	        <result property="sjDeleteAt" column="SJ_DELETE_AT"/>
+	        
+	        <association property="teacher" javaType="TeacherVO" autoMapping="true"/>
+	    </collection>
+	</resultMap>
+<!-- 	<resultMap type="SjVO" id="SjMap" autoMapping="true"> -->
+<!-- 		<id property="sjNo" column="SJ_NO"/> -->
+<!-- 		<id property="edcCrseCode" column="EDC_CRSE_CODE"/> -->
+<!-- 		<collection property="sjManagerList" javaType="SjManagerVO" autoMapping="true"> -->
+<!-- 		</collection> -->
+<!-- 	</resultMap> -->
+	<!-- 강의실 가져오기 -->
+	<select id="selectLectureRoomList" resultType="LectureRoomVO">
+		SELECT LECTURE_ROOM_NO, LECTURE_ROOM_NAME, LECTURE_ROOM_TY
+		FROM LECTURE_ROOM
+	</select>
+	
+	<!-- 교육과정에 속한 교과목 담당리스트 출력 -->
+	<select id="selectClassInteacher" parameterType="SjManagerVO" resultMap="SjMap">
+		SELECT A.SJ_NO, A.USER_ID, A.EDC_CRSE_CODE, A.SJ_DELETE_AT, 
+				B.SJ_NAME,C.TEACHER_NAME, C.TEACHER_GENDER, 
+				C.TEACHER_PHONENO, C.TEACHER_ADDRESS, C.TEACHER_MAIL
+		FROM SJ_MANAGER A INNER JOIN SJ B ON(A.SJ_NO=B.SJ_NO)
+		INNER JOIN TEACHER C ON(A.USER_ID=C.USER_ID)
+		WHERE a.edc_crse_code=b.edc_crse_code
+		AND A.EDC_CRSE_CODE = #{edcCrseCode}
+		AND A.SJ_DELETE_AT='N'
+	</select>
+	
+	<insert id="insertClass" parameterType="ClassVO">
+		<selectKey keyProperty="classCode" order="BEFORE" resultType="String">
+			SELECT 'CLA'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(CLASS_CODE,4))),0)+1,7,'0')
+			FROM CLASS
+		</selectKey>
+		INSERT INTO CLASS (
+			CLASS_CODE, CLASS_NAME, USER_ID, 
+			CLASS_CREATION_DE, CLASS_END_DE, 
+			CLASS_NMPR, EDC_CRSE_CODE, LECTURE_ROOM_NO, EDC_CRSE_ROUND
+		) VALUES (
+			#{classCode},#{className},#{userId},
+			#{classCreationDe},#{classEndDe},
+			#{classNmpr},#{edcCrseCode},#{lectureRoomNo},#{edcCrseRound}
+		)
+	</insert>
+<!-- 	<insert id="insertClassInteacher" parameterType="SjMapping"> -->
+<!-- 		<selectKey keyProperty="sjMappingCode" order="BEFORE" resultType="String"> -->
+<!-- 			SELECT 'SJT'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(SJ_MAPPING_CODE,4))),0)+1,7,'0') -->
+<!-- 			FROM sj_mapping -->
+<!-- 		</selectKey> -->
+<!-- 		INSERT INTO SJ_MAPPING( -->
+<!-- 			SJ_MAPPING_CODE, CLASS_CODE, SJ_NO, USER_ID, EDC_CRSE_CODE -->
+<!-- 		) VALUES (#{sjMappingCode},#{classCode},#{sjNo},#{userId},#{edcCrseCode}) -->
+<!-- 	</insert> -->
+</mapper>

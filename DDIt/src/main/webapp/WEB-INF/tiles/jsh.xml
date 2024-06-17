@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd" >
+<tiles-definitions>
+
+	<definition name="index" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/index.jsp" />
+	</definition>
+	<definition name="board/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/board/{1}.jsp"/>
+	</definition>
+	
+	<definition name="sns/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/sns/{1}.jsp" />	
+	</definition>
+	
+	<definition name="message/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/message/{1}.jsp" />	
+	</definition>
+	
+	<definition name="lect/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/lect/{1}.jsp" />	
+	</definition>
+	
+	<definition name="group/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/group/{1}.jsp" />	
+	</definition>
+	
+	
+</tiles-definitions>

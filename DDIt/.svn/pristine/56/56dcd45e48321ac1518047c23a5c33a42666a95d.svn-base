@@ -1,0 +1,41 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="card">
+  <div class="card-header">
+    <h4 class="text-center mb-0">설문제목</h4>
+  </div>
+  <div class="card-body bg-body-tertiary">
+    <h6>설문내용1</h6>
+    <div class="form-check form-check-inline">
+	  <input class="form-check-input" id="inlineRadio1" type="radio" name="inlineRadioOptions" value="option1" />
+	  <label class="form-check-label" for="inlineRadio1">문제의답변에맞게</label>
+	</div>
+	<div class="form-check form-check-inline">
+	  <input class="form-check-input" id="inlineRadio2" type="radio" name="inlineRadioOptions" value="option2" />
+	  <label class="form-check-label" for="inlineRadio2">문제의답변에맞게</label>
+	</div>
+    <hr class="my-3">
+    <h6>설문내용2</h6>
+    <div class="form-check form-check-inline">
+	  <input class="form-check-input" id="inlineRadio3" type="radio" name="inlineRadioOptions1" value="option3" />
+	  <label class="form-check-label" for="inlineRadio3">문제의답변에맞게</label>
+	</div>
+	<div class="form-check form-check-inline">
+	  <input class="form-check-input" id="inlineRadio4" type="radio" name="inlineRadioOptions1" value="option4" />
+	  <label class="form-check-label" for="inlineRadio4">문제의답변에맞게</label>
+	</div>
+    <hr class="my-3">
+  </div>
+  <div class="card-footer d-flex align-items-center bg-body-tertiary">
+    <h5 class="d-inline-block me-3 mb-0 fs-10">제출하시겠습니까?</h5>
+    <button class="btn btn-falcon-default btn-sm">Yes</button>
+    <button class="btn btn-falcon-default btn-sm ms-2">No</button>
+  </div>
+</div>
+    
+    
+    
+    
+    
+
+

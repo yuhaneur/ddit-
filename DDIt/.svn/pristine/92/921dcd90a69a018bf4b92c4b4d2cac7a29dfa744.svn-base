@@ -1,0 +1,39 @@
+/**
+ * 
+ */
+const modal = document.querySelector("#curriculumModal");
+
+
+function insertCurriBtn(){
+	modal.style.display="block";
+}
+function outModal(){
+    modal.style.display="none";
+}
+function submitCurriculum(){
+    let curriculumForm = document.forms.curriculumForm;
+    console.log("curriculumForm",curriculumForm);
+    let url = `${cPath}/subject/curriculumInsert`;
+    let method = curriculumForm.method;
+    let data = new FormData(curriculumForm);
+    console.log("data",data);
+    $.ajax({
+        url:url,
+        method:method,
+        data: data,
+        dataType:"JSON",
+		processData: false,
+        contentType: false,
+        success: function(resp){
+			if(resp.result=="ok"){
+	            console.log("resp : ",resp);
+				alert("등록 성공");
+				let sjNo = data.get("sjNo"); 
+                let edcCrseCode = data.get("edcCrseCode"); 
+				console.log("sjNo",sjNo);
+				console.log("edcCrseCode",edcCrseCode);
+                window.location.href = `${cPath}/subject/detail?sjNo=${sjNo}&edcCrseCode=${edcCrseCode}`;			
+			}
+        }
+    })
+}

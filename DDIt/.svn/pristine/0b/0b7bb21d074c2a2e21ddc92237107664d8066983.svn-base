@@ -1,0 +1,54 @@
+package kr.or.ddit.school.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.school.dao.SchoolDAO;
+import kr.or.ddit.vo.ClassVO;
+import kr.or.ddit.vo.LectureRoomVO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjMapping;
+import kr.or.ddit.vo.SjVO;
+
+@Service
+public class SchoolServiceImpl implements SchoolService{
+
+	@Autowired
+	private SchoolDAO dao;
+	@Override
+	public List<LectureRoomVO> selectLectureRoomList() {
+		return dao.selectLectureRoomList();
+	}
+
+	@Override
+	public List<ClassVO> selectClassList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int insertClass(ClassVO classVO) {
+		int cnt = dao.insertClass(classVO);
+		return cnt;
+	}
+
+	@Override
+	public int updateClass(ClassVO classVO) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<SjVO> selectClassInteacher(SjManagerVO sjManagerVO) {
+		return dao.selectClassInteacher(sjManagerVO);
+	}
+
+	@Override
+	public int insertClassInteacher(SjMapping sjMappingVO) {
+		int cnt = dao.insertClassInteacher(sjMappingVO);
+		return cnt;
+	}
+
+}

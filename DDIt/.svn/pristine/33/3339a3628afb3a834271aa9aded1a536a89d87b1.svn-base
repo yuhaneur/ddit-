@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd" >
+<tiles-definitions>
+
+	<definition name="index" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/index.jsp" />
+	</definition>
+	<definition name="board/*" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/board/{1}.jsp"/>
+	</definition>
+	<definition name="test" extends="parent">
+		<put-attribute name="content" value="/WEB-INF/views/test.jsp"/>
+	</definition>
+	
+	<definition name="test2" extends="parent_admin">
+		<put-attribute name="content" value="/WEB-INF/views/admin/admin_main.jsp"/>
+	</definition>
+	
+	<definition name="test3" extends="parent_apply">
+		<put-attribute name="content" value="/WEB-INF/views/apply/apply_main.jsp"/>
+	</definition>
+
+</tiles-definitions>
+
+

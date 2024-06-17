@@ -1,0 +1,52 @@
+/**
+ * 
+ */
+const cPath = document.body.dataset.contextPath;
+let hide;
+let ctgry = 1;
+	console.log(hide);
+	console.log(ctgry);
+/*카테고리별 보유 아이템 목록*/
+function itemStorage(hide, ctgry){
+	console.log(hide);
+	console.log(ctgry);
+	let ctgryDiv;
+	$.ajax({
+		url: cPath+"/preset/Storage",
+		data: {hide: hide,
+				ctgry: ctgry},
+		method: "GET",
+		dataType: "json",
+		success: function(storageList){
+			console.log(ctgry)
+			console.log(storageList[1].item.itemCtgry);
+			let storageStr = "";
+			
+			for(var i = 0; i<storageList.length; i++){
+			let storage = storageList[i];
+			ctgryDiv = document.querySelector(`#ctgry${ctgry}`);
+			console.log(ctgryDiv)
+			storageStr += `
+						<ul class="list-unstyled mb-0">
+							<li class="d-flex align-items-center fs-11 fw-medium pt-1 mb-3">
+								<p class="lh-sm mb-0 text-900">${storage.itemCode}</p>
+							</li>
+				
+						</ul>`
+						
+				ctgryDiv.innerHTML = ctgryDiv.innerHTML + storageStr;
+			}
+		}
+		
+	});
+};
+
+
+
+/*첫 실행*/
+$(function() {
+	itemStorage(hide, 1);
+	itemStorage(hide, 2);
+	itemStorage(hide, 3);
+});	
+

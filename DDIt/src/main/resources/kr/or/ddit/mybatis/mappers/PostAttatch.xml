@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.project.dao.ProjectAttatch">
+
+
+<insert id="insertAttatchList">
+	<selectKey order="BEFORE" resultType="long" keyProperty="atchFileNo">
+		
+		SELECT NVL(MAX(ATCH_FILE_NO),0)+1 FROM GR_ATCH_FILE
+	</selectKey>
+	INSERT ALL
+	<foreach collection="atchList" item="atch" index="idx">
+		INTO GR_ATCH_FILE (
+				ATCH_FILE_NO, 
+				ATCH_FILE_TURN, 
+				JOB_SE, 
+				FILE_COURS, 
+				FILE_NAME, 
+				STRE_FILE_NAME, 
+				FILE_TY, 
+				FILE_MG
+			)VALUES(
+				#{atchFileNo},
+				(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM GR_ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo}),
+				#{atch.jobSe},
+				#{atch.fileCours},
+				#{atch.fileName},
+				#{atch.streFileName},
+				#{atch.fileTy},
+				#{atch.fileMg}
+			 )
+		</foreach>
+		SELECT * FROM DUAL
+
+</insert>
+
+<sql id="atchSelectFrag">
+	ATCH_FILE_NO, 
+	ATCH_FILE_TURN, 
+	JOB_SE, FILE_COURS, 
+	FILE_NAME, 
+	STRE_FILE_NAME, 
+	FILE_TY, FILE_MG, 
+	DWLD_RTRVL, 
+	FILE_REGIST_DE, 
+	FILE_REGIST_ID, 
+	FILE_UPDT_DE, 
+	FILE_UPDT_ID, 
+	FILE_FANCYSIZE
+</sql>
+<select id="selectAttatch"  resultType="GrAtchFileVO">
+	SELECT
+	<include refid="atchSelectFrag" />
+	FROM GR_ATCH_FILE
+	WHERE ATCH_FILE_NO =#{atchFileNo} AND ATCH_FILE_TURN =#{atchFileTurn}
+</select>
+
+<update id="incrementDowncount" >
+		UPDATE GR_ATCH_FILE
+		SET
+		DWLD_RTRVL = DWLD_RTRVL+1
+		WHERE ATCH_FILE_NO = #{atchFileNo} AND ATCH_FILE_TURN =#{atchFileTurn}
+	</update>
+	
+<delete id="deleteAttatch">
+	DELETE FROM GR_ATCH_FILE
+	WHERE ATCH_FILE_NO =#{atchFileNo}  AND ATCH_FILE_TURN =#{atchFileTurn}
+	
+
+
+</delete>
+
+
+
+
+</mapper>

@@ -1,0 +1,138 @@
+/**
+ * 
+ */
+
+
+let teacherList = document.querySelector("#teacherList");
+let teacherTbody = document.querySelector("#table-contact-body")
+console.log("teacherTbody",teacherTbody);
+const cPath = document.body.dataset.contextPath;
+// 오전오후버튼 바뀌는 함수
+function monOrAt(event){
+  // <input class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="monOrAt(this)" value="오전"></input>
+  if(event.value == "오전"){
+    event.value = "오후";
+  }else{
+    event.value="오전";
+  }
+}
+// 선생님 추가
+function addTeacher(){
+  let checkBoxs = document.querySelectorAll(".form-check-input");
+  console.log("checkBoxs",checkBoxs);
+  checkBoxs.forEach(function(i,v){
+    if(i.checked==true && !(i.id)){
+      let teacherId = findElement(i);
+      $.ajax({
+
+      })
+      let txt = `
+        <div class="mb-3">
+          <span>${teacherId[0]}</span>
+          <span id="userId">${teacherId[1]}</span>
+          <button class="btn btn-falcon-default btn-sm ms-2" type="button" onclick="delTeacher(this)">삭제</button>
+          </div>
+          `
+      teacherList.innerHTML +=txt;
+    }
+  })
+}
+
+function delTeacher(delBtn){
+  let pDiv = delBtn.closest(".mb-3");
+  pDiv.remove();
+}
+
+// 요소 찾는 함수
+function findElement(i){
+  let tr = i.closest("tr");
+      let userId = tr.querySelector(".userId");
+      let teacherName = tr.querySelector(".teacherName");
+      console.log("teacherName",teacherName)
+      let info = []
+      info.push(teacherName.innerHTML);
+      info.push(userId.value);
+      console.log("info",info);
+      return info;
+}
+
+function insertClass(){
+  let edcCord = document.querySelector("#edcCord");
+  let lecName = document.querySelector("#edcName");
+  let edcRound = document.querySelector("#edcRound");
+  let classNmpr = document.querySelector("#classNmpr");
+  let classStartDay = document.querySelector("#datepicker1");
+  let classEndDay = document.querySelector("#datepicker2");
+  let span = teacherList.querySelector("#userId")
+  let userId = span.innerHTML;
+
+  let data = {
+    className: lecName.value+'호',
+    userId : userId,
+    classCreationDe : classStartDay.value,
+    classEndDe : classEndDay.value,
+    classNmpr : classNmpr.value,
+    edcCrseCode : edcCord.value,
+    lectureRoomNo : lecName.value,
+    edcCrseRound : edcRound.value
+  }
+  let url=`${cPath}/school/classInsert`
+  $.ajax({
+    url:url,
+    data:JSON.stringify(data),
+    method:'POST',
+    dataType:'JSON',
+    contentType:"application/json",
+    success: function(resp){
+      if(resp.result=="ok"){
+        alert("클래스등록 성공")
+        location.href=`${cPath}/school/classList`;
+      }else{
+        alert("클래스등록 실패!");
+      }
+    }
+  })
+  
+}
+// function changeEdcCord(checkedValue){
+//   let edcCord = checkedValue.value;
+//   let url = `${cPath}/school/teachList`
+// 	console.log(cPath);
+//   $.ajax({
+//     url:url,
+//     method:'get',
+//     data:{edcCord:edcCord},
+//     dataType:'json',
+//     success:function(resp){
+//       let teacher = resp.teachList;
+//       let txt = "";
+//       for(let i=0; i<teacher.length; i++){
+//         let tc = teacher[i].sjManagerList;
+//         console.log("tc",tc);
+//         for(let j=0; j <tc.length;j++){
+//         txt += `
+//         <tr>
+//           <td class="align-middle fs-9 py-3">
+//             <div class="form-check mb-0">
+//               <input class="form-check-input" type="checkbox"  data-bulk-select-row="data-bulk-select-row">
+//             </div>
+//           </td>
+//           <td class="align-middle name white-space-nowrap pe-5 ps-2">
+//             <div class="d-flex align-items-center gap-2 position-relative">
+//               <input type="hidden" class="userId" value=${tc[j].teacher.userId}>
+//               <input type="hidden" class="sjNo" value=${tc[j].sjNo}>
+//               <h6 class="teacherName mb-0">${tc[j].teacher.teacherName }</h6>
+//             </div>
+//           </td>
+//           <td class="align-middle phone-number font-sans-serif white-space-nowrap">${tc[j].teacher.teacherPhoneno }</td>
+//           <td class="align-middle report">${tc[j].teacher.teacherMail }</td>
+//           <td class="align-middle subscription fs-9 text-end"><small class="badge rounded badge-subtle-success">${teacher[i].sjName}</small>
+//           </td>
+//         </tr>
+//         `
+//         }
+//       }
+//       teacherTbody.innerHTML=txt;
+//     }
+//   })
+// }

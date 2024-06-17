@@ -1,0 +1,124 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!-- 설문작성 시작 -->
+<div class="card mb-3">
+   <div class="card-header">
+     <div class="row align-items-center">
+       <div class="col">
+         <h5 class="mb-0">설문통계페이지 모달</h5>
+       </div>
+       <div class="col-auto"><a class="btn btn-falcon-default btn-sm" href="#!"><svg class="svg-inline--fa fa-pencil-alt fa-w-16 fs-11 me-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="pencil-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" data-fa-i2svg=""><path fill="currentColor" d="M497.9 142.1l-46.1 46.1c-4.7 4.7-12.3 4.7-17 0l-111-111c-4.7-4.7-4.7-12.3 0-17l46.1-46.1c18.7-18.7 49.1-18.7 67.9 0l60.1 60.1c18.8 18.7 18.8 49.1 0 67.9zM284.2 99.8L21.6 362.4.4 483.9c-2.9 16.4 11.4 30.6 27.8 27.8l121.5-21.3 262.6-262.6c4.7-4.7 4.7-12.3 0-17l-111-111c-4.8-4.7-12.4-4.7-17.1 0zM124.1 339.9c-5.5-5.5-5.5-14.3 0-19.8l154-154c5.5-5.5 14.3-5.5 19.8 0s5.5 14.3 0 19.8l-154 154c-5.5 5.5-14.3 5.5-19.8 0zM88 424h48v36.3l-64.5 11.3-31.1-31.1L51.7 376H88v48z"></path></svg><!-- <span class="fas fa-pencil-alt fs-11 me-1"></span> Font Awesome fontawesome.com -->Update details</a></div>
+     </div>
+   </div>
+   <div class="card-body bg-body-tertiary border-top">
+     <div class="row">
+     <!-- 설문통계상세페이지 왼편 시작 -->
+       <div class="col-lg col-xxl-4">
+         <div class="row">
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">설문제목 :</p>
+           </div>
+           <div class="col">어렵다</div>
+         </div>
+         <div class="row">
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">등록자</p>
+           </div>
+           <div class="col">황구</div>
+         </div>
+         <div class="row">
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">설문시작일</p>
+           </div>
+           <div class="col">2019/01/12 23:13</div>
+         </div>
+         <div class="row">
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">설문마감일</p>
+           </div>
+           <div class="col">2019/01/15 00:00</div>
+         </div>
+         <div class="row">
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">전체보기</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">1번</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">2번</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">3번</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">4번</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">5번</p>
+           </div>
+           <div class="col-5 col-sm-4">
+             <p class="fw-semi-bold mb-1">6번</p>
+           </div>
+         </div>
+       </div>
+       <!-- 설문통계상세페이지 왼편 끝 -->
+       <!-- 설문통계상세페이지 오른편 시작 -->
+       <div class="col-lg col-xxl-5 mt-4 mt-lg-0 offset-xxl-1">
+			문제번호에 대한 통계       	
+       </div>
+       <!-- 설문통계상세페이지 오른편 끝 -->
+     </div>
+   </div>
+   <div class="card-footer border-top text-end">
+   <!-- 차트에다가 데이터셋으로 문제번호를 넘기고 그 문제에 대한 통계를 각각 보여준다. -->
+   	<div class="echart-pie-chart-example" style="min-height: 150px;" data-echart-responsive="true"></div>
+   </div>
+   <script src="${pageContext.request.contextPath }/resources/js/app/school/sulmoonChart.js"></script>
+</div>
+<!-- 설문작성 끝 -->
+<!-- 설문리스트 시작 -->
+<div class="card">
+  <div class="card-header d-flex">
+    <h5 class="mb-0">설문목록</h5>
+    <button class="btn btn-danger me-3" style="margin-left:800px;">완료</button>
+    <button class="btn btn-success me-3">진행중</button>
+    <button class="btn btn-primary">등록하기</button>
+  </div>
+  <div class="card-body border-top p-0">
+    <div class="row g-0 align-items-center border-bottom py-2 px-3">
+      <div class="col-md-1 pe-3"><span class="badge badge-subtle-danger rounded-pill">완료</span></div>
+      <div class="col-md mt-1 mt-md-0"><code>설문리스트1</code></div>
+      <div class="col-md-2">
+        <button class="btn btn-primary">통계보기</button>
+      </div>
+      <div class="col-md-auto">
+        <p class="mb-0">2019/02/08 02:20:23</p>
+      </div>
+    </div>
+    <div class="row g-0 align-items-center border-bottom py-2 px-3">
+      <div class="col-md-1 pe-3"><span class="badge badge-subtle-danger rounded-pill">완료</span></div>
+      <div class="col-md mt-1 mt-md-0"><code>설문리스트2</code></div>
+      <div class="col-md-2">
+        <button class="btn btn-primary">통계보기</button>
+      </div>
+      <div class="col-md-auto">
+        <p class="mb-0">2019/02/08 02:20:23</p>
+      </div>
+    </div>
+    <div class="row g-0 align-items-center border-bottom py-2 px-3">
+      <div class="col-md-1 pe-3"><span class="badge badge-subtle-success rounded-pill">진행중</span></div>
+      <div class="col-md mt-1 mt-md-0"><code>설문리스트3</code></div>
+      <div class="col-md-auto">
+        <p class="mb-0">2019/02/08 02:20:23</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-footer bg-body-tertiary p-0"><a class="btn btn-link d-block w-100" href="#!">View more logs<svg class="svg-inline--fa fa-chevron-right fa-w-10 fs-11 ms-1" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-right" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" data-fa-i2svg=""><path fill="currentColor" d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z"></path></svg><!-- <span class="fas fa-chevron-right fs-11 ms-1"></span> Font Awesome fontawesome.com --></a></div>
+</div>
+<!-- 설문리스트 끝 -->
+
+
+<!-- e차트 -->
+<script src="${pageContext.request.contextPath}/resources/public/vendors/echarts/echarts.min.js"></script>
+    

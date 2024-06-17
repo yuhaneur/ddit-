@@ -1,0 +1,49 @@
+package kr.or.ddit.sj.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.sj.dao.SjDAO;
+import kr.or.ddit.vo.SjManagerVO;
+import kr.or.ddit.vo.SjVO;
+
+@Service
+public class SjServiceImpl implements SjService{
+	
+	@Autowired
+	private SjDAO dao; 
+	@Override
+	public List<SjVO> selectSjList() {
+		return dao.selectSjList();
+	}
+
+	@Override
+	public SjVO selectSj(SjVO sjvo) {
+		return dao.selectSj(sjvo);
+	}
+
+	@Override
+	public int createSj(SjVO sjvo) {
+		return dao.insertSj(sjvo);
+	}
+
+	@Override
+	public List<SjManagerVO> selectSjManagerList(SjVO sjvo) {
+		return dao.selectSjManagerList(sjvo);
+	}
+
+	@Override
+	public int createSjManager(SjVO sjvo) {
+		List<SjManagerVO> sjManagerList =  sjvo.getSjManagerList();
+		int cnt = 0;
+		for (SjManagerVO sjManager : sjManagerList) {
+			cnt += dao.insertSjManager(sjManager);
+		}
+		return cnt;
+//		return dao.insertSjManager(sjvo);
+	}
+	
+
+}

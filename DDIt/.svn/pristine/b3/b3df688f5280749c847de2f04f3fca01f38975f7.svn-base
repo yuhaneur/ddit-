@@ -1,0 +1,103 @@
+/**
+ * 
+ */
+// 설문내용작성 폼
+	let surveyContent = document.querySelector("#surveyContent");
+	// 설문내용 추가 함수
+	function addSurvey(){
+		let rowDiv = document.createElement('div');
+		rowDiv.className= "row";
+		let text = `
+			<div class="col-8 mb-3">
+				<h5>설문내용</h5>
+				<input class="form-control" type="text">
+			</div>
+			<div class="col-2">
+			<h5>답변유형</h5>
+				<select class="form-select" name="answerType" onchange="surveyAnswer(this)">
+					<option value="usd">5지선답</option>
+					<option value="eur">예/아니요</option>
+					<option value="gbp">점수</option>
+				</select>
+			</div>
+			<div class="col-2">
+				<button class="btn btn-danger me-1 mb-1" type="button" style="margin-top:11% !important" onclick="delSurvey(this)">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus text-900 fs-6"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+				</button>
+			</div>
+	`
+		rowDiv.innerHTML = text;
+		surveyContent.appendChild(rowDiv);
+		surveyAnswer(rowDiv.querySelector("[name='answerType']"));
+	}
+	
+	// 설문지 답변유형에 따른 선택지 보여주기
+	function surveyAnswer(asnwerType){
+		let atValue = asnwerType.value;
+		let rowDiv = asnwerType.closest('.row');
+		console.log("atValue",atValue);
+		
+		let surveyAnswerDiv = rowDiv.querySelector('.surveyAnswer');
+	    if (!surveyAnswerDiv) {
+	        surveyAnswerDiv = document.createElement('div');
+	        surveyAnswerDiv.className = 'surveyAnswer col-8 mb-1 d-flex';
+	        rowDiv.appendChild(surveyAnswerDiv);
+	    }
+	    
+		let txt = "";
+		if(atValue =="usd"){
+			txt= `
+				<div style="margin-top:1%;">
+			        <span class="number" >1.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="매우그렇다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >2.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="그렇다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >3.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="보통" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >4.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="아니다" />
+				</div>
+				<div style="margin-top:1%;">
+			        <span class="number" >5.</span>
+			    </div>
+				<div class="form-check form-check-inline" style="padding-right:3%;">
+				  <input class="form-control"  type="text" name="inlineRadioOptions" value="매우아니다" />
+				</div>
+			`
+		}else if(atValue=="eur"){
+			txt = `
+			<div style="margin-top:1%;">
+		        <span class="number" >1.</span>
+		    </div>
+			<div class="form-check form-check-inline" style="padding-right:3%;">
+			  <input class="form-control"  type="text" name="inlineRadioOptions" value="예" />
+			</div>
+			<div style="margin-top:1%;">
+		        <span class="number" >2.</span>
+		    </div>
+			<div class="form-check form-check-inline" style="padding-right:3%;">
+			  <input class="form-control"  type="text" name="inlineRadioOptions" value="아니요" />
+			</div>
+			`
+		}
+		surveyAnswerDiv.innerHTML = txt;
+	}
+	// 설문 내용 삭제 함수
+	function delSurvey(delBtn){
+		let parentDiv = delBtn.closest('.row');
+		parentDiv.remove();
+	}

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.sns.dao.SnsFileDAO">
+	<resultMap type="AtchFileVO" id="atchFileMap">
+		<id property="atchFileNo" column="ATCH_FILE_NO"/>
+	</resultMap>
+	
+	<insert id="insertAtchFileList">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(SNS_FEED_NO), 0) FROM SNS_FEED
+		</selectKey>
+		INSERT ALL
+		<foreach collection="feed.atchList" item="atch" index="idx">
+			    INTO ATCH_FILE
+			    (
+			        ATCH_FILE_NO
+			        ,ATCH_FILE_TURN
+			        ,FILE_COURS
+			        ,FILE_NAME
+			        ,STRE_FILE_NAME
+			        ,FILE_TY
+			        ,FILE_MG
+			        ,FILE_FANCYSIZE
+			    )
+			    VALUES
+			    (
+			        #{atchFileNo}
+			        ,(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo})
+			        ,#{atch.fileCours}
+			        ,#{atch.fileName}
+			        ,#{atch.streFileName}
+			        ,#{atch.fileTy}
+			        ,#{atch.fileMg}
+			        ,#{atch.fileFancysize}
+			    )
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	
+	<sql id="atchSelectFlag">
+		ATCH_FILE_NO, ATCH_FILE_TURN, JOB_SE, FILE_COURS
+		,FILE_NAME, STRE_FILE_NAME, FILE_TY, FILE_MG, DWLD_RTRVL
+		,FILE_REGIST_DE, FILE_REGIST_ID, FILE_UPDT_DE, FILE_UPDT_ID
+		,FILE_FANCYSIZE
+	</sql>
+	<select id="selectAtch" resultMap="atchFileMap">
+		SELECT
+		<include refid="atchSelectFlag" />
+		FROM ATCH_FILE
+	</select>
+	
+	<update id="incrementDowncount" parameterType="int">
+		
+	</update>
+	<delete id="deleteAtches" parameterType="int">
+	
+	</delete>
+</mapper>

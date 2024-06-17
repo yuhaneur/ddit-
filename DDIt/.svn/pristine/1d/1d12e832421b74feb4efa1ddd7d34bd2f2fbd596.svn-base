@@ -1,0 +1,36 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    
+    
+<button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#tooltippopovers">테스트버튼(나중에는필요없음)</button>
+<div class="modal fade" id="tooltippopovers" tabindex="-1" aria-labelledby="tooltippopoversLabel" aria-hidden="true">
+  <div class="modal-dialog mt-6" role="document">
+    <div class="modal-content border-0">
+      <div class="position-absolute top-0 end-0 mt-2 me-2 z-1"><button class="btn-close btn btn-sm btn-circle d-flex flex-center transition-base" data-bs-dismiss="modal" aria-label="Close"></button></div>
+      <div class="modal-body p-0">
+        <div class="bg-body-tertiary rounded-top-3 py-3 ps-4 pe-6">
+          <h4 class="mb-1" id="tooltippopoversLabel">아이템미리보기</h4>
+        </div>
+        <div class="p-4 pb-0">
+          <div class="row">
+            <div class="col">
+              <img class="img-fluid rounded-top" src="${pageContext.request.contextPath}/resources/public/assets/img/products/2.jpg" alt="">
+              <p></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+

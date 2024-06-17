@@ -1,0 +1,37 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div class="card mb-3">
+  <div class="card-header">
+    <h5 class="mb-0">교과목등록</h5>
+  </div>
+  <div class="card-body bg-body-tertiary">
+    <form>
+      <div class="row gx-2">
+      	<div class="col-2">
+			<h5>교육과정명</h5>
+			<select class="form-select" name="edcName" >
+				<option value="usd">정부전자프레임워크</option>
+				<option value="eur">AI</option>
+				<option value="gbp">AWS/Docker기반 풀스탤</option>
+			</select>
+		</div>
+        <div class="col-12 mb-3">
+          <label class="form-label" for="event-name">교과목명</label>
+          <input class="form-control" id="event-name" type="text" placeholder="Event Title">
+        </div>
+        <div class="col-12 mb-3">
+          <label class="form-label" for="event-name">교육시간</label>
+          <input class="form-control" id="event-name" type="text" placeholder="Event Title">
+        </div>
+       <div class="col-12 mb-3">
+          <label class="form-label" for="event-name">교과목순서</label>
+          <input class="form-control" id="event-name" type="text" placeholder="Event Title">
+        </div>
+      </div>
+      <button class="btn btn-falcon-default me-1 mb-1" type="button">등록
+	  </button>
+      <button class="btn btn-falcon-default me-1 mb-1" type="button">취소
+	  </button>
+    </form>
+  </div>
+</div>

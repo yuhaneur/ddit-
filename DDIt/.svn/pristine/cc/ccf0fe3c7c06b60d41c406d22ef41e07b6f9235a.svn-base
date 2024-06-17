@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.project.dao.ProjectDao">
+
+
+<sql id="searchFrag">
+		<where>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)">
+				<choose>
+					<when test="simpleCondition.searchType eq 'no'">
+						INSTR(PROJECT_NO, #{simpleCondition.searchWord}) > 0
+					</when>
+					<when test="simpleCondition.searchType eq 'name'">
+						INSTR(PROJECT_NAME, #{simpleCondition.searchWord}) > 0
+					</when>
+					<otherwise>
+						INSTR(PROJECT_NO, #{simpleCondition.searchWord}) > 0
+						OR INSTR(PROJECT_NAME, #{simpleCondition.searchWord}) > 0
+					</otherwise>
+				</choose>
+			</if>
+		</where>
+	</sql>
+	<select id="selectTotalRecord" resultType="int" parameterType="kr.or.ddit.paging.PaginationInfo">
+		SELECT COUNT(*) 
+		FROM PROJECT
+		<include refid="searchFrag" />
+		
+	</select>
+	
+	
+	
+	
+<select id="selectProjectList" resultType="ProjectVO">
+	WITH ORDERED AS (
+	SELECT PROJECT_NO, PROJECT_NAME, PROJECT_CREAT_DATE, PROJECT_DUE_DATE, PROJECT_STATUS, PROJECT_DELYN, PROJECT_UPDT_DATE, PROJECT_DELETE_DATE, USER_ID, PROJECT_DELETE_PASSWORD, AUTH,PROJECT_CN
+FROM PROJECT
+<include refid="searchFrag"></include>
+    ORDER BY PROJECT.ROWID DESC
+    ), RNUMOREDERED AS(
+    	SELECT ROWNUM RNUM, ORDERED.*
+    	FROM ORDERED
+    )
+    SELECT *
+    FROM RNUMOREDERED
+    WHERE RNUM BETWEEN #{firstRecord} AND #{lastRecord}
+
+</select>
+
+ <insert id="insertProject" parameterType="ProjectVO">
+ 	<selectKey order="BEFORE" resultType="long"
+ 		keyProperty="projectNo">
+ 	SELECT PROJECT_SEQ.NEXTVAL FROM DUAL
+ 	</selectKey>
+INSERT INTO PROJECT (
+    PROJECT_NO,
+    PROJECT_NAME,
+    PROJECT_CREAT_DATE,
+    PROJECT_DUE_DATE,
+    PROJECT_STATUS,
+    PROJECT_DELYN,
+    PROJECT_UPDT_DATE,
+    PROJECT_DELETE_DATE,
+    USER_ID,
+    PROJECT_DELETE_PASSWORD,
+    AUTH,
+    PROJECT_CN
+) VALUES (
+    #{projectNo},
+    #{projectName},
+    sysdate,
+    #{projectDueDate},
+    #{projectStatus},
+    #{projectDelyn},
+    #{projectUpdtDate},
+    #{projectDeleteDate},
+    #{userId},
+    #{projectDeletePassword},
+    #{auth},
+    #{projectCn}
+)
+
+</insert> 
+
+</mapper>

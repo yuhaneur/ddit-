@@ -1,0 +1,95 @@
+package kr.or.ddit.item.controller;
+
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.item.service.ItemService;
+import kr.or.ddit.point.service.PointService;
+import kr.or.ddit.vo.FollowVO;
+import kr.or.ddit.vo.ItemGiftVO;
+import kr.or.ddit.vo.ItemLikeVO;
+import kr.or.ddit.vo.ItemPurchaseVO;
+import kr.or.ddit.vo.ItemVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/item")
+public class ItemController {
+
+	@Autowired
+	private ItemService iService;
+	@Autowired
+	private PointService pService;
+	
+	@GetMapping
+	public String item(){
+		return "item/itemShop";
+	}
+	
+	@GetMapping("/list")
+	@ResponseBody
+	public List<ItemVO> itemList(String userId) {
+		List<ItemVO> itemList = iService.readItemList("A005");
+		return itemList;
+	}
+	
+	@GetMapping("/point")
+	@ResponseBody
+	public int myPoint(String userId) {
+		int point = pService.readPoint("A005");
+		return point;
+	}
+	
+	@PostMapping(value = "/like",produces = "application/json; charset=UTF-8")
+	@ResponseBody
+	public void insertItemLike(ItemLikeVO itemLike) {
+		itemLike.setUserId("A005");
+		iService.creatItemLike(itemLike);
+		
+	}
+	
+	@PostMapping("/purchase")
+	@ResponseBody
+	public String insertItemPurchase(ItemPurchaseVO itemPurchase) throws UnsupportedEncodingException {
+		itemPurchase.setUserId("A005");
+		int res = iService.creatItemPurchase(itemPurchase);
+		if(res==1) {
+			return "success";
+		}else {
+			return "fail";
+		}
+		
+	}
+	
+	@PostMapping("/gift")
+	@ResponseBody
+	public String insertItemGift(ItemGiftVO itemGift) throws UnsupportedEncodingException {
+		itemGift.setSenderUserId("A005");
+		int res = iService.creatItemGift(itemGift);
+		if(res==1) {
+			return "success";
+		}else {
+			return "fail";
+		}
+	}
+	
+	
+	@GetMapping("/giftFollow")
+	@ResponseBody
+	public List<FollowVO> giftFollowList(String userId, String itemCode) {
+		List<FollowVO> giftFollowList = iService.readGiftFollowList("S001", itemCode);
+		log.info("list : {}", giftFollowList);
+			return giftFollowList;
+	}
+	
+	
+	
+}

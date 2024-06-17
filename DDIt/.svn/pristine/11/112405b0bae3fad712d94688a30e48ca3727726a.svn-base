@@ -1,0 +1,36 @@
+const formData = new FormData();
+const imgUp = document.querySelector(".imgUp");
+const preview = document.querySelector(".preview");
+
+imgUp.addEventListener('change', ()=> {
+	for(const file of $('.feedInsertForm input[type="file"]')[0].files) {
+		formData.append('images', file);
+
+		const reader = new FileReader();
+		reader.onload = ({target}) => {
+			preview.src = target.result;
+		};
+		reader.readAsDataURL(imgUp.files[0]);
+		console.log(file);
+		console.log(file.name);
+	}
+});
+
+$('.feedInsertBtn').click(function(event) {
+	event.preventDefault();
+	var snsFeedCn = document.querySelector('.snsFeedCn').value;	
+	formData.append('snsFeedCn', snsFeedCn); // 텍스트 데이터 추가
+	
+	// formData 값 콘솔 출력
+	for (let key of formData.keys()) {
+		console.log(key);
+	}
+	for (let value of formData.values()) {
+		console.log(value);
+	}
+	
+	// 아래에서 비동기로 처리
+	
+	// $.ajax({})
+
+})

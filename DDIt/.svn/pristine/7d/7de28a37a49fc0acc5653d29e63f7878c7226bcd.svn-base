@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.AttenceDAO">
+	<resultMap type="StudentVO" id="studentMap" autoMapping="true">
+		<association property="classVO" javaType="ClassVO" autoMapping="true"></association>
+		<collection property="attenanceList" ofType="AttenanceVO" autoMapping="true">
+			<id property="attenanceCode" column="ATTENANCE_CODE" />
+		</collection>
+	</resultMap>
+
+
+	<insert id="attenanceStudent" parameterType="AttenanceVO">
+	<!-- 출석하기 -->
+	<selectKey keyProperty="attenanceCode" resultType="String" order="BEFORE">
+		SELECT 'ATT'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ATTENANCE_CODE,4))),0)+1,7,'0')
+		FROM ATTENANCE
+	</selectKey>
+		INSERT INTO ATTENANCE
+		(ATTENANCE_CODE, ENTRANCE_TIME, CHECKOUT_TIME, USER_ID)
+		VALUES(#{attenanceCode},SYSDATE,#{checkoutTime},#{userId})
+	</insert>
+	
+	<!-- 출석중복확인 -->
+	<select id="selectAttenance" resultType="AttenanceVO">
+		SELECT ATTENANCE_CODE, ENTRANCE_TIME, CHECKOUT_TIME, USER_ID
+		FROM ATTENANCE
+		WHERE SUBSTR(ENTRANCE_TIME,1,10) = SUBSTR(SYSDATE,1,10)
+		AND USER_ID=#{userId}
+	</select>
+	
+	<!-- 퇴실하기 -->
+	<update id="updateCheckOut" parameterType="AttenanceVO">
+		UPDATE ATTENANCE SET
+		CHECKOUT_TIME = SYSDATE
+		WHERE SUBSTR(ENTRANCE_TIME,1,10) = SUBSTR(SYSDATE,1,10)
+		AND USER_ID=#{userId}
+	</update>
+	<!-- 외출하기 -->
+	<insert id="insertGoingOut" parameterType="GoingOutVO">
+	<selectKey order="BEFORE" resultType="long" keyProperty="goingoutNo">
+		SELECT NVL(MAX(GOINGOUT_NO),0)+1
+		FROM GOINGOUT
+	</selectKey>
+		INSERT INTO GOINGOUT(
+			GOINGOUT_NO, ENTRANCE_TIME, CHECKOUT_TIME, ATTENANCE_CODE
+		)
+		VALUES (#{goingoutNo},#{entranceTime},SYSDATE,#{attenanceCode})
+	</insert>
+	<!-- 외출 중복확인 -->
+	<select id="checkGoingOut" resultType="GoingOutVO">
+		SELECT GOINGOUT_NO, ENTRANCE_TIME, CHECKOUT_TIME, ATTENANCE_CODE
+		FROM GOINGOUT
+		WHERE ATTENANCE_CODE = #{attenanceCode}
+		ORDER BY GOINGOUT_NO
+	</select>
+	<!-- 복귀 처리 -->
+	<update id="updateGoingOut" parameterType="GoingOutVO">
+		UPDATE GOINGOUT SET
+		ENTRANCE_TIME = SYSDATE
+		WHERE GOINGOUT_NO=#{goingoutNo}
+	</update>
+	<!-- 학생정보에 출력될 정보들 -->
+	<select id="selectStudentInfoList" parameterType="StudentVO" resultMap="studentMap">
+		SELECT 
+		    STUDENT.USER_ID, STUDENT.STUDENT_GENDER, STUDENT.CLASS_CODE, 
+		    STUDENT.STUDENT_NAME, STUDENT.STUDENT_PHONENO, STUDENT.STUDENT_ADDRESS, 
+		    STUDENT.STUDENT_MAIL, STUDENT.STUDENT_INTRO,
+		    ATTENANCE.ATTENANCE_CODE,ATTENANCE.ENTRANCE_TIME, 
+		    ATTENANCE.CHECKOUT_TIME, ATTENANCE.USER_ID,
+	    	CLASS.CLASS_CREATION_DE,CLASS.CLASS_END_DE
+		FROM STUDENT LEFT OUTER JOIN ATTENANCE ON (STUDENT.USER_ID=ATTENANCE.USER_ID)
+		LEFT OUTER JOIN CLASS ON (STUDENT.CLASS_CODE=CLASS.CLASS_CODE)
+		WHERE STUDENT.CLASS_CODE = #{classCode}
+		and ROWNUM=1
+		AND STUDENT.USER_ID = #{userId}
+		order by ATTENANCE.ATTENANCE_CODE desc
+<!-- 		AND SUBSTR(ATTENANCE.ENTRANCE_TIME,1,10) = SUBSTR(SYSDATE,1,10) -->
+	</select>
+	
+	<!-- 학생한명에 대한 출결 리스트 -->
+	<select id="selectAttenanceList" resultType="AttenanceVO">
+		SELECT ATTENANCE_CODE, ENTRANCE_TIME, CHECKOUT_TIME, USER_ID
+		FROM ATTENANCE
+		WHERE USER_ID=#{userId}
+	</select>
+</mapper>

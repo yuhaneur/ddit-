@@ -1,0 +1,31 @@
+package kr.or.ddit.sns.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/sns")
+public class SnsController {
+	@GetMapping("/feed.do")
+	public String snsFeedTest() {
+		return "sns/snsFeed";
+	}
+	
+	@GetMapping("/profile.do")
+	public String snsProfileTest() {
+		return "sns/snsProfile";
+	}
+	
+	@GetMapping("/myProfile.do")
+	public String snsMyProfileTest() {
+		return "sns/snsMyProfile";
+	}
+	
+	@GetMapping("/friend.do")
+	public String snsFriendTest() {
+		return "sns/snsFriend";
+	}
+	
+}

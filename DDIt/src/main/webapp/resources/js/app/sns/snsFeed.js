@@ -1,0 +1,581 @@
+let feedInsertBtn = document.querySelector(".feedInsertBtn");
+let feedDeleteBtn = document.querySelector("#feedDeleteBtn");
+let profileForm = document.querySelector(".profileForm");
+let profileBtn = document.querySelector(".profileBtn");
+
+// 메인화면 프로필 정보 바로 출력 ( 학생과 교사 구분을 어떻게 ? )
+$(document).ready(function(){
+	validate();
+	ipDetail();
+});
+
+// 수정 이벤트 취소에 쓰일 전역변수.
+var feedUpdateForm;
+var feedRevertForm;
+var child = '';
+var lengths = '';
+var form = '';
+
+// 검증
+function validate() {
+	let url = `${cPath}/sns/validate`;
+	console.log("test : ", userId);
+    $.ajax({
+        url : url,
+        method : "GET",
+        data: { userId : userId },
+        dataType : "JSON",
+        contentType:"application/json",
+        success:function(resp){
+            if(resp.result=="ok"){
+                teacherProfile();
+				console.log("선생",resp);
+            }else{
+                studentProfile();
+				console.log("학생",resp);
+            }
+        }
+    })
+}
+
+// 요약 프로필 학생
+function studentProfile() {
+	let url = `${cPath}/sns/profileStudent`;
+    let profileimg = document.querySelector(".profileimg");
+	console.log("프로필사진 : ", profileimg);
+	$.ajax({
+        url : url
+        ,method : "GET"
+		,data : {userId : userId}
+        ,dataType : "JSON"
+        ,success:function(res){
+            console.log("검증완료 학생정보:", res);
+            /*profileimg.innerHTML +=
+            `
+            <img class="rounded-circle img-thumbnail shadow-sm" src="/atch/${res.atchList[0].streFileName}" alt="" style="width: 250px; height: 250px;"></img>
+            `*/
+            profileBtn.innerHTML +=
+            `
+                <input type="hidden" name="userId" value="${res.userId}">
+            `
+            profileForm.innerHTML =
+            `
+                <h4>${res.studentName}</h4>
+                <h5 class="mb-1 text-800 fs-9">학생 | 402호_전자정부프레임워크</h5>
+            `;
+        }
+    })
+}
+
+// 요약 프로필 선생
+function teacherProfile() {
+	let url = `${cPath}/sns/profileTeacher${userId}`;
+    let profileimg = document.querySelector(".profileimg");
+	$.ajax({
+        url : url
+        ,method : "GET"
+        ,dataType : "JSON"
+        ,success:function(res){
+            console.log("검증완료 교사정보:", res);
+            /*profileimg.innerHTML =
+            `
+            <img class="rounded-circle img-thumbnail shadow-sm" src="/atch/${res.atchList[0].streFileName}" alt="" style="width: 250px; height: 250px;"></img>
+            `*/
+            profileBtn.innerHTML +=
+            `
+                <input type="hidden" name="userId" value="${res.userId}">
+            `
+            profileForm.innerHTML =
+            `
+                <h4>${res.teacherName}</h4>
+                <h5 class="mb-1 text-800 fs-9">학생 | 402호_전자정부프레임워크</h5>
+            `;
+        }
+    })
+}
+
+// 피드 수정폼
+function feedUpdate(aTag, feedImg) {
+    var feedFormElement = aTag.closest(".feedForm");
+    var childElements = feedFormElement.querySelector(".imgs");
+    var imgElements = childElements.querySelectorAll('img');
+    var imgTag = '';
+    console.log("이미지 div", childElements);
+    console.log("이미지 추출", imgElements);
+
+    feedUpdateForm = aTag.closest(".feedForm");
+    feedRevertForm = aTag.closest(".feedForm");
+
+    child = feedRevertForm.children;
+	lengths = feedRevertForm.children.length;
+	
+    form = '';
+    
+	for(let i=0; i<lengths; i++) {
+		form += child[i].outerHTML;
+	}
+
+    // 수정 할 피드의 내용들.
+
+    let feedNo = aTag.dataset.num;
+    let feedCn = aTag.dataset.cn;
+    let feedUserId = aTag.dataset.userid;
+    let feedSnsde = aTag.dataset.snsde;
+    let feedTag = aTag.dataset.tag;
+    let feedProImg = aTag.dataset.pro;
+	
+    console.log("feedCn : ", feedCn);
+    if(userId == feedUserId) {
+        feedUpdateForm.innerHTML = 
+        `
+         <form class="feedUpdateForm" name="feedUpdateForm" method="put" enctype="multipart/form-data">
+            <div class="card-header bg-body-tertiary">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <div class="d-flex">
+                            <div class="avatar avatar-2xl status-online">
+                                <img class="rounded-circle" src="/atch/${feedProImg }" alt="">
+                            </div>
+                            <div class="flex-1 align-self-center ms-2">
+                                <input class="userId" type="hidden" value="${feedUserId}">
+                                <p class=" mb-1 lh-1"><a class="fw-semi-bold" href="/resources/public/pages/user/profile.html" >${feedUserId}</a></p>
+                                <input class="snsFeedCreatDe" type="hidden" value="${feedSnsde}">
+                                <p class="mb-0 fs-10" >${feedSnsde} • 학생? • <svg class="svg-size" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="globe-americas" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm82.29 357.6c-3.9 3.88-7.99 7.95-11.31 11.28-2.99 3-5.1 6.7-6.17 10.71-1.51 5.66-2.73 11.38-4.77 16.87l-17.39 46.85c-13.76 3-28 4.69-42.65 4.69v-27.38c1.69-12.62-7.64-36.26-22.63-51.25-6-6-9.37-14.14-9.37-22.63v-32.01c0-11.64-6.27-22.34-16.46-27.97-14.37-7.95-34.81-19.06-48.81-26.11-11.48-5.78-22.1-13.14-31.65-21.75l-.8-.72a114.792 114.792 0 0 1-18.06-20.74c-9.38-13.77-24.66-36.42-34.59-51.14 20.47-45.5 57.36-82.04 103.2-101.89l24.01 12.01C203.48 89.74 216 82.01 216 70.11v-11.3c7.99-1.29 16.12-2.11 24.39-2.42l28.3 28.3c6.25 6.25 6.25 16.38 0 22.63L264 112l-10.34 10.34c-3.12 3.12-3.12 8.19 0 11.31l4.69 4.69c3.12 3.12 3.12 8.19 0 11.31l-8 8a8.008 8.008 0 0 1-5.66 2.34h-8.99c-2.08 0-4.08.81-5.58 2.27l-9.92 9.65a8.008 8.008 0 0 0-1.58 9.31l15.59 31.19c2.66 5.32-1.21 11.58-7.15 11.58h-5.64c-1.93 0-3.79-.7-5.24-1.96l-9.28-8.06a16.017 16.017 0 0 0-15.55-3.1l-31.17 10.39a11.95 11.95 0 0 0-8.17 11.34c0 4.53 2.56 8.66 6.61 10.69l11.08 5.54c9.41 4.71 19.79 7.16 30.31 7.16s22.59 27.29 32 32h66.75c8.49 0 16.62 3.37 22.63 9.37l13.69 13.69a30.503 30.503 0 0 1 8.93 21.57 46.536 46.536 0 0 1-13.72 32.98zM417 274.25c-5.79-1.45-10.84-5-14.15-9.97l-17.98-26.97a23.97 23.97 0 0 1 0-26.62l19.59-29.38c2.32-3.47 5.5-6.29 9.24-8.15l12.98-6.49C440.2 193.59 448 223.87 448 256c0 8.67-.74 17.16-1.82 25.54L417 274.25z"></path></svg><!-- <span class="fas fa-globe-americas"></span> Font Awesome fontawesome.com --></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <input class="snsFeedNo" type="hidden" value="${feedNo}">
+		`;
+		
+        for (const imgs of imgElements) {
+            const src = imgs.src;
+            console.log(src);
+            feedUpdateForm.innerHTML +=
+            `
+                <div contenteditable="true">
+                    <img class="feed_img" src="${src}">
+            `
+      }
+		
+		feedUpdateForm.innerHTML +=
+		`
+            	<textarea name="snsFeedCn" class="snsFeedCn shadow-none form-control rounded-0 resize-none px-x1 border-y-0 border-200" placeholder="내용을 입력해주세요." rows="4">${feedCn}</textarea>
+				</div>
+                <!-- 해시태그 -->
+                <div class="d-flex align-items-center ps-x1 border border-200">
+                    <label class="text-nowrap mb-0 me-2" for="hash-tags">
+                        <svg class="svg-size" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg><!-- <span class="fas fa-plus me-1 fs-11"></span> Font Awesome fontawesome.com --><span class="fw-medium fs-10">해시태그</span>
+                    </label>
+                    <input name="snsTagCn" class="snsTagCn form-control border-0 fs-10 shadow-none" id="hash-tags" type="text" placeholder="#해시태그" value="${feedTag}" />
+                </div>
+                <!-- 해시태그 끝 -->
+                <div class="row g-0 justify-content-between mt-3 px-x1 pb-3">
+                    <div class="col">
+                        <button class="btn btn-tertiary btn-sm rounded-pill shadow-none d-inline-flex align-items-center fs-10 mb-0 me-1" type="button">Image</button>
+                    </div>
+                <!-- 공개여부 -->
+                    <div class="col-auto">
+                        <div class="dropdown d-inline-block me-1">
+                            <select name="snsFeedAt" class="btn btn-sm dropdown-toggle px-1" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <option value="A">전체 공개</option>
+                                <option value="B">비공개</option>
+                            </select>
+                            <button type="button" onclick="update(this)" class="btn btn-primary btn-sm px-4 px-sm-5">수 정</button>
+                            <button onclick="feedUpdateRevert(this)" class="btn btn-danger btn-sm px-4 px-sm-5">취 소</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        `
+    }else {
+		Swal.fire({
+		 	title: '본인의 피드가 아닙니다',
+   		    text: '본인이 작성한 피드가 아닙니다.',
+   		    icon: 'error'
+         })
+    }
+
+}
+
+// 피드 수정 이벤트
+function update(update) {
+	let upForm = update.closest(".feedUpdateForm");
+    // 수정 내용
+    let feedNo = document.querySelector(".snsFeedNo").value;
+	let feedUserId = document.querySelector(".userId").value;
+	let feedCn = document.querySelector(".snsFeedCn").value;
+	let feedTag = document.querySelector(".snsTagCn").value;
+    let feedSnsDe = document.querySelector(".snsFeedCreatDe").value;
+	
+	console.log("feedNo : ", feedNo);
+	console.log("feedUserId : ", feedUserId);
+	console.log("feedCn : ", feedCn);
+	console.log("feedTag : ", feedTag);
+	console.log("feedSnsDe : ", feedSnsDe);
+	
+    let url = `${cPath}/sns/feedUpdate.do`;
+    let method = "PUT"
+    let data = {
+        snsFeedNo : feedNo,
+        userId : feedUserId,
+        snsFeedCn : feedCn,
+        snsTagCn : feedTag,
+        snsFeedCreatDe : feedSnsDe
+    }
+	$.ajax({
+        url : url,
+        method : method,
+        data : JSON.stringify(data),
+        dataType : "JSON",
+        contentType:"application/json",
+        success:function(resp){
+            if(resp.result=="ok"){
+				Swal.fire({
+					title: '수정완료',
+					text: '피드 수정이 완료되었습니다.',
+					icon: 'success',
+				}).then(()=>{
+	                window.location.href = `${cPath}/sns/feedList.do`;
+				})
+            }else{
+				Swal.fire({
+				 	title: '수정실패',
+		   		    text: '피드 수정을 실패하셨습니다.',
+		   		    icon: 'error'
+		         })
+            }
+        }
+    })
+}
+
+// 피드 수정 이벤트 취소
+function feedUpdateRevert(revert) {
+    let feedUpdateRevert = revert.closest(".feedForm");
+    let child = feedUpdateRevert.children;
+
+    feedUpdateRevert.innerHTML = '';
+	feedUpdateRevert.innerHTML = `${form}`;
+}
+
+
+// 피드 삭제 이벤트
+function feedDelete(no) {
+	let feedNo = no.dataset.num;
+    let feedUserId = no.dataset.user;
+	let url = `${cPath}/sns/feedDelete.do`;
+	let method = "DELETE";
+	
+	console.log("피드 작성자 : ", feedUserId);
+	console.log("피드 삭제하려는 사용자 : ", userId);
+	
+    if(userId == feedUserId) {
+        $.ajax({
+            url : url,
+            method : method,
+            data : JSON.stringify(feedNo),
+            dataType : "JSON",
+            contentType:"application/json",
+            success:function(resp){
+                if(resp.result=="ok"){
+					Swal.fire({
+						title: '삭제완료',
+						text: '피드 삭제가 완료되었습니다.',
+						icon: 'success',
+					}).then(()=>{
+	                    window.location.href = `${cPath}/sns/feedList.do`;
+					})
+                }else{
+					Swal.fire({
+					 	title: '삭제실패',
+			   		    text: '피드 삭제 실패하셨습니다.',
+			   		    icon: 'error'
+			         })
+                }
+    
+            }
+        })
+    }else{
+		Swal.fire({
+		 	title: '본인이 작성한 피드가 아닙니다.',
+   		    text: '본인이 작성한 피드가 아닙니다.',
+   		    icon: 'error'
+         })
+    }
+}
+
+// 피드 신고
+function feedReport(feed) {
+	let url = `${cPath}/sns/feedDelete.do`;
+	let method = "DELETE";
+	let snsFeedNo = feed.dataset.num;
+    console.log("신고 피드 번호 : ", snsFeedNo);
+
+    $.ajax({
+            url : url,
+            method : method,
+            data : JSON.stringify(snsFeedNo),
+            dataType : "JSON",
+            contentType:"application/json",
+            success:function(resp){
+	            if(resp.result=="ok"){
+					Swal.fire({
+						title: '신고완료',
+						text: '피드게시물 신고가 완료되었습니다.',
+						icon: 'success',
+					}).then(()=>{
+		                window.location.href = `${cPath}/sns/feedList.do`;
+					})
+	            }else{
+					Swal.fire({
+					 	title: '신고실패',
+			   		    text: '피드게시물 신고를 실패하셨습니다.',
+			   		    icon: 'error'
+			         })
+	            }
+        	}
+    })
+}
+
+
+// 피드 좋아요 ( 야매... )
+function feedLike(feed, imgTag) {
+  let feedNo = feed.dataset.num;
+  let url = '';
+  let method = "POST";
+  let data = {
+    snsFeedNo: feedNo,
+    snsLikeUserId: userId
+  };
+
+  console.log("좋아요 피드번호 : ", feedNo);
+  console.log("좋아요 유저 아이디 : ", userId);
+  console.log("img 태그 : ", imgTag);
+
+  if (imgTag.tagName.toLowerCase() === 'img') {
+    // src 속성 업데이트
+    if (imgTag.src.includes('/like-inactive')) {
+      imgTag.src = imgTag.src.replace('/like-inactive', '/like-active');
+
+      // 좋아요 API 호출 및 성공 시 세션 저장
+      $.ajax({
+        url: `${cPath}/sns/like`,
+        method: method,
+        data: JSON.stringify(data),
+        dataType: "JSON",
+        contentType: "application/json",
+        success: function(resp) {
+          if (resp.result === "ok") {
+            // 좋아요 상태 세션 저장
+			Swal.fire({
+				title: '좋아요',
+				text: '좋아요를 눌렀습니다.',
+				icon: 'success',
+			}).then(()=>{
+	            sessionStorage.setItem(`like-${feedNo}`, 'like-active');
+			})
+
+            // 이미지 업데이트
+            if (imgTag.src.includes('/like-inactive')) {
+              imgTag.src = imgTag.src.replace('/like-inactive', '/like-active');
+            }
+          } else {
+			Swal.fire({
+			 	title: '좋아요 실패',
+	   		    text: '좋아요 실패!',
+	   		    icon: 'error'
+         	})
+          }
+        }
+      });
+    } else if (imgTag.src.includes('/like-active')) {
+      imgTag.src = imgTag.src.replace('/like-active', '/like-inactive');
+
+      // 좋아요 취소 API 호출 및 성공 시 세션 업데이트
+      $.ajax({
+        url: `${cPath}/sns/likeMinus`,
+        method: method,
+        data: JSON.stringify(data),
+        dataType: "JSON",
+        contentType: "application/json",
+        success: function(resp) {
+          if (resp.result === "ok") {
+            // 좋아요 취소 상태 세션 저장
+			Swal.fire({
+				title: '좋아요취소',
+				text: '좋아요 취소',
+				icon: 'success',
+			}).then(()=>{
+	            sessionStorage.setItem(`like-${feedNo}`, 'like-inactive');
+			})
+
+            // 이미지 업데이트
+            if (imgTag.src.includes('/like-active')) {
+              imgTag.src = imgTag.src.replace('/like-active', '/like-inactive');
+            }
+          } else {
+			Swal.fire({
+			 	title: '좋아요 취소 실패',
+	   		    text: '좋아요 취소 실패.',
+	   		    icon: 'error'
+	         })
+          }
+        }
+      });
+    }
+  }
+}
+
+
+/*프리셋 디테일 목록 */
+function ipDetail(){
+	$.ajax({
+		url: cPath+"/preset/presetDetail",
+		method: "GET",
+		dataType: "json",
+		success: function(itemPresetDetailList){
+			ipDetailOn(itemPresetDetailList)
+		}
+	});
+}
+/*프리셋 디테일 적용이미지 */
+function ipDetailOn(itemPresetDetailList){
+	let profileImg = itemPresetDetailList[0].gafile.streFileName;
+	console.log("사용자이미지명"+profileImg)
+	let presetDetailOnStr = "";
+	let itemOn = document.querySelector(".profileimg");
+	
+	let itemCtgry1 = "";
+	let itemCtgry2 = `<img class="rounded-circle profileImg rounded-circle img-thumbnail shadow-sm" src="" alt="" style="width: 250px; height: 250px;">`;
+	let itemCtgry3 = "";
+		if(itemPresetDetailList[0].item!=null){	
+			for(let i=0; i<itemPresetDetailList.length; i++){
+				let presetDetail = itemPresetDetailList[i];
+					
+					if(presetDetail.item.itemCtgry==1){
+						itemCtgry1 = `${presetDetail.item.itemEffect}`;
+					}
+					if(presetDetail.item.itemCtgry==2){
+						itemCtgry2 = `${presetDetail.item.itemEffect}`;
+					}
+					if(presetDetail.item.itemCtgry==3){
+						itemCtgry3 = `${presetDetail.item.itemEffect}`;
+					}
+			}
+		}
+		presetDetailOnStr =
+				`<div class="p-1 pb-1 pv">
+					<div class="itemDiv">
+						<div class="itemImgDiv">
+							<div class="itemCtgry1Div" style="${itemCtgry1}" >
+							</div>
+						
+							<div class="itemCtgry2Div">
+								${itemCtgry2}
+							</div>
+							
+							<div class="itemCtgry3Div" class="dynamic-div">
+								${itemCtgry3}
+							</div>
+						</div>
+					</div>
+				</div>`
+				
+		itemOn.innerHTML = presetDetailOnStr;
+		
+		/* 이미지 요소 찾아서 src 설정 */
+		const imgElement = itemOn.querySelector(".itemCtgry2Div img");
+		if (imgElement) {
+		        imgElement.src = '/atch/'+profileImg; // 사용자 이미지
+		}
+		
+		/* a태그 이벤트 삭제 */
+		const aTagElement = itemOn.querySelector(".itemCtgry2Div a");
+		if(aTagElement==null){
+			return
+		}else{
+			aTagElement.onclick = null;
+			aTagElement.removeAttribute("data-bs-toggle");
+			aTagElement.removeAttribute("data-bs-target");
+		};
+}
+
+/*프리셋 디테일 목록 */
+function ipDetail(){
+	$.ajax({
+		url: cPath+"/preset/presetDetail",
+		method: "GET",
+		dataType: "json",
+		success: function(itemPresetDetailList){
+			ipDetailOn(itemPresetDetailList)
+		}
+	});
+}
+/*프리셋 디테일 적용이미지 */
+function ipDetailOn(itemPresetDetailList){
+	let profileImg = itemPresetDetailList[0].gafile.streFileName;
+	let profileName = itemPresetDetailList[0].userName;
+	
+	let presetDetailOnStr = "";
+	let itemOn = document.querySelector(".profileimg");
+	
+	let itemCtgry1 = "";
+	let itemCtgry2 = `<img class="rounded-circle profileImg rounded-circle img-thumbnail shadow-sm" src="" alt="" style="width: 250px; height: 250px;">`;
+	let itemCtgry3 = "";
+		if(itemPresetDetailList[0].item!=null){	
+			for(let i=0; i<itemPresetDetailList.length; i++){
+				let presetDetail = itemPresetDetailList[i];
+					
+					if(presetDetail.item.itemCtgry==1){
+						itemCtgry1 = `${presetDetail.item.itemEffect}`;
+					}
+					if(presetDetail.item.itemCtgry==2){
+						itemCtgry2 = `${presetDetail.item.itemEffect}`;
+					}
+					if(presetDetail.item.itemCtgry==3){
+						itemCtgry3 = `${presetDetail.item.itemEffect}`;
+					}
+			}
+		}
+		presetDetailOnStr =
+				`<div class="p-1 pb-1 pv">
+					<div class="itemDiv">
+						<div class="itemImgDiv">
+							<div class="itemCtgry1Div" style="${itemCtgry1}" >
+							</div>
+						
+							<div class="itemCtgry2Div">
+								${itemCtgry2}
+							</div>
+							
+							<div class="itemCtgry3Div" class="dynamic-div">
+								${itemCtgry3}
+							</div>
+						</div>
+					</div>
+				</div>`
+				
+		itemOn.innerHTML = presetDetailOnStr;
+		
+		/* 이미지태그 찾아서 src 설정 */
+		const imgElement = itemOn.querySelector(".itemCtgry2Div img");
+		if (imgElement) {
+		        imgElement.src = '/atch/'+profileImg; // 사용자 이미지
+		}
+		
+		/* p태그 찾아서 이미지에 이름 출력 설정 */
+		const itemCtgry2p = itemOn.querySelector(".itemCtgry2Div p");
+		itemCtgry2p.innerText = profileName;  // 사용자 이름
+		
+		
+		/* a태그 이벤트 삭제 */
+		const aTagElement = itemOn.querySelector(".itemCtgry2Div a");
+		if(aTagElement==null){
+			return
+		}else{
+			aTagElement.onclick = null;
+			aTagElement.removeAttribute("data-bs-toggle");
+			aTagElement.removeAttribute("data-bs-target");
+		};
+}

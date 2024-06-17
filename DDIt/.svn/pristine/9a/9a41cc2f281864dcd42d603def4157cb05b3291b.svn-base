@@ -1,0 +1,102 @@
+package kr.or.ddit.school.controller;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.school.service.QustnrService;
+import kr.or.ddit.vo.CmmnCodeGrVO;
+import kr.or.ddit.vo.QustnrAnswerDetailGrVO;
+import kr.or.ddit.vo.QustnrAnswerDetailVO;
+import kr.or.ddit.vo.QustnrSelectorVO;
+import kr.or.ddit.vo.QustnrVO;
+import kr.or.ddit.vo.QustnrWrapperVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/school")
+public class QustnrController {
+
+	@Autowired
+	private QustnrService qustnrService;
+	
+	
+	// 설문 유형 코드 가져오는곳
+	@GetMapping("codeGr")
+	@ResponseBody
+	public List<QustnrAnswerDetailGrVO> selectCodeGrList(){
+		List<QustnrAnswerDetailGrVO> codeGrList= qustnrService.selectCodeGrList();
+		return codeGrList;
+	}
+	// 설문 유형 코드에맞는 목록 가져오는곳
+	@GetMapping("codeGr/{code}")
+	@ResponseBody
+	public List<QustnrAnswerDetailVO> selectCodeList(@PathVariable String code){
+		List<QustnrAnswerDetailVO> codeList =qustnrService.selectCodeList(code);
+		return codeList;
+	}
+	
+	// 설문리스트 화면
+	@GetMapping("sulmoon/{userId}/{classCode}")
+	public String sulmoon(@PathVariable String userId, @PathVariable String classCode,Model model) {
+		List<QustnrVO> qusList =  qustnrService.selectQustnrList(userId);
+		Date date = new Date();
+		List<QustnrAnswerDetailGrVO> codeGrList= qustnrService.selectCodeGrList();
+		List<QustnrSelectorVO> qustnrSelectorList = qustnrService.qustnrSelectorList(classCode);
+		model.addAttribute("codeGrList", codeGrList);
+		model.addAttribute("date", date);
+		model.addAttribute("qusList", qusList);
+		model.addAttribute("classCode", classCode);
+		model.addAttribute("qustnrSelectorList", qustnrSelectorList);
+		
+		return "school/sulmoon";
+	}
+	
+	// 설문등록화면
+	@GetMapping("sulmoonInsert")
+	public String sulmoonInsertForm(Model model) {
+		List<QustnrAnswerDetailGrVO> codeGrList= qustnrService.selectCodeGrList();
+		log.info("codeGrList 저장정보값 넘어온거: {}",codeGrList);
+		return "school/sulmoonInsert";
+	}
+	
+	// 설문저장
+	@PostMapping("sulmoon/{userId}/{classCode}")
+	public String sulmoonIsert(
+			@ModelAttribute QustnrWrapperVO qustnrWrapperVO,
+			@PathVariable String userId,
+			@PathVariable String classCode,
+			RedirectAttributes redirectAttributes
+			) {
+		int cnt = qustnrService.insertQustnrAll(qustnrWrapperVO);
+		if(cnt>0) {
+			redirectAttributes.addFlashAttribute("result", "설문저장확인");
+		}else {
+			redirectAttributes.addFlashAttribute("result", "설문저장실패");
+		}
+		
+		log.info("qustnrWrapperVO : {} ", qustnrWrapperVO);
+		return "redirect:/school/sulmoon"+"/"+userId+"/"+classCode;
+	}
+	
+	// 설문 제출 화면
+	@GetMapping("sulmoonDetail/{qusNo}")
+	@ResponseBody
+	public QustnrVO sulmoonDetail(@PathVariable long qusNo) {
+		QustnrVO qustnrVO = qustnrService.selectQustnr(qusNo);
+		log.info("설문디테일 : {}",qustnrVO);
+		return qustnrVO;
+	}
+	
+}

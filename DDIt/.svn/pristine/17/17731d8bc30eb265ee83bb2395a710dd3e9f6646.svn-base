@@ -1,0 +1,39 @@
+/**
+ * 
+ */
+
+const cPath = document.body.dataset.contextPath;
+const userId = document.querySelector("#userId").value;
+const classCode = document.querySelector("#classCode").value;
+// 과제등록모달
+let assignmentInsertModal = document.querySelector("#assignmentInsertModal");
+// 과제등록버튼
+let insertAssignmentBtnTag = document.querySelector("#insertAssignmentBtn");
+// 과제 등록 폼
+let assignmentInsertForm = document.querySelector("#assignmentInsertForm");
+
+
+console.log("assignmentInsertModal",assignmentInsertModal);
+
+function insertAssignmentBtn(){
+    assignmentInsertModal.style.display="block";
+}
+
+insertAssignmentBtnTag.addEventListener("click",function(){
+    let formData = new FormData(assignmentInsertForm);
+	console.log("formData",formData);
+    formData.append("userId",userId);
+    formData.append("classCode",classCode);
+    let url = `${cPath}/school/assignment`;
+    $.ajax({
+        url: url,
+        data: formData,
+        dataType: "json",
+        method : "post",
+        contentType:false,
+        processData: false,
+        success : function(resp){
+            console.log("resp",resp);
+        }
+    })
+})

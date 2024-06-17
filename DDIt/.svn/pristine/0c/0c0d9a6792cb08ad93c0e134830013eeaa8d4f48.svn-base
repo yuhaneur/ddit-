@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.snsFollower.dao.SnsFollowerDao">
+	<resultMap type="FollowVO" id="FollowMap">
+		<id property="followId" column="FOLLOW_ID" />
+	</resultMap>
+	
+	<sql id="searchFrag">
+		<trim prefix="and">
+			<if test="paging.simpleCondition neq null and @org.apache.commons.lang3.StringUtils@isNotBlank(paging.simpleCondition.searchWord)">
+				INSTR(F.USER_ID, #{paging.simpleCondition.searchWord}) > 0
+			</if>
+		</trim>
+	</sql>
+	
+	<select id="selectFollowerList" resultMap="FollowMap" parameterType="String">
+		WITH ORDERED AS (
+			SELECT F.USER_ID2
+			      ,F.USER_ID
+			      ,F.FOLLOW_REQUEST_DATE
+			      ,(SELECT G2.STRE_FILE_NAME
+			         FROM GR_ATCH_FILE G2
+			         WHERE G2.ATCH_FILE_NO = T.ATCH_FILE_NO
+			       ) AS TEACHER_PROFILE_IMAGE
+			      ,G.STRE_FILE_NAME AS STUDENT_PROFILE_IMAGE
+			      ,S.STUDENT_NAME
+			      ,T.TEACHER_NAME
+			FROM USERS U
+			RIGHT JOIN FOLLOW F ON (F.USER_ID2 = U.USER_ID)
+			LEFT JOIN STUDENT S ON (S.USER_ID = F.USER_ID)
+			LEFT JOIN TEACHER T ON (T.USER_ID = F.USER_ID)
+			LEFT OUTER JOIN GR_ATCH_FILE G ON(S.ATCH_FILE_NO = G.ATCH_FILE_NO)
+		WHERE U.USER_ID = 'S002'
+		AND 1=1
+		<include refid="searchFrag"></include>
+	    ORDER BY U.ROWID DESC
+	    ), RNUMOREDERED AS(
+	    	SELECT ROWNUM RNUM, ORDERED.*
+	    	FROM ORDERED
+	    )
+	    SELECT *
+	    FROM RNUMOREDERED
+	    WHERE RNUM BETWEEN #{paging.firstRecord} AND #{paging.lastRecord}
+	</select>
+	
+	<select id="selectTotalRecordFollowerList" resultType="int" parameterType="String">
+		SELECT COUNT(*) 
+			FROM USERS U 
+			RIGHT JOIN FOLLOW F ON (F.USER_ID2 = U.USER_ID)
+			WHERE U.USER_ID = 'S002'
+			AND 1=1
+		<include refid="searchFrag" />
+	</select>
+	
+</mapper>

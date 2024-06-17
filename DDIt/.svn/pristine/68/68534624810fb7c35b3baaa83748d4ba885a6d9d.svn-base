@@ -1,0 +1,12 @@
+package kr.or.ddit.school.service;
+
+import kr.or.ddit.vo.AssignmentVO;
+
+public interface AssignmentService {
+	/**
+	 * 과제등록
+	 * @param assignmentVO
+	 * @return
+	 */
+	public int insertAssignment(AssignmentVO assignmentVO);
+}

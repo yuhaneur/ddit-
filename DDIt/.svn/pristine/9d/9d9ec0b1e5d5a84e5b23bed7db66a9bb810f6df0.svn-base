@@ -1,0 +1,57 @@
+var formData = new FormData();
+const imgUp = document.querySelector(".imgUp");
+
+imgUp.addEventListener('change', ()=> {
+  const previews = document.getElementById('previews');
+	  for (const file of $('.feedInsertForm input[type="file"]')[0].files) {
+	    formData.append('snsFiles', file);
+	    const reader = new FileReader();
+	    reader.onloadend = ({ target }) => {
+	      const preview = document.createElement('img');
+	      preview.src = target.result;
+	      previews.appendChild(preview);
+	    };
+	    reader.readAsDataURL(file);
+	}
+});
+
+$('.feedInsertBtn').click(function(event) {
+	event.preventDefault();
+	let url = `${cPath}/sns/feedList.do`;
+	let snsFeedCn = document.querySelector('.snsFeedCn').value;	
+	let snsFeedAt = document.querySelector('.snsFeedAt').value;
+	let snsTagCn = document.querySelector('.snsTagCn').value;
+
+	console.log("이미지 찍히는지 체크", formData);
+
+	formData.append('userId', userId);
+	formData.append('snsFeedCn', snsFeedCn); // 텍스트 데이터 추가
+	formData.append('snsFeedAt', snsFeedAt); // 공개여부 데이터 추가
+	formData.append('snsTagCn', snsTagCn); // 해시태그 추가
+
+	let test2 = snsFeedCn;
+	console.log("변수 테스트 : ", test2);
+	
+	// formData 값 콘솔 출력
+	for (let key of formData.keys()) {
+		console.log(key);
+	}
+	for (let value of formData.values()) {
+		console.log(value);
+	}
+	
+	$.ajax({
+		url : url
+		,method : "POST"
+		,contentType : false
+		,processData : false
+		,caches : false // 선택사항
+		,dataType : "JSON"
+		,data : formData
+		,success:function(res) {
+			alert("테스트 성공");
+			console.log(res);
+			// window.location.href = `${cPath}/sns/feedList.do`;
+		}
+	})
+})

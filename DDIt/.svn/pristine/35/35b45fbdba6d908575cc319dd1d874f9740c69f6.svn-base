@@ -1,0 +1,63 @@
+package kr.or.ddit.sns.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.sns.dao.SnsDAO;
+import kr.or.ddit.vo.SnsAnswerVO;
+import kr.or.ddit.vo.SnsFeedVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class SnsServiceImpl implements SnsService{
+	private final SnsDAO snsDao;
+	
+	@Override
+	public List<SnsFeedVO> readFeedList() {
+		List<SnsFeedVO> feedList = snsDao.selectFeedList();
+		return feedList;
+	}
+	
+	@Override
+	public List<SnsAnswerVO> readAnswerList(int snsFeedNo) {
+		List<SnsAnswerVO> answerList = snsDao.selectAnswerList(snsFeedNo);
+		return answerList;
+	}
+	
+	@Override
+	public int createFeed(SnsFeedVO feedVo) {
+		int chk = 0;
+		chk = snsDao.insertFeed(feedVo);
+		if(chk > 0) {
+			return chk;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return chk;
+		}
+	}
+
+	@Override
+	public int deleteFeed(Long snsFeedNo) {
+		int chk = 0;
+		int chk2 = 0;
+		int result = 1;
+		chk = snsDao.deleteFeed(snsFeedNo);
+		chk2 = snsDao.deleteHashTag(snsFeedNo);
+		if(chk > 0 && chk2 > 0) {
+			return result + 1;
+		}else {
+			// 인셉션 처리 들어갈 자리.
+			return result;
+		}
+	}
+
+	@Override
+	public int updateFeed(SnsFeedVO feedVo) {
+		int chk = 0;
+		chk = snsDao.updateFeed(feedVo);
+		snsDao.updateHashTag(feedVo);
+		return chk;
+	}
+}

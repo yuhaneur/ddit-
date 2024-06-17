@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.SchoolDAO">
+	
+	<resultMap type="ClassVO" id="classMap" autoMapping="true">
+		<id property="classCode" column="CLASS_CODE"/>
+		<association property="edcCrse" javaType="EdcCrseVO" autoMapping="true">
+			<id column="edc_crse_code" property="edcCrseCode" />
+			<collection property="sjList" ofType="SjVO" autoMapping="true">
+				<collection property="sjManagerList" ofType="SjMapping" >
+					<association property="teacher" javaType="TeacherVO">
+							<result column="SJ_TEACHER" property="teacherName"/>
+							<result column="TEACHER_ID" property="userId"/>
+					</association>
+				</collection>
+			</collection>
+		</association>
+		<association property="teacher" javaType="TeacherVO" autoMapping="true"></association>
+	</resultMap>
+	
+	<resultMap type="SjVO" id="SjMap" autoMapping="true">
+		<id property="sjNo" column="SJ_NO"/>
+		<id property="edcCrseCode" column="EDC_CRSE_CODE"/>
+		<collection property="sjManagerList" ofType="SjManagerVO" autoMapping="true">
+		<association property="teacher" javaType="TeacherVO" autoMapping="true"></association>
+		</collection>
+	</resultMap>
+	
+	<resultMap type="SjMapping" id="sjMappingMap" autoMapping="true">
+		<association property="sjManager" javaType="SjManagerVO" autoMapping="true"></association>
+	</resultMap>
+	<resultMap type="SjMapping" id="sjMappingSjMap" autoMapping="true">
+		<association property="sjVO" javaType="SjVO" autoMapping="true"></association>
+	</resultMap>
+	
+	<!-- 강의실 가져오기 -->
+	<select id="selectLectureRoomList" resultType="LectureRoomVO">
+		SELECT LECTURE_ROOM_NO, LECTURE_ROOM_NAME, LECTURE_ROOM_TY
+		FROM LECTURE_ROOM
+	</select>
+	<!-- 클래스 전체 목록 가져오기 -->
+	<select id="selectClassList" resultMap="classMap">
+		SELECT 
+		    CLASS_CODE, CLASS_NAME, A.USER_ID, 
+		    CLASS_CREATION_DE, CLASS_END_DE, CLASS_NMPR, 
+		    A.EDC_CRSE_CODE, LECTURE_ROOM_NO, EDC_CRSE_ROUND,
+		    B.EDC_CRSE_NAME,C.TEACHER_NAME
+		FROM CLASS A LEFT JOIN EDC_CRSE B ON(A.EDC_CRSE_CODE=B.EDC_CRSE_CODE)
+		LEFT JOIN TEACHER C ON (A.USER_ID= C.USER_ID)
+		order by CLASS_CREATION_DE desc
+	</select>
+	<!-- 클래스 단건 조회 -->
+	<!-- TEACHER.USER_ID AS TEACHER_ID / E.TEACHER_ID 학생 상담화면 때문에 추가함 RESULT MAP 에도
+	RESULT 추가함
+	 -->
+	<select id="selectClass" parameterType="String" resultMap="classMap">
+		WITH DUDU AS (
+		    SELECT 
+		        SJ_MAPPING.SJ_MAPPING_CODE, SJ_MAPPING.CLASS_CODE AS CLASS_CODE,
+		        SJ_MANAGER.SJ_NO AS SJ_NO, SJ_MANAGER.USER_ID, 
+		        SJ_MANAGER.EDC_CRSE_CODE, SJ_MANAGER.SJ_DELETE_AT, TEACHER.TEACHER_NAME,TEACHER.USER_ID AS TEACHER_ID
+		    FROM SJ_MAPPING INNER JOIN SJ_MANAGER ON(SJ_MAPPING.USER_ID=SJ_MANAGER.USER_ID) 
+		        INNER JOIN TEACHER  ON(SJ_MAPPING.USER_ID=TEACHER.USER_ID) 
+		    WHERE SJ_MAPPING.EDC_CRSE_CODE=SJ_MANAGER.EDC_CRSE_CODE AND SJ_MAPPING.SJ_NO=SJ_MANAGER.SJ_NO 
+		    AND SJ_MAPPING.CLASS_CODE=#{classCode}
+		)
+		SELECT DISTINCT
+		    A.CLASS_CODE, A.CLASS_NAME,D.TEACHER_NAME, D.TEACHER_PHONENO, 
+		    D.TEACHER_MAIL,D.USER_ID, A.USER_ID, A.CLASS_CREATION_DE, 
+		    A.CLASS_END_DE, A.CLASS_NMPR, A.EDC_CRSE_CODE, A.LECTURE_ROOM_NO, 
+		    A.EDC_CRSE_ROUND, B.EDC_CRSE_CODE,B.EDC_CRSE_NAME,C.SJ_NAME, 
+		    C.SJ_ORDR,C.SJ_NO,C.EDC_CRSE_CODE, 
+		    NVL(E.TEACHER_NAME, NULL) AS SJ_TEACHER, E.TEACHER_ID
+		FROM CLASS A LEFT JOIN EDC_CRSE B ON (A.EDC_CRSE_CODE=B.EDC_CRSE_CODE) 
+		    INNER JOIN SJ C ON(C.EDC_CRSE_CODE=B.EDC_CRSE_CODE) 
+		    INNER JOIN TEACHER D ON(A.USER_ID=D.USER_ID)
+		    LEFT JOIN DUDU E ON(C.SJ_NO = E.SJ_NO)
+		WHERE A.CLASS_CODE=#{classCode}
+		ORDER BY C.SJ_ORDR
+	</select>
+	<!--클래스에 속한 담당교사 리스트  -->
+	 <select id="selectSjTeacherList" parameterType="String" resultMap="sjMappingMap">
+	 	SELECT
+		    A.SJ_MAPPING_CODE, A.CLASS_CODE, A.SJ_NO, A.USER_ID, A.EDC_CRSE_CODE,
+		    B.SJ_NO, B.USER_ID, B.EDC_CRSE_CODE, B.SJ_DELETE_AT,
+		    C.TEACHER_NAME
+		FROM SJ_MAPPING A LEFT JOIN SJ_MANAGER B ON(A.USER_ID=B.USER_ID)
+		LEFT JOIN TEACHER C ON(A.USER_ID=C.USER_ID)
+		WHERE A.EDC_CRSE_CODE=B.EDC_CRSE_CODE
+		AND A.SJ_NO=B.SJ_NO
+		AND a.class_code=#{classCode}
+	 </select>
+	<!-- 교육과정에 속한 교과목 담당리스트 출력 -->
+	<select id="selectClassInteacher" parameterType="SjManagerVO" resultMap="SjMap">
+		SELECT A.SJ_NO, A.USER_ID, A.EDC_CRSE_CODE, A.SJ_DELETE_AT, 
+				B.SJ_NAME,C.TEACHER_NAME, C.TEACHER_GENDER, 
+				C.TEACHER_PHONENO, C.TEACHER_ADDRESS, C.TEACHER_MAIL
+		FROM SJ_MANAGER A INNER JOIN SJ B ON(A.SJ_NO=B.SJ_NO)
+		INNER JOIN TEACHER C ON(A.USER_ID=C.USER_ID)
+		WHERE a.edc_crse_code=b.edc_crse_code
+		AND A.EDC_CRSE_CODE = #{edcCrseCode}
+		AND B.SJ_NO=#{sjNo}
+		AND A.SJ_DELETE_AT='N'
+	</select>
+	<!-- 클래스 등록 -->
+	<insert id="insertClass" parameterType="ClassVO">
+		<selectKey keyProperty="classCode" order="BEFORE" resultType="String">
+			SELECT 'CLA'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(CLASS_CODE,4))),0)+1,7,'0')
+			FROM CLASS
+		</selectKey>
+		INSERT INTO CLASS (
+			CLASS_CODE, CLASS_NAME, USER_ID, 
+			CLASS_CREATION_DE, CLASS_END_DE, 
+			CLASS_NMPR, EDC_CRSE_CODE, LECTURE_ROOM_NO, EDC_CRSE_ROUND
+		) VALUES (
+			#{classCode},#{className},#{userId},
+			#{classCreationDe},#{classEndDe},
+			#{classNmpr},#{edcCrseCode},#{lectureRoomNo},
+			(SELECT NVL(MAX(EDC_CRSE_ROUND),0)+1
+			FROM CLASS
+			WHERE EDC_CRSE_CODE=#{edcCrseCode})
+		)
+	</insert>
+	<!-- 클래스에 교과목 교사 등록 -->
+	<insert id="insertClassInteacher" parameterType="SjMapping" >
+		<selectKey keyProperty="sjMappingCode" order="BEFORE" resultType="String">
+			SELECT 'SJT'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(SJ_MAPPING_CODE,4))),0)+1,7,'0')
+			FROM sj_mapping
+		</selectKey>
+		INSERT INTO SJ_MAPPING(
+			SJ_MAPPING_CODE, CLASS_CODE, SJ_NO, USER_ID, EDC_CRSE_CODE
+		) VALUES (#{sjMappingCode},#{classCode},#{sjNo},#{userId},#{edcCrseCode})
+	</insert>
+	<insert id="insertClassAllocation" parameterType="ClassAllocationVO">
+		INSERT INTO CLASS_ALLOCATION(MN_OR_AT, SJ_MAPPING_CODE)
+		VALUES (#{mnOrAt},#{sjMappingCode}) 
+	</insert>
+	<!-- 시간표등록 -->
+	<insert id="insertSchedule" parameterType="ScheduleVO">
+		<selectKey keyProperty="sceduleNo" order="BEFORE" resultType="Long">
+			SELECT NVL(MAX(SCEDULE_NO),0)+1 FROM SCHEDULE
+		</selectKey>
+		INSERT INTO SCHEDULE (
+			SCEDULE_NO, CLASS_CODE, START_DATE, 
+			END_DATE, SJ_NAME, SJ_ORDR,
+			 EDC_TIME, USER_ID, MN_OR_AT, SJ_NO,TEACHER_NAME
+		)VALUES(
+			#{sceduleNo},#{classCode},#{startDate},
+			#{endDate},#{sjName},#{sjOrdr},
+			#{edcTime},#{userId},#{mnOrAt},#{sjNo},#{teacherName}
+		)
+	</insert>
+	
+	<update id="updateSchedule" parameterType="ScheduleVO">
+		UPDATE SCHEDULE SET
+		USER_ID = #{userId},
+		TEACHER_NAME = #{teacherName}
+		WHERE SJ_NO = #{sjNo}
+		AND CLASS_CODE =#{classCode}
+	</update>
+	
+	<!-- 시간표 만들기위한 정보조회 -->
+	<select id="scheduleInfo" parameterType="String" resultMap="classMap">
+		WITH DUDU AS 
+		(
+		    SELECT 
+		        SJ_MAPPING.SJ_MAPPING_CODE, SJ_MAPPING.CLASS_CODE AS CLASS_CODE,
+		        SJ_MANAGER.SJ_NO AS SJ_NO, 
+		        TEACHER.TEACHER_NAME
+		    FROM SJ_MAPPING INNER JOIN SJ_MANAGER ON(SJ_MAPPING.USER_ID=SJ_MANAGER.USER_ID) 
+		        INNER JOIN TEACHER  ON(SJ_MAPPING.USER_ID=TEACHER.USER_ID) 
+		    WHERE SJ_MAPPING.EDC_CRSE_CODE=SJ_MANAGER.EDC_CRSE_CODE AND SJ_MAPPING.SJ_NO=SJ_MANAGER.SJ_NO 
+		    AND SJ_MAPPING.CLASS_CODE=#{classCode}
+		)
+		    SELECT DISTINCT
+		        A.CLASS_CODE,A.CLASS_CREATION_DE, A.CLASS_END_DE, A.EDC_CRSE_CODE,
+		        C.SJ_NAME,C.SJ_ORDR,C.SJ_NO,C.EDC_TIME,
+		        CLASS_ALLOCATION.MN_OR_AT,NVL(E.TEACHER_NAME, NULL) AS SJ_TEACHER
+		    FROM CLASS A LEFT JOIN EDC_CRSE B ON (A.EDC_CRSE_CODE=B.EDC_CRSE_CODE) 
+		        INNER JOIN SJ C ON(C.EDC_CRSE_CODE=B.EDC_CRSE_CODE) 
+		        INNER JOIN TEACHER D ON(A.USER_ID=D.USER_ID)
+		        LEFT JOIN DUDU E ON(C.SJ_NO = E.SJ_NO)
+		        LEFT JOIN CLASS_ALLOCATION ON(CLASS_ALLOCATION.SJ_MAPPING_CODE=E.SJ_MAPPING_CODE)
+		    WHERE A.CLASS_CODE=#{classCode}
+		    ORDER BY C.SJ_ORDR
+	</select>
+	
+	
+	<!-- 시간표 출력 -->
+	<select id="selectScheduleList" parameterType="String" resultType="ScheduleVO">
+		SELECT 
+			SCEDULE_NO, CLASS_CODE, START_DATE, END_DATE, 
+			SJ_NAME, SJ_ORDR, EDC_TIME, USER_ID, MN_OR_AT, SJ_NO,TEACHER_NAME
+		FROM SCHEDULE
+		WHERE CLASS_CODE=#{classCode}
+	</select>
+	<!-- 휴일제외한 날짜들 조회하기 -->
+	<select id="selectNoHolidayList" resultType="CalendarVO">
+		SELECT DATEVALUE
+      	FROM CALENDAR
+      	WHERE DATEVALUE BETWEEN TO_DATE(#{startDate},'YYYY-MM-DD') AND TO_DATE(#{endDate},'YYYY-MM-DD')
+      	<![CDATA[
+        AND NVL(HOLIDAY,0)<>1
+        AND  (DAYOFWEEK<>1 AND DAYOFWEEK<>7)
+      	ORDER BY DATEVALUE
+      	]]>
+	</select>
+	
+	<!-- 클래스에 속한 과목리스트 -->
+	<select id="selectClassInSubjectList" resultMap="sjMappingSjMap">
+		SELECT SJ_MAPPING_CODE, CLASS_CODE, A.SJ_NO, USER_ID, A.EDC_CRSE_CODE, B.SJ_NAME,B.SJ_ORDR
+		FROM SJ_MAPPING A INNER JOIN SJ B ON(A.SJ_NO=B.SJ_NO)
+		WHERE A.EDC_CRSE_CODE=B.EDC_CRSE_CODE
+		AND A.CLASS_CODE=#{classCode}
+		ORDER BY B.SJ_ORDR
+	</select>
+	
+	<!-- 수업 파일 가져오기 -->
+	<select id="selectFileList" resultType="GrAtchFileVO">
+		SELECT ATCH_FILE_NO, ATCH_FILE_TURN, JOB_SE, FILE_COURS, FILE_NAME, STRE_FILE_NAME, FILE_TY, FILE_MG
+		FROM GR_ATCH_FILE
+		WHERE ATCH_FILE_NO=#{fileNo}
+	</select>
+</mapper>

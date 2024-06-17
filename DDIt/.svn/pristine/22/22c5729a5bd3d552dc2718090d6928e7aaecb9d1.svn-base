@@ -1,0 +1,256 @@
+package kr.or.ddit.project.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.function.Failable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.exception.ProjectException;
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.project.controller.advice.BoardException;
+import kr.or.ddit.project.dao.ProjectAttatch;
+import kr.or.ddit.project.dao.ProjectDao;
+import kr.or.ddit.vo.CmmnCodeVO;
+import kr.or.ddit.vo.GrAtchFileVO;
+import kr.or.ddit.vo.ProjectPostVO;
+import kr.or.ddit.vo.ProjectStudentMappingVO;
+import kr.or.ddit.vo.ProjectVO;
+import kr.or.ddit.vo.UsersVO;
+import kr.or.ddit.vo.WorkVO;
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
+@Service
+
+public class ProjectServiceImpl implements ProjectService{
+		@Autowired
+		private ProjectAttatch atcdao;
+	
+		@Autowired
+		private ProjectDao dao;
+		
+		 @Value("#{appInfo.atchSavePath}")
+		 private File saveFolder; // AppInfo 설정 및 properties 파읿 빈 등록(root-context.xml)
+		 
+		 @PostConstruct // 라이프 사이클 콜백
+		   public void init() throws IOException {
+		      if(!saveFolder.exists()) saveFolder.mkdirs();
+		   }
+		 
+		 @SuppressWarnings("unused")
+		private void saveAttatchList(ProjectPostVO projectPostVO) {
+		      try {
+		         List<GrAtchFileVO> atchList = projectPostVO.getAtchList();
+		            Optional.ofNullable(atchList)
+		            .filter(l->!l.isEmpty())
+		            .ifPresent(pl->{
+		               atcdao.insertAttatchList(projectPostVO);
+		               pl.forEach(Failable.asConsumer((p)->p.saveToFolder(saveFolder)));
+		            });
+		      }catch (Exception e) {
+		         throw new BoardException(e);
+		      }
+		   }
+	
+		
+
+		@Override
+		public int createProject(ProjectVO projectVO) {
+			int cnt = dao.insertProject(projectVO);
+			if(cnt>0)return cnt;
+			return cnt;
+		}
+
+		@Override
+		public List<ProjectVO> retrieveProjectList(PaginationInfo paging) {
+			int totalRecord = dao.selectTotalRecordProject(paging);
+			paging.setTotalRecord(totalRecord);
+			List<ProjectVO> project = dao.selectProjectList(paging);
+			
+			return project;
+		}
+
+		@Override
+		public ProjectVO readProject(int projectNo) {
+			ProjectVO project =Optional.ofNullable(dao.readProject(projectNo))
+					.orElseThrow(()->new ProjectException(String.format("%d 번 프로젝트 없음",projectNo)));
+				
+			return project;
+		}
+
+		@Override
+		public List<ProjectVO> projectList() {
+			List<ProjectVO> project = dao.projectList();
+			return project;
+		}
+
+		@Override
+		public List<WorkVO> retrieveWorkList(PaginationInfo paging, int projectNo) {
+			int totalRecord = dao.selectTotalRecordWork(paging, projectNo);
+			paging.setTotalRecord(totalRecord);
+			List<WorkVO> work = dao.selectWokrList(paging, projectNo);
+			return work;
+		}
+
+		@Override
+		public int createWork(WorkVO workVO) {
+			int cnt = dao.insertWork(workVO);
+			if(cnt>0)return cnt;
+			return cnt;
+		
+		}
+
+		@Override
+		public List<WorkVO> workList() {
+			List<WorkVO> work = dao.workList();
+			
+			return work;
+		}
+
+		@Override
+		public List<UsersVO> retrieveUserList(PaginationInfo paging, int projectNo) {
+			int totalRecord = dao.selectTotalRecordTeam(paging,projectNo);
+			paging.setTotalRecord(totalRecord);
+			List<UsersVO> user = dao.selectTeamList(paging,projectNo);
+			
+			return user;
+		}
+
+		@Override
+		public List<UsersVO> userList() {
+			List<UsersVO> user = dao.TeamList();
+			return user;
+		}
+
+		@Override
+		public List<CmmnCodeVO> CmmnCodeList() {
+			List<CmmnCodeVO> code = dao.CmmnCodeList();
+			log.info("codeList==>>>>>>>>>>>> {}", code);
+			return code;
+		}
+
+		@Override
+		public int insertTeam(ProjectStudentMappingVO projectStudentMappingVO) {
+			int cnt = dao.insertTeam(projectStudentMappingVO);
+			if(cnt>0)return cnt;
+			return cnt;
+		}
+
+		@Override
+		public int updateTeam(ProjectStudentMappingVO projectStudentMappingVO) {
+			int cnt = dao.updateTeam(projectStudentMappingVO);
+			if(cnt>0) return cnt;
+			return cnt;
+		}
+
+		@Override
+		public int deleteTeam(ProjectStudentMappingVO projectStudentMappingVO) {
+			
+			return dao.deleteTeam(projectStudentMappingVO);
+		}
+
+		@Override
+		public List<ProjectStudentMappingVO> myTeamList(PaginationInfo paging, int projectNo) {
+			int totalRecord = dao.selectTotalRecordMyTeam(paging, projectNo);
+			List<ProjectStudentMappingVO> myTeam =dao.MyTeamList(paging, projectNo);
+			paging.setTotalRecord(totalRecord);
+			
+			return myTeam;
+		}
+
+		@Override
+		public int insertPost(ProjectPostVO projectPostVO) {
+			saveAttatchList(projectPostVO);
+			int cnt = dao.insertPost(projectPostVO);
+			if(cnt>0) {
+				//파일저장
+			}
+			return cnt;
+		}
+
+		@Override
+		public int updatePost(ProjectPostVO projectPostVO) {
+			int cnt = dao.insertPost(projectPostVO);
+			if(cnt>0)return cnt;
+			return cnt;
+			
+		}
+
+		@Override
+		public int deletePost(ProjectPostVO projectPostVO) {
+			int cnt = dao.insertPost(projectPostVO);
+			if(cnt>0)return cnt;
+			return cnt;
+		}
+
+		@Override
+		public List<ProjectPostVO> selectPostList(PaginationInfo paging, int projectNo) {
+			int totalRecord = dao.selectTotalRecordPost(paging, projectNo);
+			List<ProjectPostVO> Post  = dao.selectPostList(paging, projectNo);
+			paging.setTotalRecord(totalRecord);
+			return Post;
+		}
+
+		@Override
+		public int updateCount(int projectPostNo) {
+			int cnt = dao.updateCount(projectPostNo);
+			if(cnt>0)return cnt;
+			
+			return cnt;
+		}
+		
+		/**
+		 * 파일검증
+		 */
+		@SuppressWarnings("unused")
+		private GrAtchFileVO validateAttatch(int atchFileNo) {
+			GrAtchFileVO atch = Optional.ofNullable(atcdao.selectAttatch(atchFileNo))
+					.orElseThrow(()->
+					new BoardException(String.format("%d 해당 파일의 메타 정보가 없음.", atchFileNo)));
+			 		File atchFile = new File(saveFolder, atch.getFileCours());
+			 		if(!atchFile.exists()) {
+			 			throw new BoardException(String.format("%s 해당 파일이 없음.", atchFile.getAbsolutePath()));
+			 		}
+			 		atch.setBinary(new FileSystemResource(atchFile));
+			 		return atch;
+		}
+		
+		/**
+		 * 파일읽기
+		 */
+		@Override
+		public GrAtchFileVO selectAttatch(int atchFileNo) {
+			GrAtchFileVO atch = validateAttatch(atchFileNo);
+			atcdao.selectAttatch(atchFileNo);
+			return atch;
+		}
+
+		@Override
+		public void deleteAttatch(int atchFileNo) {
+			GrAtchFileVO atch = validateAttatch(atchFileNo);
+			atcdao.deleteAttatch(atchFileNo);
+			try {
+				FileUtils.deleteQuietly(atch.getBinary().getFile());
+			}catch(IOException e) {
+				throw new BoardException(e);
+			}
+			
+		}
+
+		@Override
+		public ProjectPostVO readPost(int projectPostNo) {
+				ProjectPostVO post =Optional.ofNullable(dao.readPost(projectPostNo))
+						.orElseThrow(()->new ProjectException(String.format("%d 번 프로젝트 없음",projectPostNo)));
+				return post;
+		}
+		
+		
+}

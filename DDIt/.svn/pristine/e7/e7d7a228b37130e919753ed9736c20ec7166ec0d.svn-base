@@ -1,0 +1,38 @@
+package kr.or.ddit.message.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.message.dao.MessageDAO;
+import kr.or.ddit.vo.MessageVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class MessageServiceImpl implements MessageService{
+	private final MessageDAO mDao;
+	
+	@Override
+	public List<MessageVO> readMessageList() {
+		List<MessageVO> list = mDao.selectMessageList();
+		return list;
+	}
+
+	@Override
+	public MessageVO readMessage() {
+		MessageVO message = mDao.selectMessage();
+		return message;
+	}
+
+	@Override
+	public int createMessage() {
+		return 0;
+	}
+
+	@Override
+	public int deleteMessage() {
+		return 0;
+	}
+	
+}

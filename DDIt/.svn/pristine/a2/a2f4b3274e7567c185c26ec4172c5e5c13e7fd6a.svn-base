@@ -1,0 +1,154 @@
+/**
+ * 
+ */
+
+const cPath = document.body.dataset.contextPath;
+const userId = document.querySelector("#userId").value;
+const classCode = document.querySelector("#classCode").value;
+
+// 과제디테일 모달
+const assignmentDetailModal = document.querySelector("#assignmentDetailModal");
+console.log("assignmentInsertModal",assignmentInsertModal);
+// 과제 제출 모달 
+const submitAssignmentModal = document.querySelector("#submitAssignmentModal");
+// 과제 제출 폼
+const submitForm = document.querySelector("#submitForm");
+// 과제 제출버튼
+const submitBtn = document.querySelector("#submitBtn");
+
+// 과제하나 눌렀을때
+function assignmentDetail(assignmentBtn){
+    let assignmentCode = assignmentBtn.dataset.assignmentCode;
+    console.log("assignmentCode",assignmentCode);
+    let url =`${cPath}/school/assignment/${assignmentCode}`;
+    $.ajax({
+        url:url,
+        dataType:"json",
+        success:function(resp){
+            console.log("resp",resp);
+            let month = resp.assignmentVO.assignmentCreatDe.substring(3,5);
+            let day = resp.assignmentVO.assignmentCreatDe.substring(6,8);
+            
+            console.log("resp.assignmentCreatDe",resp.assignmentVO.assignmentCreatDe);
+            console.log("month",month);
+            console.log("day",day);
+            let text="";
+            text+=`
+                    <div class="P47N4e MwOlIe bFjUmb-Wvd9Cc Fh209b pOf0gc">
+                        <svg width="24" height="24" viewBox="0 0 24 24" focusable="false" class=" NMm5M">
+                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H6V4h2v8l2.5-1.5L13 12V4h5v16z"></path>
+                        </svg>
+                    </div>
+                    <div class="EE538">
+                        <div jscontroller="QlRoyd" jsmodel="I8BbUd;UvJ3Mb;uJydvc;xeYtDf;" jsaction="rcuQ6b:rcuQ6b;uwjiC:rcuQ6b;wuANJc:rcuQ6b;wJx4ze:rcuQ6b;">
+                            <div class="nl5VRd ypv4re">
+                                <div class="N5dSp">
+                                <h1 class="fOvfyc B7SYid VnOHwf-Tvm9db"><span id="style-o8Kob" class="style-o8Kob">${resp.assignmentVO.assignmentSj}</span></h1>
+                                <button class="btn btn-primary" onclick="submitModal(this)" data-assignment-code="${resp.assignmentVO.assignmentCode}">제출하기</button>
+                                <button class="btn btn-primary" onclick="outAssignmentDetailModal()">닫기</button>
+                                </div>
+                                <div class="rec5Nb cSyPgb QRiHXd">
+                                    <div class="YVvGBb">${resp.assignmentVO.teacher.teacherName}</div>
+                                    <div class="DwLQSc" aria-hidden="true">•</div>
+                                    <div class="YVvGBb">${month}월 ${day}일</div>
+                                </div>
+                                <div class="W4hhKd">
+                                    <div class="CzuI5c asQXV QRiHXd"></div>
+                                    <div class="asQXV hnID5d"></div>
+                                </div>
+                            </div>
+                        <div class="nGi02b tLDEHd j70YMc"><span>${resp.assignmentVO.assignmentCn}</span></div>
+                    </div>`
+                resp.assignmentVO.atchList.forEach(file=>{
+                    console.log("file",file);
+                    let fileType = file.fileTy.toUpperCase();
+                    let fileTypes = fileType.split("/");
+                    text+=`
+                    <div jscontroller="yP6Lwf" jsaction="rcuQ6b:rcuQ6b;URgETb:rcuQ6b;uwjiC:rcuQ6b;ZQcBrc:rcuQ6b;wuANJc:.CLIENT;nK3Vsc:.CLIENT" class="sVNOQ" jsmodel="PTCFbe hGbFme BrMJ0e" data-is-edit-mode="false" data-filter="0" data-material-parent-id="PTCFbe" data-include-stream-item-materials="true">
+                        <div class="AgzMgb hjqfGd" jsname="UYewLd" style="">
+                            <div class="MlZb9c xLFtvb" jscontroller="ze9NU" jsaction="rcuQ6b:rcuQ6b;uwjiC:rcuQ6b;KtPeHe:rcuQ6b;IKzbTb:rcuQ6b;wuANJc:.CLIENT" jsname="C2Qrw" data-parent-id="PTCFbe" data-mode="7" data-exclude-cover-photo="false" data-copies-only="false" data-link-destination="1" data-show-originality-analyses="false" data-show-cover-photo-settings="false" data-forms-only="false" data-read-only="false">
+                                <div class="t2wIBc" jsaction="click:LWntbc(HrdP0);error:dyBsCf(q4uQmd);JIbuQc:Rsbfue(Rsbfue);h4C2te:MvKmtd" data-attachment-id="648027161290">
+                                    <div class="r0VQac QRiHXd Aopndd ">
+                                    <a class="vwNuXe JkIgWb QRiHXd MymH0d maXJsd Fh209b" target="_blank" aria-label="첨부: ${fileTypes[1]}: ${file.fileName}" jsname="HrdP0" href="${cPath}/school/fileView/${file.atchFileNo}/${file.atchFileTurn}" title="${file.fileName}" data-focus-id="hSRGPd-648027161290">
+                                            <div class="bxp7vf bHOAdb Niache">
+                                            <img class="fileImg" alt="" src="${cPath}/resources/images/fileImg.jpg">
+                                            </div>
+                                            <div class="MM30Lb">
+                                                <div class="A6dC2c QDKOcc OGhwGf VBEdtc-Wvd9Cc zZN2Lb-Wvd9Cc Fh209b">${file.fileName}</div>
+                                                <div class="cSyPgb WInaFd QRiHXd">
+                                                    <div class="QRiHXd">
+                                                        <div class="kRYv9b YVvGBb">${fileTypes[1]}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="ZgfM9 QRiHXd"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="MlZb9c xLFtvb" jscontroller="Z2vwzc" jsaction="rcuQ6b:rcuQ6b;uwjiC:rcuQ6b;wuANJc:rcuQ6b;voP7ud:rcuQ6b;nK3Vsc:hVCa3c;n7J2fb:GDCStd;IKzbTb:rcuQ6b;YCR7Tc:STeVHc;" jsname="C2Qrw" data-mode="7" data-material-parent-id="PTCFbe"></div>
+                        </div>
+                        <div class="style-PbD9X" jsname="QkPyvd" id="style-PbD9X"></div>
+                    </div>`
+            })
+            text += `
+                </div>
+            </div>
+            `
+            assignmentDetailModal.innerHTML= text;
+            assignmentDetailModal.style.display="block";
+        }
+    })
+}
+// 과제 제출 하기
+submitBtn.addEventListener("click",function(){
+    let formData = new FormData(submitForm);
+    formData.append("userId",userId);
+    let url = `${cPath}/school/assignmentPresentnHist`;
+    $.ajax({
+        url:url,
+        data : formData,
+        method:"post",
+        dataType:"json",
+        contentType:false,
+        processData: false,
+        success:function(resp){
+            console.log("resp",resp);
+            if(resp.result=="ok"){
+                alert("과제제출성공!");
+                location.href=`${cPath}/school/assignment/${classCode}`
+            }else{
+                alert("과제제출 실패!!");
+            }
+        }
+    })
+})
+
+// 과제 제출하기 버튼 눌렀을때 모달띄우기
+function submitModal(sumbitBtn){
+    let assignmentCode = sumbitBtn.dataset.assignmentCode;
+    submitForm.assCode.value=assignmentCode;
+    submitAssignmentModal.style.display="block";
+}
+
+// 과제 제출하기 모달에서 취소눌렀을때
+function cancleSubmit(){
+	submitForm.reset();
+	submitAssignmentModal.style.display="none";
+}
+// 과제 디테일 모달 닫기 버튼눌렀을때
+function outAssignmentDetailModal(){
+    submitForm.reset();
+    submitAssignmentModal.style.display="none";
+    assignmentDetailModal.style.display="none";
+}
+// 과제 작성 모달창버튼
+function insertAssignmentBtn(){
+    assignmentInsertModal.style.display="block";
+}
+// 과제 작성모달 나가기버튼
+outModalBtn.addEventListener("click",function(){
+    assignmentInsertForm.reset();
+    assignmentInsertModal.style.display="none";
+})
+

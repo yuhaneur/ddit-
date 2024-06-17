@@ -1,0 +1,22 @@
+package kr.or.ddit.Users.dao;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import kr.or.ddit.spring.AbstractRootContextTest;
+import kr.or.ddit.vo.UsersVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+class UsersDAOTest extends AbstractRootContextTest {
+
+	@Autowired
+	UsersDAO dao;
+	
+	@Test
+	void testSelectMemberForAuth() {
+		UsersVO user = dao.selectMemberForAuth("ADMIN");
+		log.info("list : {}", user);
+	}
+
+}

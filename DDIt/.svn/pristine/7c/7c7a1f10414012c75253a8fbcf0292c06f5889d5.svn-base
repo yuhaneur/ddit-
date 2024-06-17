@@ -1,0 +1,196 @@
+let feedInsertBtn = document.querySelector(".feedInsertBtn");
+let feedDeleteBtn = document.querySelector("#feedDeleteBtn");
+
+// 메인화면 프로필 정보 바로 출력 ( 학생과 교사 구분을 어떻게 ? )
+$(document).ready(function(){
+	let url = `${cPath}/sns/profile${userId}`;
+	
+	$.ajax({
+        url : url
+        ,method : "GET"
+        ,dataType : "JSON"
+        ,success:function(res){
+            console.log(res.usersVO.userId);
+        }
+    })
+});
+
+
+// 피드 등록 알림
+feedInsertBtn.addEventListener('click', function() {
+	alert("등록완료");
+});
+// 피드 삭제 알림
+feedDeleteBtn.addEventListener('click', function() {
+    alert("삭제되었습니다.");
+});
+
+
+
+// 수정 이벤트 취소에 쓰일 전역변수.
+var feedUpdateForm;
+var feedRevertForm;
+var child = '';
+var lengths = '';
+var form = '';
+/* 로그인한 유저 아이디값 */
+
+// 피드 수정
+function feedUpdate(aTag) {
+    feedUpdateForm = aTag.closest(".feedForm");
+    feedRevertForm = aTag.closest(".feedForm");
+
+    child = feedRevertForm.children;
+	lengths = feedRevertForm.children.length;
+	
+    form = '';
+    
+	for(let i=0; i<lengths; i++) {
+		form += child[i].outerHTML;
+	}
+
+    // 수정 할 피드의 내용들.
+    let feedNo = aTag.dataset.num;
+    let feedCn = aTag.dataset.cn;
+    let feedUserId = aTag.dataset.userid;
+    let feedSnsde = aTag.dataset.snsde;
+    let feedTag = aTag.dataset.tag;
+    
+    console.log("feedCn : ", feedCn);
+    if(userId == feedUserId) {
+        feedUpdateForm.innerHTML = 
+        `
+         <form class="feedUpdateForm" name="feedUpdateForm" method="put" enctype="multipart/form-data">
+            <div class="card-header bg-body-tertiary">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <div class="d-flex">
+                            <div class="avatar avatar-2xl status-online">
+                                <img class="rounded-circle" src="/resources/public/assets/img/team/4.jpg" alt="">
+                            </div>
+                            <div class="flex-1 align-self-center ms-2">
+                                <input class="userId" type="hidden" value="${feedUserId}">
+                                <p class=" mb-1 lh-1"><a class="fw-semi-bold" href="/resources/public/pages/user/profile.html" >${feedUserId}</a></p>
+                                <input class="snsFeedCreatDe" type="hidden" value="${feedSnsde}">
+                                <p class="mb-0 fs-10" >${feedSnsde} • 학생? • <svg class="svg-size" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="globe-americas" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" data-fa-i2svg=""><path fill="currentColor" d="M248 8C111.03 8 0 119.03 0 256s111.03 248 248 248 248-111.03 248-248S384.97 8 248 8zm82.29 357.6c-3.9 3.88-7.99 7.95-11.31 11.28-2.99 3-5.1 6.7-6.17 10.71-1.51 5.66-2.73 11.38-4.77 16.87l-17.39 46.85c-13.76 3-28 4.69-42.65 4.69v-27.38c1.69-12.62-7.64-36.26-22.63-51.25-6-6-9.37-14.14-9.37-22.63v-32.01c0-11.64-6.27-22.34-16.46-27.97-14.37-7.95-34.81-19.06-48.81-26.11-11.48-5.78-22.1-13.14-31.65-21.75l-.8-.72a114.792 114.792 0 0 1-18.06-20.74c-9.38-13.77-24.66-36.42-34.59-51.14 20.47-45.5 57.36-82.04 103.2-101.89l24.01 12.01C203.48 89.74 216 82.01 216 70.11v-11.3c7.99-1.29 16.12-2.11 24.39-2.42l28.3 28.3c6.25 6.25 6.25 16.38 0 22.63L264 112l-10.34 10.34c-3.12 3.12-3.12 8.19 0 11.31l4.69 4.69c3.12 3.12 3.12 8.19 0 11.31l-8 8a8.008 8.008 0 0 1-5.66 2.34h-8.99c-2.08 0-4.08.81-5.58 2.27l-9.92 9.65a8.008 8.008 0 0 0-1.58 9.31l15.59 31.19c2.66 5.32-1.21 11.58-7.15 11.58h-5.64c-1.93 0-3.79-.7-5.24-1.96l-9.28-8.06a16.017 16.017 0 0 0-15.55-3.1l-31.17 10.39a11.95 11.95 0 0 0-8.17 11.34c0 4.53 2.56 8.66 6.61 10.69l11.08 5.54c9.41 4.71 19.79 7.16 30.31 7.16s22.59 27.29 32 32h66.75c8.49 0 16.62 3.37 22.63 9.37l13.69 13.69a30.503 30.503 0 0 1 8.93 21.57 46.536 46.536 0 0 1-13.72 32.98zM417 274.25c-5.79-1.45-10.84-5-14.15-9.97l-17.98-26.97a23.97 23.97 0 0 1 0-26.62l19.59-29.38c2.32-3.47 5.5-6.29 9.24-8.15l12.98-6.49C440.2 193.59 448 223.87 448 256c0 8.67-.74 17.16-1.82 25.54L417 274.25z"></path></svg><!-- <span class="fas fa-globe-americas"></span> Font Awesome fontawesome.com --></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <input class="snsFeedNo" type="hidden" value="${feedNo}">
+                <textarea name="snsFeedCn" class="snsFeedCn shadow-none form-control rounded-0 resize-none px-x1 border-y-0 border-200" placeholder="내용을 입력해주세요." rows="4">${feedCn}</textarea>
+                <!-- 해시태그 -->
+                <div class="d-flex align-items-center ps-x1 border border-200">
+                    <label class="text-nowrap mb-0 me-2" for="hash-tags">
+                        <svg class="svg-size" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg><!-- <span class="fas fa-plus me-1 fs-11"></span> Font Awesome fontawesome.com --><span class="fw-medium fs-10">해시태그</span>
+                    </label>
+                    <input name="snsTagCn" class="snsTagCn form-control border-0 fs-10 shadow-none" id="hash-tags" type="text" placeholder="#해시태그" value="${feedTag}" />
+                </div>
+                <!-- 해시태그 끝 -->
+                <div class="row g-0 justify-content-between mt-3 px-x1 pb-3">
+                    <div class="col">
+                        <button class="btn btn-tertiary btn-sm rounded-pill shadow-none d-inline-flex align-items-center fs-10 mb-0 me-1" type="button">Image</button>
+                    </div>
+                <!-- 공개여부 -->
+                    <div class="col-auto">
+                        <div class="dropdown d-inline-block me-1">
+                            <select name="snsFeedAt" class="btn btn-sm dropdown-toggle px-1" id="dropdownMenuButton" type="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <option value="A">전체 공개</option>
+                                <option value="B">비공개</option>
+                            </select>
+                            <button type="button" onclick="update(this)" class="btn btn-primary btn-sm px-4 px-sm-5">수 정</button>
+                            <button onclick="feedUpdateRevert(this)" class="btn btn-danger btn-sm px-4 px-sm-5">취 소</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        `
+    }else {
+        alert("니 피드 아님;");
+    }
+
+}
+
+// 피드 수정 이벤트
+function update(update) {
+	let upForm = update.closest(".feedUpdateForm");
+    // 수정 내용
+    let feedNo = document.querySelector(".snsFeedNo").value;
+	let feedUserId = document.querySelector(".userId").value;
+	let feedCn = document.querySelector(".snsFeedCn").value;
+	let feedTag = document.querySelector(".snsTagCn").value;
+    let feedSnsDe = document.querySelector(".snsFeedCreatDe").value;
+	
+	console.log("feedNo : ", feedNo);
+	console.log("feedUserId : ", feedUserId);
+	console.log("feedCn : ", feedCn);
+	console.log("feedTag : ", feedTag);
+	console.log("feedSnsDe : ", feedSnsDe);
+	
+    let url = `${cPath}/sns/feedUpdate.do`;
+    let method = "PUT"
+    let data = {
+        snsFeedNo : feedNo,
+        userId : feedUserId,
+        snsFeedCn : feedCn,
+        snsTagCn : feedTag,
+        snsFeedCreatDe : feedSnsDe
+    }
+	$.ajax({
+        url : url,
+        method : method,
+        data : JSON.stringify(data),
+        dataType : "JSON",
+        contentType:"application/json",
+        success:function(resp){
+            if(resp.result=="ok"){
+                alert("수정 성공");
+                window.location.href = `${cPath}/sns/feedList.do`;
+            }else{
+                alert("수정 실패");
+            }
+        }
+    })
+}
+
+// 피드 수정 이벤트 취소
+function feedUpdateRevert(revert) {
+    let feedUpdateRevert = revert.closest(".feedForm");
+    let child = feedUpdateRevert.children;
+
+    console.log(child);
+    feedUpdateRevert.innerHTML = '';
+	feedUpdateRevert.innerHTML = `${form}`;
+}
+
+
+// 피드 삭제 이벤트
+function feedDelete(no) {
+	let feedNo = no.dataset.num;
+    let feedUserId = no.dataset.user;
+	let url = `${cPath}/sns/feedDelete.do`;
+	let method = "DELETE";
+
+    if(userId == feedUserId) {
+        $.ajax({
+            url : url,
+            method : method,
+            data : JSON.stringify(feedNo),
+            dataType : "JSON",
+            contentType:"application/json",
+            success:function(resp){
+                if(resp.result=="ok"){
+                    alert("삭제 성공");
+                    window.location.href = `${cPath}/sns/feedList.do`;
+                }else{
+                    alert("삭제 실패");
+                }
+    
+            }
+        })
+    }else{
+        alert("니 피드 아님;");
+    }
+
+}

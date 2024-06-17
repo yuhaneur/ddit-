@@ -1,0 +1,59 @@
+package kr.or.ddit.vo;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "projectPostNo")
+public class ProjectPostVO {
+
+	/* @NotNull */
+	@Min(0)
+	private Long projectPostNo;
+	@NotBlank
+	@Size(max = 600)
+	private String projectPostSj;
+	@Size(max = 4000)
+	private String projectPostCn;
+
+	@Size(max = 7)
+	private String projectPostWritingDe;
+	private Long projectPostRdcnt;
+	@Size(max = 1)
+	private String projectPostDeleteAt;
+	private Long atchFileNo;
+	private Long projectCount;
+	private Long projectNo;
+	private List<GrAtchFileVO> atchList;
+	private MultipartFile[] projectFiles;
+	
+	/**
+	 * 업로드된 첨부파일을 adapter 인 GrAtchFileVO 로 wrapping
+	 */
+	public void setProjectFiles(MultipartFile[] projectFiles) {
+		if(projectFiles ==null || projectFiles.length ==0) {
+			this.atchList = Collections.emptyList();
+			return;
+		}
+		List<GrAtchFileVO> atchList = new ArrayList<>();
+		for(MultipartFile projectFile : projectFiles) {
+			if(!projectFile.isEmpty()) {
+				atchList.add(new GrAtchFileVO(projectFile));
+			}
+		}
+		this.atchList = atchList;
+		
+	}
+	
+}

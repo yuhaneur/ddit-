@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.school.dao.AssignmentDAO">
+	<resultMap type="AssignmentVO" id="assignMap" autoMapping="true">
+		<id property="assignmentCode" column="ASSIGNMENT_CODE"/>
+		<association property="teacher" javaType="TeacherVO" autoMapping="true"></association>
+		<collection property="atchList" ofType="GrAtchFileVO" autoMapping="true"></collection>
+	</resultMap>
+	
+	<resultMap type="AssignmentPresentnHistVO" id="aphMap" autoMapping="true">
+		<association property="student" javaType="StudentVO" autoMapping="true"></association>
+		<collection property="atchList" ofType="GrAtchFileVO" autoMapping="true"></collection>
+	</resultMap>
+	<!-- 과제한건조회 -->
+	<select id="selectAssignment" resultMap="assignMap">
+	SELECT 
+	    A.ASSIGNMENT_CODE, A.ASSIGNMENT_SJ, A.ASSIGNMENT_CN, 
+	    A.ASSIGNMENT_PRESENTN_NMPR, A.ATCH_FILE_NO,
+	    A.ASSIGNMENT_CREAT_DE, A.ASSIGNMENT_END_DE, 
+	    A.USER_ID, A.CLASS_CODE , B.TEACHER_NAME,
+	    C.ATCH_FILE_TURN, C.FILE_NAME, C.STRE_FILE_NAME, C.FILE_TY, FILE_MG
+	FROM ASSIGNMENT A INNER JOIN TEACHER B ON(A.USER_ID=B.USER_ID)
+	LEFT JOIN GR_ATCH_FILE C ON (A.ATCH_FILE_NO=C.ATCH_FILE_NO)
+	WHERE A.ASSIGNMENT_CODE=#{assignmentCode}
+	</select>
+	<!-- 과제출력 -->
+	<select id="selectAssignmentList" resultMap="assignMap">
+		SELECT 
+		    A.ASSIGNMENT_CODE, A.ASSIGNMENT_SJ, A.ASSIGNMENT_CN, 
+		    A.ASSIGNMENT_PRESENTN_NMPR, A.ATCH_FILE_NO,
+		    A.ASSIGNMENT_CREAT_DE, A.ASSIGNMENT_END_DE, 
+		    A.USER_ID, A.CLASS_CODE , B.TEACHER_NAME
+		FROM ASSIGNMENT A INNER JOIN TEACHER B ON(A.USER_ID=B.USER_ID)
+		ORDER BY A.ASSIGNMENT_CREAT_DE DESC
+	</select>
+
+	<!-- 과제등록 -->
+	<insert id="insertAssignment" parameterType="AssignmentVO">
+		<selectKey order="BEFORE" keyProperty="assignmentCode" resultType="String">
+			SELECT 'ASM'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ASSIGNMENT_CODE,4))),0)+1,7,'0')
+			FROM ASSIGNMENT
+		</selectKey>	
+		INSERT INTO ASSIGNMENT (
+		    ASSIGNMENT_CODE, 
+		    ASSIGNMENT_SJ, 
+		    ASSIGNMENT_CN, 
+		    ASSIGNMENT_PRESENTN_NMPR,
+		    ATCH_FILE_NO, 
+		    ASSIGNMENT_CREAT_DE, 
+		    ASSIGNMENT_END_DE, 
+		    USER_ID,
+		    CLASS_CODE
+		) VALUES (
+		    #{assignmentCode},
+		    #{assignmentSj},
+		    #{assignmentCn},
+		    #{assignmentPresentnNmpr},
+		    <if test="atchFileNo eq null">
+				#{atchFileNo},
+			</if>
+			<if test="atchFileNo neq null">
+				(SELECT NVL(MAX(ATCH_FILE_NO),0)FROM GR_ATCH_FILE),
+			</if>
+		    SYSDATE,
+		    #{assignmentEndDe},
+		    #{userId},
+		    #{classCode}
+		)
+	</insert>
+	<!-- 과제 제출 -->
+	<insert id="insertAssignmentPresentnHist" parameterType="AssignmentPresentnHistVO">
+		<selectKey order="BEFORE" keyProperty="assignmentPresentnCode" resultType="String">
+			SELECT 'APC'||LPAD(NVL(MAX(TO_NUMBER(SUBSTR(ASSIGNMENT_PRESENTN_CODE,4))),0)+1,7,'0')
+			FROM ASSIGNMENT_PRESENTN_HIST
+		</selectKey>
+		INSERT INTO ASSIGNMENT_PRESENTN_HIST (
+		    ASSIGNMENT_PRESENTN_CODE, 
+		    USER_ID, 
+		    ASSIGNMENT_PRESENTN_SJ, 
+		    ASSIGNMENT_PRESENTN_DT,
+		    ASSIGNMENT_PRESENTN_CN,
+		    ATCH_FILE_NO,
+		    ASSIGNMENT_CODE
+		)VALUES(
+			#{assignmentPresentnCode},
+			#{userId},
+			#{assignmentPresentnSj},
+			SYSDATE,
+			#{assignmentPresentnCn},
+			<if test="atchFileNo eq null">
+				#{atchFileNo},
+			</if>
+			<if test="atchFileNo neq null">
+				(SELECT NVL(MAX(ATCH_FILE_NO),0)FROM GR_ATCH_FILE),
+			</if>
+			#{assignmentCode}
+		)
+	</insert>
+	
+	<!-- 과제제출 파일저장 -->
+	<insert id="insertAttatchList2">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(ATCH_FILE_NO), 0)+1 FROM GR_ATCH_FILE
+		</selectKey>
+		INSERT ALL
+		<foreach collection="assignmentPresentnHistVO.atchList" item="atch" index="idx">
+			INTO GR_ATCH_FILE (
+				ATCH_FILE_NO, 
+				ATCH_FILE_TURN, 
+				JOB_SE, 
+				FILE_COURS, 
+				FILE_NAME, 
+				STRE_FILE_NAME, 
+				FILE_TY, 
+				FILE_MG
+			)VALUES(
+				#{atchFileNo},
+				(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM GR_ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo}),
+				#{atch.jobSe},
+				#{atch.fileCours},
+				#{atch.fileName},
+				#{atch.streFileName},
+				#{atch.fileTy},
+				#{atch.fileMg}
+			 )
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	<!-- 과제파일저장 -->
+	<insert id="insertAttatchList">
+		<selectKey order="BEFORE" resultType="int" keyProperty="atchFileNo">
+			SELECT NVL(MAX(ATCH_FILE_NO), 0)+1 FROM GR_ATCH_FILE
+		</selectKey>
+		INSERT ALL
+		<foreach collection="assignmentVO.atchList" item="atch" index="idx">
+			INTO GR_ATCH_FILE (
+				ATCH_FILE_NO, 
+				ATCH_FILE_TURN, 
+				JOB_SE, 
+				FILE_COURS, 
+				FILE_NAME, 
+				STRE_FILE_NAME, 
+				FILE_TY, 
+				FILE_MG
+			)VALUES(
+				#{atchFileNo},
+				(SELECT NVL(MAX(ATCH_FILE_TURN), 1)+#{idx} FROM GR_ATCH_FILE
+        			WHERE ATCH_FILE_NO = #{atchFileNo}),
+				#{atch.jobSe},
+				#{atch.fileCours},
+				#{atch.fileName},
+				#{atch.streFileName},
+				#{atch.fileTy},
+				#{atch.fileMg}
+			 )
+		</foreach>
+		SELECT * FROM DUAL
+	</insert>
+	<!-- 과제한건에 대한 과제제출자 리스트 -->
+	<select id="selectAssignmentPresentnHistList" resultMap="aphMap">
+		SELECT 
+		    A.ASSIGNMENT_PRESENTN_CODE, A.USER_ID, 
+		    A.ASSIGNMENT_PRESENTN_DT, A.ASSIGNMENT_PRESENTN_CN, A.ATCH_FILE_NO, A.ASSIGNMENT_CODE,
+		    B.STUDENT_NAME,
+		    C.ATCH_FILE_NO, C.ATCH_FILE_TURN, C.FILE_NAME, C.STRE_FILE_NAME, C.FILE_TY, C.FILE_MG
+		FROM ASSIGNMENT_PRESENTN_HIST A INNER JOIN STUDENT B ON (A.USER_ID=B.USER_ID)
+		LEFT JOIN GR_ATCH_FILE C ON(A.ATCH_FILE_NO=C.ATCH_FILE_NO)
+		WHERE A.ASSIGNMENT_CODE=#{assignmentCode}
+	</select>
+</mapper>

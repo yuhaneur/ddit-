@@ -1,0 +1,127 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<!DOCTYPE html>
+<html data-bs-theme="light" lang="en-US" dir="ltr">
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!--===============================================-->
+<!--Document Title-->
+<!--===============================================-->
+<title>Falcon | Dashboard &amp; Web App Template</title>
+
+
+<tiles:insertAttribute name="preScript" />
+
+</head>
+
+<body data-context-path="${pageContext.request.contextPath }">
+
+	<main class="main" id="top">
+		<div class="container-fluid" data-layout="container">
+		
+			<tiles:insertAttribute name="leftMenu" />
+			
+			<div class="content" style="padding-bottom : 20px;">
+
+				<tiles:insertAttribute name="header" />
+				<tiles:insertAttribute name="content" />
+				<tiles:insertAttribute name="footer" />
+
+			</div>
+			<div class="modal fade" id="authentication-modal" tabindex="-1"
+				role="dialog" aria-labelledby="authentication-modal-label"
+				aria-hidden="true">
+				<div class="modal-dialog mt-6" role="document">
+					<div class="modal-content border-0">
+						<div
+							class="modal-header px-5 position-relative modal-shape-header bg-shape">
+							<div class="position-relative z-1">
+								<h4 class="mb-0 text-white" id="authentication-modal-label">Register</h4>
+								<p class="fs-10 mb-0 text-white">Please create your free
+									Falcon account</p>
+							</div>
+							<button class="btn-close position-absolute top-0 end-0 mt-2 me-2"
+								data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body py-4 px-5">
+							<form>
+								<div class="mb-3">
+									<label class="form-label" for="modal-auth-name">Name</label> <input
+										class="form-control" type="text" autocomplete="on"
+										id="modal-auth-name" />
+								</div>
+								<div class="mb-3">
+									<label class="form-label" for="modal-auth-email">Email
+										address</label> <input class="form-control" type="email"
+										autocomplete="on" id="modal-auth-email" />
+								</div>
+								<div class="row gx-2">
+									<div class="mb-3 col-sm-6">
+										<label class="form-label" for="modal-auth-password">Password</label>
+										<input class="form-control" type="password" autocomplete="on"
+											id="modal-auth-password" />
+									</div>
+									<div class="mb-3 col-sm-6">
+										<label class="form-label" for="modal-auth-confirm-password">Confirm
+											Password</label> <input class="form-control" type="password"
+											autocomplete="on" id="modal-auth-confirm-password" />
+									</div>
+								</div>
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox"
+										id="modal-auth-register-checkbox" /> <label
+										class="form-label" for="modal-auth-register-checkbox">I
+										accept the <a href="#!">terms </a>and <a
+										class="white-space-nowrap" href="#!">privacy policy</a>
+									</label>
+								</div>
+								<div class="mb-3">
+									<button class="btn btn-primary d-block w-100 mt-3"
+										type="submit" name="submit">Register</button>
+								</div>
+							</form>
+							<div class="position-relative mt-5">
+								<hr />
+								<div class="divider-content-center">or register with</div>
+							</div>
+							<div class="row g-2 mt-2">
+								<div class="col-sm-6">
+									<a class="btn btn-outline-google-plus btn-sm d-block w-100"
+										href="#"><span class="fab fa-google-plus-g me-2"
+										data-fa-transform="grow-8"></span> google</a>
+								</div>
+								<div class="col-sm-6">
+									<a class="btn btn-outline-facebook btn-sm d-block w-100"
+										href="#"><span class="fab fa-facebook-square me-2"
+										data-fa-transform="grow-8"></span> facebook</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+
+	<tiles:insertAttribute name="postScript" />
+</body>
+
+</html>
+ <c:if test="${not empty forbidden }">
+	<script>
+	Swal.fire({
+		  icon: "error",
+		  title: "No Authority",
+		  text: "${forbidden}",
+		});
+	</script>
+	<c:remove var="forbidden" scope="session"/>
+</c:if>

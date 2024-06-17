@@ -1,0 +1,51 @@
+package kr.or.ddit.sj.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.edcCrse.service.EdcCrseService;
+import kr.or.ddit.sj.service.SjService;
+import kr.or.ddit.vo.EdcCrseVO;
+import kr.or.ddit.vo.SjVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/subject")
+public class SjController {
+	
+	@Autowired
+	private SjService sjService;
+	@Autowired
+	private EdcCrseService edcCrseService;
+	
+	@GetMapping
+	public String subjectList(Model model) {
+		List<SjVO> sjList = sjService.selectSjList();
+		log.info("sjList : {}",sjList);
+		model.addAttribute("sjList", sjList);
+		return "subject/subjectList";
+	}
+	@GetMapping("insert")
+	public String subjectInsertForm(Model model) {
+		List<EdcCrseVO> edcList =  edcCrseService.retrieveEdcCrseList();
+		model.addAttribute("edcList", edcList);
+		return "subject/subjectInsert";
+	}
+	
+	@PostMapping("insert")
+	public String subjectInsert(@ModelAttribute SjVO sjvo) {
+		int cnt = sjService.createSj(sjvo);
+		if(cnt>0) {
+			return "redirect:/subject";
+		}
+		return "redirect:subject/insert";
+	}
+}

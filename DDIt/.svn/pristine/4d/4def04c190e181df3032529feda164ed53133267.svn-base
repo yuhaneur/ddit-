@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.point.dao.PointClDAO">
+<insert id="insertPointCl" parameterType="PointClVO">
+	INSERT INTO POINT_CL (
+	    POINT_CL_CODE,
+	    POINT_CL_NM,
+	    POINT,
+	    POINT_CL_AT
+	) VALUES (
+	    #{pointClCode},
+	    #{pointClNm},
+	    #{point},
+	    'N'
+	)
+</insert>
+
+<select id="selectPointClList" resultType="PointClVO">
+	SELECT
+	    POINT_CL_CODE,
+	    POINT_CL_NM,
+	    POINT
+	FROM
+	    POINT_CL
+	WHERE POINT_CL_AT = 'N'
+</select>
+
+<select id="selectPointCl" resultType="PointClVO">
+	SELECT
+	    POINT_CL_CODE,
+	    POINT_CL_NM,
+	    POINT
+	FROM
+	    POINT_CL
+	WHERE POINT_CL_CODE = #{pointClCode}
+</select>
+
+<update id="updatePointCl" parameterType="PointClVO">
+	UPDATE POINT_CL
+	SET 
+	    POINT_CL_NM = #{pointClNm},
+	    POINT = #{point}  
+	WHERE POINT_CL_CODE = #{pointClCode}
+</update>
+
+<delete id="deletePointCl">
+	UPDATE POINT_CL
+	SET 
+	    POINT_CL_AT = 'Y'
+	WHERE
+	    POINT_CL_CODE = #{pointClCode}
+</delete>
+</mapper>
+

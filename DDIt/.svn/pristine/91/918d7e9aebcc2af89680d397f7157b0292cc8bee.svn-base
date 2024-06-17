@@ -1,0 +1,28 @@
+package kr.or.ddit.edcCrse.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import kr.or.ddit.edcCrse.service.EdcCrseService;
+import kr.or.ddit.vo.EdcCrseVO;
+
+@Controller
+@RequestMapping("/edcCrse")
+public class EdcCrseController {
+	
+	@Autowired
+	private EdcCrseService service;
+	
+	@GetMapping
+	public String edcCrseList(Model model) {
+		List<EdcCrseVO> edcCrseList =  service.retrieveEdcCrseList();
+		model.addAttribute("edcCrseList", edcCrseList);
+		return "educate/educateList";
+	}
+}

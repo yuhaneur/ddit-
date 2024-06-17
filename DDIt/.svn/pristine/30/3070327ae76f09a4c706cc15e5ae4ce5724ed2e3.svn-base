@@ -1,0 +1,52 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<link href="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.css" rel="stylesheet" />
+
+
+<!-- 설문등록 시작	-->
+<div class="card-body">
+	<div class="row gx-2">
+		<div class="col-12 mb-4">
+			<h4>설문제목</h4>
+			<input class="form-control" id="discount-percentage" type="text">
+		</div>
+		<div class="col-12 mb-4">
+			<h4>마감일</h4>
+			<input class="form-control datetimepicker" id="datepicker"
+				type="text" placeholder="dd/mm/yy"
+				data-options='{"disableMobile":true}' />
+		</div>
+		<div class="col-12 mb-2">
+			<button class="btn btn-primary btn-sm" type="button">
+				<svg class="svg-inline--fa fa-plus fa-w-14 me-2" aria-hidden="true"	focusable="false" data-prefix="fas" data-icon="plus" role="img"
+					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+					data-fa-i2svg="">
+					<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
+				설문내용추가
+			</button>
+		</div>
+		<div class="col-8 mb-3">
+			<h5>설문내용</h5>
+			<input class="form-control" id="base-price" type="text">
+		</div>
+		<div class="col-4">
+			<h5>답변유형</h5>
+			<select class="form-select" id="price-currency" name="price-currency">
+				<option value="usd">5지선답</option>
+				<option value="eur">예/아니요</option>
+				<option value="gbp">점수</option>
+			</select>
+		</div>
+	</div>
+</div>
+<!-- 설문등록 끝	-->
+
+
+
+<!-- feather 아이콘 -->
+<script
+	src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<!-- 시간 나오는거 -->
+<script
+	src="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.js"></script>

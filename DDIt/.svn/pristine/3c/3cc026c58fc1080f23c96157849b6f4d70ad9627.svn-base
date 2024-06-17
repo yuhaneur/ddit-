@@ -1,0 +1,9 @@
+package kr.or.ddit.authority.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface AuthorityDAO {
+
+	
+}

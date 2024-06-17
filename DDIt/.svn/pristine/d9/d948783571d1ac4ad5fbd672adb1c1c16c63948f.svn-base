@@ -1,0 +1,21 @@
+package kr.or.ddit.project.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.paging.PaginationInfo;
+import kr.or.ddit.vo.ProjectVO;
+
+@Mapper
+public interface ProjectDao {
+	
+	/**
+	 * 프로젝트 조회
+	 */
+	public List<ProjectVO> selectProjectList(PaginationInfo paging);
+	public int selectTotalRecord(PaginationInfo paging);
+	public int insertProject(ProjectVO projectVO);
+	
+
+}

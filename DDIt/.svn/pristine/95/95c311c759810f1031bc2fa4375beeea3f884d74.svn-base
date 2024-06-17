@@ -1,0 +1,32 @@
+package kr.or.ddit.sj.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.sj.dao.SjDao;
+import kr.or.ddit.vo.SjVO;
+
+@Service
+public class SjServiceImpl implements SjService{
+	
+	@Autowired
+	private SjDao dao; 
+	@Override
+	public List<SjVO> selectSjList() {
+		return dao.selectSjList();
+	}
+
+	@Override
+	public SjVO selectSj(SjVO sjvo) {
+		
+		return null;
+	}
+
+	@Override
+	public int createSj(SjVO sjvo) {
+		return dao.insertSj(sjvo);
+	}
+
+}

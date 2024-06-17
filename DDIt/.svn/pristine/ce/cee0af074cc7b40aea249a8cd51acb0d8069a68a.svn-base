@@ -1,0 +1,153 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<link href="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.css" rel="stylesheet" />
+
+
+<!-- 설문등록 시작	-->
+<div class="card-body">
+	<div class="row gx-2">
+		<div class="col-12 mb-4">
+			<h4>설문제목</h4>
+			<input class="form-control" id="discount-percentage" type="text">
+		</div>
+		<div class="col-12 mb-4">
+			<h4>마감일</h4>
+			<input class="form-control datetimepicker" id="datepicker"
+				type="text" placeholder="dd/mm/yy"
+				data-options='{"disableMobile":true}' />
+		</div>
+		<div class="col-12 mb-2">
+			<button class="btn btn-primary btn-sm" type="button" onclick="addSurvey()">
+				<svg class="svg-inline--fa fa-plus fa-w-14 me-2" aria-hidden="true"	focusable="false" data-prefix="fas" data-icon="plus" role="img"
+					xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"
+					data-fa-i2svg="">
+					<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>
+				설문내용추가
+			</button>
+		</div>
+		<!-- 설문내용 추가버튼눌르면 추가로 생길것들 -->
+	<div id="surveyContent" class="row">
+		<div class="row">
+			<div class="col-8 mb-3">
+				<h5>설문내용</h5>
+				<input class="form-control" type="text">
+			</div>
+			<div class="col-2">
+				<h5>답변유형</h5>
+				<select class="form-select" name="price-currency" onchange="surveyAnswer(this)">
+					<option value="usd">5지선답</option>
+					<option value="eur">예/아니요</option>
+					<option value="gbp">점수</option>
+				</select>
+			</div>
+			<!-- 답변유형 선택했을때 그거에 맞게 라디오버튼 나와야됨 -->
+			<div class="col-8 mb-3">
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio1" type="radio" name="inlineRadioOptions" value="option1" />
+				  <label class="form-check-label" for="inlineRadio1">매우그렇다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio2" type="radio" name="inlineRadioOptions" value="option2" />
+				  <label class="form-check-label" for="inlineRadio2">그렇다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio3" type="radio" name="inlineRadioOptions" value="option3" />
+				  <label class="form-check-label" for="inlineRadio3">보통</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio4" type="radio" name="inlineRadioOptions" value="option4" />
+				  <label class="form-check-label" for="inlineRadio4">아니다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio5" type="radio" name="inlineRadioOptions" value="option5" />
+				  <label class="form-check-label" for="inlineRadio5">매우아니다</label>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+		<!-- 설문내용 추가버튼눌르면 추가로 생길것들 끝 -->
+	</div>
+</div>
+<!-- 설문등록 끝	-->
+<script>
+	// 설문내용작성 폼
+	let surveyContent = document.querySelector("#surveyContent");
+	// 설문내용 추가 함수
+	function addSurvey(){
+		let rowDiv = document.createElement('div');
+		rowDiv.className= "row";
+		let text = `
+			<div class="col-8 mb-3">
+				<h5>설문내용</h5>
+				<input class="form-control" type="text">
+			</div>
+			<div class="col-2">
+				<h5>답변유형</h5>
+				<select class="form-select" name="price-currency" onchange="surveyAnswer(this)">
+					<option value="usd">5지선답</option>
+					<option value="eur">예/아니요</option>
+					<option value="gbp">점수</option>
+				</select>
+			</div>
+			<div class="col-2">
+				<button class="btn btn-danger me-1 mb-1" type="button" style="margin-top:11% !important" onclick="delSurvey(this)">
+				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-minus text-900 fs-6"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+				</button>
+			</div>
+	`
+		rowDiv.innerHTML = text;
+		surveyContent.appendChild(rowDiv);
+	}
+	// 설문 내용 삭제 함수
+	function delSurvey(delBtn){
+		let parentDiv = delBtn.closest('.row');
+		parentDiv.remove();
+	}
+	// 설문지 답변유형에 따른 선택지 보여주기
+	function surveyAnswer(asnwerType){
+		let atValue = asnwerType.value;
+		let rowDiv = document.createElement('div');
+		rowDiv.className= "row";
+		console.log("atValue",atValue);
+		let txt = "";
+		if(atValue =="usd"){
+			txt= `
+			<div class="col-8 mb-3">
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio1" type="radio" name="inlineRadioOptions" value="option1" />
+				  <label class="form-check-label" for="inlineRadio1">매우그렇다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio2" type="radio" name="inlineRadioOptions" value="option2" />
+				  <label class="form-check-label" for="inlineRadio2">그렇다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio3" type="radio" name="inlineRadioOptions" value="option3" />
+				  <label class="form-check-label" for="inlineRadio3">보통</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio4" type="radio" name="inlineRadioOptions" value="option4" />
+				  <label class="form-check-label" for="inlineRadio4">아니다</label>
+				</div>
+				<div class="form-check form-check-inline">
+				  <input class="form-check-input" id="inlineRadio5" type="radio" name="inlineRadioOptions" value="option5" />
+				  <label class="form-check-label" for="inlineRadio5">매우아니다</label>
+				</div>
+			</div>
+			`
+		}
+		rowDiv.innerHTML = txt;
+		surveyContent.appendChild(rowDiv);
+
+	}
+</script>
+
+
+<!-- feather 아이콘 -->
+<script
+	src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<!-- 시간 나오는거 -->
+<script
+	src="${pageContext.request.contextPath}/resources/public/vendors/flatpickr/flatpickr.min.js"></script>
